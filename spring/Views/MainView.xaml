@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="spring.Views.MainView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:oxy="http://oxyplot.org/wpf"
+             xmlns:lcl="clr-namespace:spring"
+             mc:Ignorable="d" d:DesignHeight="500" d:DesignWidth="600">
+    <DockPanel LastChildFill="True">
+        <StackPanel DockPanel.Dock="Bottom" Margin="0,0,0,5">
+            <Button Content="Get it" Command="{Binding GetIT}"/>
+        </StackPanel>
+        <!--<CheckBox DockPanel.Dock="Top" Content="Live Update" VerticalAlignment="Bottom"
+                  Margin="5,0,0,0" IsChecked="{Binding IsLiveUpd}"/>-->
+        <oxy:PlotView DockPanel.Dock="Top" Margin="5" Model="{Binding ResPlotModel}" 
+                      />
+    </DockPanel>
+</UserControl>

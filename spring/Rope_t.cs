@@ -1,50 +1,66 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace spring
+﻿namespace spring
 {
     public class Rope_t
     {
-        private Node_t[] nds;
+        private float dt;
+        private int tLength;
+        public Node_t[] nds;
 
-        private Rope_t()
+        public Rope_t(float _dt, int _tLength, int nCount)
         {
-            nds = new Node_t[4];
-            nds[0] = new Node_t(new float[3] { 0, 0, 0 }, new int[1] { 1 });
-            nds[nds.Length - 1] = new Node_t(new float[3] { nds.Length - 1, 0, 0 }, new int[1] { nds.Length - 2 });
+            dt = _dt;
+            tLength = _tLength;
+            nds = new Node_t[nCount];
+            nds[0] = new Node_t(new float[3] { 0, 0, 0 }, new int[1] { 1 }, tLength);
+            nds[nds.Length - 1] = new Node_t(new float[3] { nds.Length - 1, 0, 0 }, new int[1] { nds.Length - 2 }, tLength);
             for (int i = 1; i < nds.Length - 1; i++)
             {
-                nds[i] = new Node_t(new float[3] { i, 0, 0 }, new int[2] { i - 1, i + 1 });
+                nds[i] = new Node_t(new float[3] { i, 0, 0 }, new int[2] { i - 1, i + 1 }, tLength);
             }
         }
 
-        public void GetState()
+        public void Sim()
         {
-            for (int node = 0; node < nds.Length; node++)
+            for (int i = 1; i < tLength; i++)
+            {
+                GetState(i, i - 1);
+            }
+        }
+
+        private void GetState(int now, int before)
+        {
+            //intgrate collected force for all Dx orders
+            if (now < 2)
+            {
+                nds[0].a[now][0] = 1 / 0.1f;
+            nds[0].v[now][0] = nds[0].v[before][0] + nds[0].a[now][0] * dt;
+            nds[0].x[now][0] = nds[0].x[before][0] + nds[0].v[now][0] * dt;
+            nds[0].coord[now][0] = nds[0].coord[before][0] + nds[0].x[now][0];
+            }
+
+            for (int node = 1; node < nds.Length - 1; node++)
             {
                 //nds[node].AddForce(EXTERNAL LOAD));
                 //getDCM
-                float[] dcm = coords.getDCM(nds[node].dxs[(int)Dx.coord], nds[node].k);
+                float[] dcm = coords.getDCM(nds[node].coord[before], nds[node].k[before]);
                 foreach (int neighbour in nds[node].ngb)
                 {
-                    nds[node].AddForce(getNodeAction(node, neighbour, dcm));
-
+                    //convert Ux(basePoint) and Ux(neighbour) to local coordinate of link
+                    float[] lUxb = coords.toLoc(dcm, nds[node].x[before]);
+                    float[] lUxn = coords.toLoc(dcm, nds[neighbour].x[before]);
+                    //get length of link
+                    float l = coords.getTotL(nds[node].coord[before], nds[neighbour].coord[before]);
+                    //get Fn of link, convert Fn to gloabal coordinates
+                    float[] FnGlobal = coords.toGlob(dcm, Element.GetFn(lUxb, lUxn, l, 0.1f, 1E9f));
+                    //push to node forces
+                    nds[node].AddForce(now, FnGlobal);
                 }
                 //intgrate collected force for all Dx orders
+                nds[node].a[now][0] = nds[node].F[now][0] / 0.1f;
+                nds[node].v[now][0] = nds[node].v[before][0] + nds[node].a[now][0] * dt;
+                nds[node].x[now][0] = nds[node].x[before][0] + nds[node].v[now][0] * dt;
+                nds[node].coord[now][0] = nds[node].coord[before][0] + nds[node].x[now][0];
             }
-        }
-
-        private float[] getNodeAction(int basePoint, int neighbour, float[] dcm)
-        {
-            //convert Ux(basePoint) and Ux(neighbour) to local coordinate of link
-            float[] lUxb = coords.toLoc(dcm, nds[basePoint].dxs[(int)Dx.x]);
-            float[] lUxn = coords.toLoc(dcm, nds[neighbour].dxs[(int)Dx.x]);
-            float l = coords.getTotL(nds[basePoint].dxs[(int)Dx.coord], nds[neighbour].dxs[(int)Dx.coord]);
-            //get Fn of link, convert Fn to gloabal coordinates and return
-            return coords.toGlob(dcm, Element.GetFn(lUxb, lUxn, l, 1, 1E9f));
         }
     }
 }

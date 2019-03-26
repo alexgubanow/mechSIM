@@ -2,27 +2,42 @@
 {
     public class Node_t
     {
-        public float[] k;
-        public float[][] dxs;
+        public float[][] k;
+        public float[][] x;
+        public float[][] v;
+        public float[][] a;
+        public float[][] coord;
+        public float[][] F;
+        public float[][] Fext;
         public int[] ngb;
+        public float massa;
 
-        public Node_t(float[] coords, int[] neighbours)
+        public Node_t(float[] coords, int[] neighbours, int length)
         {
-            k = coords;
-            k[(int)c.y] = k[(int)c.y] + 1;
-            ngb = neighbours;
-            for (int i = 0; i < 5; i++)
+            k = new float[length][];
+            x = new float[length][];
+            v = new float[length][];
+            a = new float[length][];
+            coord = new float[length][];
+            F = new float[length][];
+            for (int t = 0; t < length; t++)
             {
-                dxs[i] = new float[3];
+                k[t] = coords;
+                k[t][(int)c.y] = k[t][(int)c.y] + 1;
+                ngb = neighbours;
+                x[t] = new float[3];
+                v[t] = new float[3];
+                a[t] = new float[3];
+                coord[t] = coords;
+                F[t] = new float[3];
             }
-            dxs[(int)Dx.coord] = coords;
         }
 
-        public void AddForce(float[] Fglob)
+        public void AddForce(int t, float[] Fglob)
         {
             for (int i = 0; i < 3; i++)
             {
-                dxs[(int)Dx.F][i] += Fglob[i];
+                F[t][i] += Fglob[i];
             }
         }
     }
