@@ -2,16 +2,15 @@
 
 namespace spring
 {
+    public enum c
+    {
+        x, y, z
+    }
     public class coords
     {
-        private enum c
-        {
-            x, y, z
-        }
-
         private enum cosine { Xx, Yx, Zx, Xy, Yy, Zy, Xz, Yz, Zz, }
 
-        private float getTotL(float[] zeroP, float[] targetP)
+        public static float getTotL(float[] zeroP, float[] targetP)
         {
             return (float)Math.Sqrt(
                 Math.Pow(targetP[(int)c.x] - zeroP[(int)c.x], 2) +
@@ -19,7 +18,7 @@ namespace spring
                 Math.Pow(targetP[(int)c.z] - zeroP[(int)c.z], 2));
         }
 
-        public float[] getDCM(float[] a, float[] b, float h)
+        public static float[] getDCM(float[] a, float[] b)
         {
             //baseX = 0;
             //baseY = 0;
@@ -65,7 +64,7 @@ namespace spring
             return dcm;
         }
 
-        public float[] toGlob(float[] dcm, float[] a)
+        public static float[] toGlob(float[] dcm, float[] a)
         {
             float[] gA = new float[3];
             gA[(int)c.x] = dcm[(int)cosine.Xx] * a[(int)c.x] + dcm[(int)cosine.Yx] * a[(int)c.x] + dcm[(int)cosine.Zx] * a[(int)c.x];
@@ -74,7 +73,7 @@ namespace spring
             return gA;
         }
 
-        public float[] toLoc(float[] dcm, float[] a)
+        public static float[] toLoc(float[] dcm, float[] a)
         {
             float[] lA = new float[3];
             lA[(int)c.x] = dcm[(int)cosine.Xx] * a[(int)c.x] + dcm[(int)cosine.Xy] * a[(int)c.x] + dcm[(int)cosine.Xz] * a[(int)c.x];

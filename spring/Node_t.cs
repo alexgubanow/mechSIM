@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace spring
+﻿namespace spring
 {
     public class Node_t
     {
+        public float[] k;
         public float[][] dxs;
         public int[] ngb;
 
         public Node_t(float[] coords, int[] neighbours)
         {
+            k = coords;
+            k[(int)c.y] = k[(int)c.y] + 1;
             ngb = neighbours;
             for (int i = 0; i < 5; i++)
             {

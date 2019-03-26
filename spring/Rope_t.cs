@@ -27,22 +27,24 @@ namespace spring
             {
                 //nds[node].AddForce(EXTERNAL LOAD));
                 //getDCM
+                float[] dcm = coords.getDCM(nds[node].dxs[(int)Dx.coord], nds[node].k);
                 foreach (int neighbour in nds[node].ngb)
                 {
-                    nds[node].AddForce(getNodeAction(node, neighbour));
+                    nds[node].AddForce(getNodeAction(node, neighbour, dcm));
+
                 }
                 //intgrate collected force for all Dx orders
             }
         }
 
-        private float[] getNodeAction(int basePoint, int neighbour)
+        private float[] getNodeAction(int basePoint, int neighbour, float[] dcm)
         {
-            float[] Fglob = new float[3] { 0, 0, 0 };
             //convert Ux(basePoint) and Ux(neighbour) to local coordinate of link
-            //get Fn of link
-            Element.GetFn(nds[basePoint].dxs[(int)Dx.x], nds[neighbour].dxs[(int)Dx.x]);
-            //convert Fn to gloabal coordinates
-            return Fglob;
+            float[] lUxb = coords.toLoc(dcm, nds[basePoint].dxs[(int)Dx.x]);
+            float[] lUxn = coords.toLoc(dcm, nds[neighbour].dxs[(int)Dx.x]);
+            float l = coords.getTotL(nds[basePoint].dxs[(int)Dx.coord], nds[neighbour].dxs[(int)Dx.coord]);
+            //get Fn of link, convert Fn to gloabal coordinates and return
+            return coords.toGlob(dcm, Element.GetFn(lUxb, lUxn, l, 1, 1E9f));
         }
     }
 }
