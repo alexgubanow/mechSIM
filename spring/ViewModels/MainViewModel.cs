@@ -3,6 +3,7 @@ using OxyPlot.Series;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
@@ -19,7 +20,6 @@ namespace spring.ViewModels
         public LineSeries LineSeries2 { get; set; }
         public LineSeries LineSeries3 { get; set; }
         public LineSeries LineSeries4 { get; set; }
-        private List<LineSeries> ListPointAray { get; set; }
 
         public IList<DataPoint> Points { get; set; }
         public MainViewModel(IEventAggregator ea)
@@ -51,11 +51,10 @@ namespace spring.ViewModels
         private DelegateCommand _GetIT;
         public DelegateCommand GetIT => _GetIT ?? (_GetIT = new DelegateCommand(() => _ea.GetEvent<GetITEvent>().Publish()));
 
-        private float[] getT(float dt, float tmax)
+        private float[] getT(float dt, int Counts)
         {
-            int maxI = (int)(tmax / dt);
-            float[] tCounts = new float[maxI];
-            for (int i = 1; i < maxI; i++)
+            float[] tCounts = new float[Counts];
+            for (int i = 1; i < Counts; i++)
             {
                 tCounts[i] = tCounts[i - 1] + dt;
             }
@@ -68,10 +67,15 @@ namespace spring.ViewModels
             LineSeries2.Points.Clear();
             LineSeries3.Points.Clear();
             LineSeries4.Points.Clear();
-            float tmax = 0.9f;
-            float dt = 0.00005f;
-            float[] tCounts = getT(dt, tmax);
-            Rope_t rope = new Rope_t(dt, tCounts.Length, 4);
+            int counts = 100;
+            float E = 200E6f;
+            float dt = 1E-7f;
+            float D = 0.001f;
+            float ro = 1040f;
+            float L = 0.025f;
+            int nodes = 6;
+            float[] time = getT(dt, counts);
+            Rope_t rope = new Rope_t(time, nodes, E, ro);
             rope.Sim();
 
             //for (int i = 0; i < rope.nds[0].F.Length; i++)
@@ -82,19 +86,19 @@ namespace spring.ViewModels
             //Points.Clear();
             for (int i = 0; i < rope.nds[1].F.Length; i++)
             {
-                Points.Add(new DataPoint(tCounts[i], rope.nds[1].a[i][0]));
+                Points.Add(new DataPoint(time[i], rope.nds[1].a[i][0]));
             }
             LineSeries2.Points.AddRange(Points);
             Points.Clear();
             for (int i = 0; i < rope.nds[2].F.Length; i++)
             {
-                Points.Add(new DataPoint(tCounts[i], rope.nds[2].a[i][0]));
+                Points.Add(new DataPoint(time[i], rope.nds[2].a[i][0]));
             }
             LineSeries3.Points.AddRange(Points);
             Points.Clear();
             for (int i = 0; i < rope.nds[3].F.Length; i++)
             {
-                Points.Add(new DataPoint(tCounts[i], rope.nds[3].a[i][0]));
+                Points.Add(new DataPoint(time[i], rope.nds[3].a[i][0]));
             }
             LineSeries4.Points.AddRange(Points);
             ResPlotModel.InvalidatePlot(true);

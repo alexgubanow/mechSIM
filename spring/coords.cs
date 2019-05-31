@@ -2,23 +2,23 @@
 
 namespace spring
 {
-    public enum c
+    public enum C : int
     {
         x, y, z
     }
     public class coords
     {
-        private enum cosine { Xx, Yx, Zx, Xy, Yy, Zy, Xz, Yz, Zz, }
+        private enum Cosine { Xx, Yx, Zx, Xy, Yy, Zy, Xz, Yz, Zz, }
 
-        public static float getTotL(float[] zeroP, float[] targetP)
+        public static float GetTotL(float[] zeroP, float[] targetP)
         {
             return (float)Math.Sqrt(
-                Math.Pow(targetP[(int)c.x] - zeroP[(int)c.x], 2) +
-                Math.Pow(targetP[(int)c.y] - zeroP[(int)c.y], 2) +
-                Math.Pow(targetP[(int)c.z] - zeroP[(int)c.z], 2));
+                Math.Pow(targetP[(int)C.x] - zeroP[(int)C.x], 2) +
+                Math.Pow(targetP[(int)C.y] - zeroP[(int)C.y], 2) +
+                Math.Pow(targetP[(int)C.z] - zeroP[(int)C.z], 2));
         }
 
-        public static float[] getDCM(float[] a, float[] b)
+        public static float[] GetDCM(float[] a, float[] b)
         {
             //baseX = 0;
             //baseY = 0;
@@ -30,9 +30,9 @@ namespace spring
             //by = 12.73;
             //bz = 0;
             //lax = 79.06;
-            float lax = getTotL(new float[3] { 0, 0, 0 }, a);
+            float lax = GetTotL(new float[3] { 0, 0, 0 }, a);
             //lby = 13.42;
-            float lby = getTotL(new float[3] { 0, 0, 0 }, b);
+            float lby = GetTotL(new float[3] { 0, 0, 0 }, b);
 
             //lax = sqrt((ax - baseX) ^ 2 + (ay - baseY) ^ 2 + (az - baseZ) ^ 2)
             //lay = 0;
@@ -42,43 +42,43 @@ namespace spring
             //lbz = 0;
             float[] dcm = new float[9];
             //cosXa = ax / lax
-            dcm[(int)cosine.Xx] = a[(int)c.x] / lax;
+            dcm[(int)Cosine.Xx] = a[(int)C.x] / lax;
             //cosYa = ay / lax
-            dcm[(int)cosine.Yx] = a[(int)c.y] / lax;
+            dcm[(int)Cosine.Yx] = a[(int)C.y] / lax;
             //cosZa = az / lax
-            dcm[(int)cosine.Zx] = a[(int)c.z] / lax;
+            dcm[(int)Cosine.Zx] = a[(int)C.z] / lax;
 
             //cosXb = bx / lby
-            dcm[(int)cosine.Xy] = b[(int)c.x] / lby;
+            dcm[(int)Cosine.Xy] = b[(int)C.x] / lby;
             //cosYb = by / lby
-            dcm[(int)cosine.Yy] = b[(int)c.y] / lby;
+            dcm[(int)Cosine.Yy] = b[(int)C.y] / lby;
             //cosZb = bz / lby
-            dcm[(int)cosine.Zy] = b[(int)c.z] / lby;
+            dcm[(int)Cosine.Zy] = b[(int)C.z] / lby;
 
             //cosXz = (cosYa * cosZb - cosZa * cosYb)
-            dcm[(int)cosine.Xz] = dcm[(int)cosine.Yx] * dcm[(int)cosine.Zy] - dcm[(int)cosine.Zx] * dcm[(int)cosine.Yy];
+            dcm[(int)Cosine.Xz] = dcm[(int)Cosine.Yx] * dcm[(int)Cosine.Zy] - dcm[(int)Cosine.Zx] * dcm[(int)Cosine.Yy];
             //cosYz = -(cosXa * cosZb - cosZa * cosXb)
-            dcm[(int)cosine.Xz] = -(dcm[(int)cosine.Xx] * dcm[(int)cosine.Zy] - dcm[(int)cosine.Zx] * dcm[(int)cosine.Xy]);
+            dcm[(int)Cosine.Xz] = -(dcm[(int)Cosine.Xx] * dcm[(int)Cosine.Zy] - dcm[(int)Cosine.Zx] * dcm[(int)Cosine.Xy]);
             //cosZz = (cosXa * cosYb - cosYa * cosXb)
-            dcm[(int)cosine.Xz] = dcm[(int)cosine.Xx] * dcm[(int)cosine.Yy] - dcm[(int)cosine.Yx] * dcm[(int)cosine.Xy];
+            dcm[(int)Cosine.Xz] = dcm[(int)Cosine.Xx] * dcm[(int)Cosine.Yy] - dcm[(int)Cosine.Yx] * dcm[(int)Cosine.Xy];
             return dcm;
         }
 
-        public static float[] toGlob(float[] dcm, float[] a)
+        public static float[] ToGlob(float[] dcm, float[] a)
         {
             float[] gA = new float[3];
-            gA[(int)c.x] = dcm[(int)cosine.Xx] * a[(int)c.x] + dcm[(int)cosine.Yx] * a[(int)c.x] + dcm[(int)cosine.Zx] * a[(int)c.x];
-            gA[(int)c.y] = dcm[(int)cosine.Xy] * a[(int)c.y] + dcm[(int)cosine.Yy] * a[(int)c.y] + dcm[(int)cosine.Zy] * a[(int)c.y];
-            gA[(int)c.z] = dcm[(int)cosine.Xz] * a[(int)c.z] + dcm[(int)cosine.Yz] * a[(int)c.z] + dcm[(int)cosine.Zz] * a[(int)c.z];
+            gA[(int)C.x] = dcm[(int)Cosine.Xx] * a[(int)C.x] + dcm[(int)Cosine.Xy] * a[(int)C.y] + dcm[(int)Cosine.Xz] * a[(int)C.z];
+            gA[(int)C.y] = dcm[(int)Cosine.Yx] * a[(int)C.x] + dcm[(int)Cosine.Yy] * a[(int)C.y] + dcm[(int)Cosine.Yz] * a[(int)C.z];
+            gA[(int)C.z] = dcm[(int)Cosine.Zx] * a[(int)C.x] + dcm[(int)Cosine.Zy] * a[(int)C.y] + dcm[(int)Cosine.Zz] * a[(int)C.z];
             return gA;
         }
 
-        public static float[] toLoc(float[] dcm, float[] a)
+        public static float[] ToLoc(float[] dcm, float[] a)
         {
             float[] lA = new float[3];
-            lA[(int)c.x] = dcm[(int)cosine.Xx] * a[(int)c.x] + dcm[(int)cosine.Xy] * a[(int)c.x] + dcm[(int)cosine.Xz] * a[(int)c.x];
-            lA[(int)c.y] = dcm[(int)cosine.Yx] * a[(int)c.y] + dcm[(int)cosine.Yy] * a[(int)c.y] + dcm[(int)cosine.Yz] * a[(int)c.y];
-            lA[(int)c.z] = dcm[(int)cosine.Zx] * a[(int)c.z] + dcm[(int)cosine.Zy] * a[(int)c.z] + dcm[(int)cosine.Zz] * a[(int)c.z];
+            lA[(int)C.x] = dcm[(int)Cosine.Xx] * a[(int)C.x] + dcm[(int)Cosine.Yx] * a[(int)C.y] + dcm[(int)Cosine.Zx] * a[(int)C.z];
+            lA[(int)C.y] = dcm[(int)Cosine.Xy] * a[(int)C.x] + dcm[(int)Cosine.Yy] * a[(int)C.y] + dcm[(int)Cosine.Zy] * a[(int)C.z];
+            lA[(int)C.z] = dcm[(int)Cosine.Xz] * a[(int)C.x] + dcm[(int)Cosine.Yz] * a[(int)C.y] + dcm[(int)Cosine.Zz] * a[(int)C.z];
             return lA;
         }
     }
