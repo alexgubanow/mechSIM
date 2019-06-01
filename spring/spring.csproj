@@ -92,7 +92,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="coords.cs" />
-    <Compile Include="Euler.cs" />
+    <Compile Include="integr.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="Rope_t.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />

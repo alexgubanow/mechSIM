@@ -2,13 +2,27 @@
 
 namespace spring
 {
-    public enum C : int
+    public class N
     {
-        x, y, z
-    }
-    public enum D : int
-    {
-        c, u, v, a, b, f
+        //X coordinate
+        public const int x = 0;
+        //Y coordinate
+        public const int y = 1;
+        //Z coordinate
+        public const int z = 2;
+
+        //coordinates
+        public const int c = 0;
+        //displacement
+        public const int u = 1;
+        //velocity
+        public const int v = 2;
+        //acceleration
+        public const int a = 3;
+        //jerk
+        public const int b = 4;
+        //force
+        public const int f = 5;
     }
     public class coords
     {
@@ -17,9 +31,9 @@ namespace spring
         public static float GetTotL(float[] zeroP, float[] targetP)
         {
             return (float)Math.Sqrt(
-                Math.Pow(targetP[(int)C.x] - zeroP[(int)C.x], 2) +
-                Math.Pow(targetP[(int)C.y] - zeroP[(int)C.y], 2) +
-                Math.Pow(targetP[(int)C.z] - zeroP[(int)C.z], 2));
+                Math.Pow(targetP[N.x] - zeroP[N.x], 2) +
+                Math.Pow(targetP[N.y] - zeroP[N.y], 2) +
+                Math.Pow(targetP[N.z] - zeroP[N.z], 2));
         }
 
         public static float[] GetDCM(float[] GlobA, float[] GlobB)
@@ -46,18 +60,18 @@ namespace spring
             //lbz = 0;
             float[] dcm = new float[9];
             //cosXa = ax / lax
-            dcm[(int)Cosine.Xx] = GlobA[(int)C.x] / lax;
+            dcm[(int)Cosine.Xx] = GlobA[N.x] / lax;
             //cosYa = ay / lax
-            dcm[(int)Cosine.Yx] = GlobA[(int)C.y] / lax;
+            dcm[(int)Cosine.Yx] = GlobA[N.y] / lax;
             //cosZa = az / lax
-            dcm[(int)Cosine.Zx] = GlobA[(int)C.z] / lax;
+            dcm[(int)Cosine.Zx] = GlobA[N.z] / lax;
 
             //cosXb = bx / lby
-            dcm[(int)Cosine.Xy] = GlobB[(int)C.x] / lby;
+            dcm[(int)Cosine.Xy] = GlobB[N.x] / lby;
             //cosYb = by / lby
-            dcm[(int)Cosine.Yy] = GlobB[(int)C.y] / lby;
+            dcm[(int)Cosine.Yy] = GlobB[N.y] / lby;
             //cosZb = bz / lby
-            dcm[(int)Cosine.Zy] = GlobB[(int)C.z] / lby;
+            dcm[(int)Cosine.Zy] = GlobB[N.z] / lby;
 
             //cosXz = (cosYa * cosZb - cosZa * cosYb)
             dcm[(int)Cosine.Xz] = dcm[(int)Cosine.Yx] * dcm[(int)Cosine.Zy] - dcm[(int)Cosine.Zx] * dcm[(int)Cosine.Yy];
@@ -71,18 +85,18 @@ namespace spring
         public static float[] ToGlob(float[] dcm, float[] Lp)
         {
             float[] gA = new float[3];
-            gA[(int)C.x] = dcm[(int)Cosine.Xx] * Lp[(int)C.x] + dcm[(int)Cosine.Xy] * Lp[(int)C.y] + dcm[(int)Cosine.Xz] * Lp[(int)C.z];
-            gA[(int)C.y] = dcm[(int)Cosine.Yx] * Lp[(int)C.x] + dcm[(int)Cosine.Yy] * Lp[(int)C.y] + dcm[(int)Cosine.Yz] * Lp[(int)C.z];
-            gA[(int)C.z] = dcm[(int)Cosine.Zx] * Lp[(int)C.x] + dcm[(int)Cosine.Zy] * Lp[(int)C.y] + dcm[(int)Cosine.Zz] * Lp[(int)C.z];
+            gA[N.x] = dcm[(int)Cosine.Xx] * Lp[N.x] + dcm[(int)Cosine.Xy] * Lp[N.y] + dcm[(int)Cosine.Xz] * Lp[N.z];
+            gA[N.y] = dcm[(int)Cosine.Yx] * Lp[N.x] + dcm[(int)Cosine.Yy] * Lp[N.y] + dcm[(int)Cosine.Yz] * Lp[N.z];
+            gA[N.z] = dcm[(int)Cosine.Zx] * Lp[N.x] + dcm[(int)Cosine.Zy] * Lp[N.y] + dcm[(int)Cosine.Zz] * Lp[N.z];
             return gA;
         }
 
         public static float[] ToLoc(float[] dcm, float[] Gp)
         {
             float[] lA = new float[3];
-            lA[(int)C.x] = dcm[(int)Cosine.Xx] * Gp[(int)C.x] + dcm[(int)Cosine.Yx] * Gp[(int)C.y] + dcm[(int)Cosine.Zx] * Gp[(int)C.z];
-            lA[(int)C.y] = dcm[(int)Cosine.Xy] * Gp[(int)C.x] + dcm[(int)Cosine.Yy] * Gp[(int)C.y] + dcm[(int)Cosine.Zy] * Gp[(int)C.z];
-            lA[(int)C.z] = dcm[(int)Cosine.Xz] * Gp[(int)C.x] + dcm[(int)Cosine.Yz] * Gp[(int)C.y] + dcm[(int)Cosine.Zz] * Gp[(int)C.z];
+            lA[N.x] = dcm[(int)Cosine.Xx] * Gp[N.x] + dcm[(int)Cosine.Yx] * Gp[N.y] + dcm[(int)Cosine.Zx] * Gp[N.z];
+            lA[N.y] = dcm[(int)Cosine.Xy] * Gp[N.x] + dcm[(int)Cosine.Yy] * Gp[N.y] + dcm[(int)Cosine.Zy] * Gp[N.z];
+            lA[N.z] = dcm[(int)Cosine.Xz] * Gp[N.x] + dcm[(int)Cosine.Yz] * Gp[N.y] + dcm[(int)Cosine.Zz] * Gp[N.z];
             return lA;
         }
     }
