@@ -1,26 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace spring
+﻿namespace spring
 {
     public class Element
     {
-
-        public static float[] GetFn(float[] UxBp, float[] UxNp, float[] CoordBp, float[] CoordNp, float A, float E)
+        public static void GetFn(ref float[][] Bp, ref float[][] Np, float A, float E)
         {
             float[] Fn = new float[3] { 0, 0, 0 };
-            /* oldL2 = cd(node, t - 1) - cd(node - 1, t - 1);
-             * oldUx2 = ux(node, t - 1) - ux(node - 1, t - 1);
-             * Fe2 = ((E * A) / (oldL2)) * (oldUx2);*/
+            //getting length of link by measure between coords
+            float oldL2 = Bp[(int)D.c][(int)C.x] - Np[(int)D.c][(int)C.x];
+            //getting DCM for this link
+            float[] dcm = coords.GetDCM(Bp[(int)D.c], Np[(int)D.c]);
+            //convert base point Ux to local coords
+            float[] lBpUx = coords.ToLoc(dcm, Bp[(int)D.u]);
+            //convert n point Ux to local coords
+            float[] lNpUx = coords.ToLoc(dcm, Np[(int)D.u]);
+            //calc delta of Ux
+            float oldUx2 = lBpUx[(int)C.x] - lNpUx[(int)C.x];
             //calc Fn of link
-            float oldL2 = CoordBp[(int)C.x] - CoordNp[(int)C.x];
-            float oldUx2 = UxBp[(int)C.x] - UxNp[(int)C.x];
             Fn[(int)C.x] = E * A / oldL2 * oldUx2;
-            //ADD LOAD ON ELEMENT
-            return Fn;
+            //convert Fn to global coords
+            float[] Gfn = coords.ToLoc(dcm, Fn);
+            //push Fn of link to node force
+            Bp[(int)D.f][(int)C.x] += Gfn[(int)C.x];
         }
     }
 }
