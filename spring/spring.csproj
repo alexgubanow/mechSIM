@@ -70,6 +70,9 @@
     <Compile Include="Rope_t.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
+    <Compile Include="lblTxTbox.xaml.cs">
+      <DependentUpon>lblTxTbox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
@@ -81,6 +84,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Element.cs" />
+    <Page Include="lblTxTbox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

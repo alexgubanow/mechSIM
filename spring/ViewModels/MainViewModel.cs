@@ -25,9 +25,34 @@ namespace spring.ViewModels
 
         float[] time;
         Rope_t rope;
+
+        private string _Estr;
+        public string Estr { get => _Estr; set { _Estr = value; float.TryParse(value, out E); } }
+
+        private float E;
+
+        private string _Lstr;
+        public string Lstr { get => _Lstr; set { _Lstr = value; float.TryParse(value, out L); } }
+
+        private float L;
+
+        private string _Dstr;
+        public string Dstr { get => _Dstr; set { _Dstr = value; float.TryParse(value, out D); } }
+
+        private float D;
+
+        private string _rostr;
+        public string rostr { get => _rostr; set { _rostr = value; float.TryParse(value, out ro); } }
+
+        private float ro;
+
         public MainViewModel(IEventAggregator ea)
         {
             _ea = ea;
+            Estr = "200E6";
+            Lstr = "25E-3";
+            Dstr = "1E-3";
+            rostr = "1040";
             Points = new List<DataPoint>();
             ResPlotModel = new PlotModel { Title = "Forces in rope" };
             //ResPlotModel.DefaultColors = new List<OxyColor>() { OxyColor.FromRgb(255, 0, 0), OxyColor.FromRgb(255, 255, 0), OxyColor.FromRgb(0, 255, 255) };
@@ -48,11 +73,11 @@ namespace spring.ViewModels
             ResPlotModel.Series.Add(LineSeries3);
             ResPlotModel.Series.Add(LineSeries4);
             ResPlotModel.InvalidatePlot(true);
-            _ea.GetEvent<GetITEvent>().Subscribe(() => GetF_Click());
+            _ea.GetEvent<ComputeEvent>().Subscribe(() => Compute_Click());
         }
 
-        private DelegateCommand _GetIT;
-        public DelegateCommand GetIT => _GetIT ?? (_GetIT = new DelegateCommand(() => _ea.GetEvent<GetITEvent>().Publish()));
+        private DelegateCommand _Compute;
+        public DelegateCommand Compute => _Compute ?? (_Compute = new DelegateCommand(() => _ea.GetEvent<ComputeEvent>().Publish()));
 
         private float[] getT(float dt, int Counts)
         {
@@ -63,7 +88,7 @@ namespace spring.ViewModels
             }
             return tCounts;
         }
-        private async void GetF_Click()
+        private async void Compute_Click()
         {
             Points.Clear();
             LineSeries1.Points.Clear();
@@ -71,11 +96,11 @@ namespace spring.ViewModels
             LineSeries3.Points.Clear();
             LineSeries4.Points.Clear();
             int counts = 10000;
-            float E = 200E6f;
+            //float E = 200E6f;
             float dt = 1E-7f;
-            float D = 0.001f;
-            float ro = 1040f;
-            float L = 0.025f;
+            //float D = 0.001f;
+            //float ro = 1040f;
+            //float L = 0.025f;
             int nodes = 6;
             time = getT(dt, counts);
             rope = new Rope_t(time, nodes, L, E, D, ro);

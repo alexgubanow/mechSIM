@@ -2,6 +2,6 @@
 
 namespace spring
 {
-    public class GetITEvent : PubSubEvent { }
+    public class ComputeEvent : PubSubEvent { }
 
 }

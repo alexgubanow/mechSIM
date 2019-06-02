@@ -10,8 +10,14 @@
              xmlns:lcl="clr-namespace:spring"
              mc:Ignorable="d" d:DesignHeight="500" d:DesignWidth="600">
     <DockPanel LastChildFill="True">
-        <StackPanel DockPanel.Dock="Bottom" Margin="0,0,0,5">
-            <Button Content="Get it" Command="{Binding GetIT}"/>
+        <StackPanel DockPanel.Dock="Bottom" Margin="5">
+            <StackPanel Orientation="Horizontal">
+                <lcl:lblTxTbox LabelTxt="E:" BoxTxt="{Binding Estr}" Margin="5,0,0,0"/>
+                <lcl:lblTxTbox LabelTxt="ro:" BoxTxt="{Binding rostr}" Margin="5,0,0,0"/>
+                <lcl:lblTxTbox LabelTxt="L:" BoxTxt="{Binding Lstr}" Margin="5,0,0,0"/>
+                <lcl:lblTxTbox LabelTxt="D:" BoxTxt="{Binding Dstr}" Margin="5,0,0,0"/>
+            </StackPanel>
+            <Button Content="Compute" Command="{Binding Compute}" Margin="5"/>
         </StackPanel>
         <!--<CheckBox DockPanel.Dock="Top" Content="Live Update" VerticalAlignment="Bottom"
                   Margin="5,0,0,0" IsChecked="{Binding IsLiveUpd}"/>-->
