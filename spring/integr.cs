@@ -15,10 +15,10 @@ namespace spring
         v(node,t) = v(node, t - 1) + a(node, t - 1) * dt;
         ux(node,t) = ux(node, t - 1) + v(node, t - 1) * dt;
         cd(node,t) = cd(node, t - 1) + ux(node,t - 1);*/
-            now[N.a][N.x] = before[N.f][N.x] / m;
-            now[N.v][N.x] = before[N.v][N.x] + before[N.a][N.x] * dt;
-            now[N.u][N.x] = before[N.u][N.x] + before[N.v][N.x] * dt;
-            now[N.c][N.x] = before[N.c][N.x] + before[N.u][N.x];
+            now[N.a][C.x] = before[N.f][C.x] / m;
+            now[N.v][C.x] = before[N.v][C.x] + before[N.a][C.x] * dt;
+            now[N.u][C.x] = before[N.u][C.x] + before[N.v][C.x] * dt;
+            now[N.c][C.x] = before[N.c][C.x] + before[N.u][C.x];
         }
     }
 }

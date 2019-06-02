@@ -3,10 +3,9 @@ using OxyPlot.Series;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace spring.ViewModels
 {
@@ -22,11 +21,14 @@ namespace spring.ViewModels
         public LineSeries LineSeries4 { get; set; }
 
         public IList<DataPoint> Points { get; set; }
+
+        float[] time;
+        Rope_t rope;
         public MainViewModel(IEventAggregator ea)
         {
             _ea = ea;
             Points = new List<DataPoint>();
-            ResPlotModel = new PlotModel { Title = "Error against reference encoder" };
+            ResPlotModel = new PlotModel { Title = "Forces in rope" };
             //ResPlotModel.DefaultColors = new List<OxyColor>() { OxyColor.FromRgb(255, 0, 0), OxyColor.FromRgb(255, 255, 0), OxyColor.FromRgb(0, 255, 255) };
             LineSeries1 = new LineSeries();
             LineSeries1.Title = "1";
@@ -60,7 +62,7 @@ namespace spring.ViewModels
             }
             return tCounts;
         }
-        private void GetF_Click()
+        private async void GetF_Click()
         {
             Points.Clear();
             LineSeries1.Points.Clear();
@@ -74,34 +76,41 @@ namespace spring.ViewModels
             float ro = 1040f;
             float L = 0.025f;
             int nodes = 6;
-            float[] time = getT(dt, counts);
-            Rope_t rope = new Rope_t(time, nodes, E, ro);
-            rope.Sim();
-
+            time = getT(dt, counts);
+            rope = new Rope_t(time, nodes, L, E, D, ro);
+            await Task.Run(Simulating);
             //for (int i = 0; i < rope.nds[0].F.Length; i++)
             //{
             //    Points.Add(new DataPoint(tCounts[i], rope.nds[0].a[i][0]));
             //}
             //LineSeries1.Points.AddRange(Points);
             //Points.Clear();
-            for (int i = 0; i < rope.nds[1].F.Length; i++)
+            //for (int i = 0; i < rope.Nodes[1].F.Length; i++)
+            //{
+            //    Points.Add(new DataPoint(time[i], rope.Nodes[1].a[i][0]));
+            //}
+            //LineSeries2.Points.AddRange(Points);
+            //Points.Clear();
+            //for (int i = 0; i < rope.Nodes[2].F.Length; i++)
+            //{
+            //    Points.Add(new DataPoint(time[i], rope.Nodes[2].a[i][0]));
+            //}
+            //LineSeries3.Points.AddRange(Points);
+            //Points.Clear();
+            //for (int i = 0; i < rope.Nodes[3].F.Length; i++)
+            //{
+            //    Points.Add(new DataPoint(time[i], rope.Nodes[3].a[i][0]));
+            //}
+            //LineSeries4.Points.AddRange(Points);
+            //ResPlotModel.InvalidatePlot(true);
+        }
+        private void Simulating()
+        {
+            for (int t = 1; t < time.Length; t++)
             {
-                Points.Add(new DataPoint(time[i], rope.nds[1].a[i][0]));
+                rope.IterateOverNodes(t);
             }
-            LineSeries2.Points.AddRange(Points);
-            Points.Clear();
-            for (int i = 0; i < rope.nds[2].F.Length; i++)
-            {
-                Points.Add(new DataPoint(time[i], rope.nds[2].a[i][0]));
-            }
-            LineSeries3.Points.AddRange(Points);
-            Points.Clear();
-            for (int i = 0; i < rope.nds[3].F.Length; i++)
-            {
-                Points.Add(new DataPoint(time[i], rope.nds[3].a[i][0]));
-            }
-            LineSeries4.Points.AddRange(Points);
-            ResPlotModel.InvalidatePlot(true);
+            MessageBox.Show("done");
         }
 
     }

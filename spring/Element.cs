@@ -6,7 +6,7 @@
         {
             float[] Fn = new float[3] { 0, 0, 0 };
             //getting length of link by measure between coords
-            float oldL2 = Bp[N.c][N.x] - Np[N.c][N.x];
+            float oldL2 = Bp[N.c][C.x] - Np[N.c][C.x];
             //getting DCM for this link
             float[] dcm = coords.GetDCM(Np[N.c], radiusPoint);
             //convert base point Ux to local coords
@@ -14,9 +14,9 @@
             //convert n point Ux to local coords
             float[] lNpUx = coords.ToLoc(dcm, Np[N.u]);
             //calc delta of Ux
-            float oldUx2 = lBpUx[N.x] - lNpUx[N.x];
+            float oldUx2 = lBpUx[C.x] - lNpUx[C.x];
             //calc Fn of link
-            Fn[N.x] = E * A / oldL2 * oldUx2;
+            Fn[C.x] = E * A / oldL2 * oldUx2;
             //convert Fn to global coords and return
             return coords.ToLoc(dcm, Fn);
         }

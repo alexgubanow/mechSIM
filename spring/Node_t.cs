@@ -27,10 +27,12 @@ namespace spring
             tm = new float[time.Length][][];
             for (int t = 0; t < time.Length; t++)
             {
+                tm[t] = new float[6][];
                 tm[t][N.c] = coords;
-                tm[t][N.x] = new float[3];
+                tm[t][N.u] = new float[3];
                 tm[t][N.v] = new float[3];
                 tm[t][N.a] = new float[3];
+                tm[t][N.b] = new float[3];
                 tm[t][N.f] = new float[3];
             }
         }
@@ -48,7 +50,7 @@ namespace spring
                 //get Fn from link between this point and np
                 float[] gFn = Element.GetFn(this.tm[t - 1], Nodes[np].tm[t - 1], this.r, A, E);
                 //push it to this force pull
-                this.tm[t][N.f][N.x] += gFn[N.x];
+                this.tm[t][N.f][C.x] += gFn[C.x];
             }
             //here need to read ext load
         }
