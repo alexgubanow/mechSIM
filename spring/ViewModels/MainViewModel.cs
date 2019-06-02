@@ -3,6 +3,7 @@ using OxyPlot.Series;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
@@ -69,7 +70,7 @@ namespace spring.ViewModels
             LineSeries2.Points.Clear();
             LineSeries3.Points.Clear();
             LineSeries4.Points.Clear();
-            int counts = 100;
+            int counts = 10000;
             float E = 200E6f;
             float dt = 1E-7f;
             float D = 0.001f;
@@ -111,6 +112,7 @@ namespace spring.ViewModels
                 rope.IterateOverNodes(t);
             }
             MessageBox.Show("done");
+            GC.Collect();
         }
 
     }
