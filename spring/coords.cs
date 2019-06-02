@@ -36,7 +36,7 @@ namespace spring
                 Math.Pow(targetP[N.z] - zeroP[N.z], 2));
         }
 
-        public static float[] GetDCM(float[] GlobA, float[] GlobB)
+        public static float[] GetDCM(float[] endPoint, float[] radiusPoint)
         {
             //baseX = 0;
             //baseY = 0;
@@ -48,9 +48,9 @@ namespace spring
             //by = 12.73;
             //bz = 0;
             //lax = 79.06;
-            float lax = GetTotL(new float[3] { 0, 0, 0 }, GlobA);
+            float lax = GetTotL(new float[3] { 0, 0, 0 }, endPoint);
             //lby = 13.42;
-            float lby = GetTotL(new float[3] { 0, 0, 0 }, GlobB);
+            float lby = GetTotL(new float[3] { 0, 0, 0 }, radiusPoint);
 
             //lax = sqrt((ax - baseX) ^ 2 + (ay - baseY) ^ 2 + (az - baseZ) ^ 2)
             //lay = 0;
@@ -60,18 +60,18 @@ namespace spring
             //lbz = 0;
             float[] dcm = new float[9];
             //cosXa = ax / lax
-            dcm[(int)Cosine.Xx] = GlobA[N.x] / lax;
+            dcm[(int)Cosine.Xx] = endPoint[N.x] / lax;
             //cosYa = ay / lax
-            dcm[(int)Cosine.Yx] = GlobA[N.y] / lax;
+            dcm[(int)Cosine.Yx] = endPoint[N.y] / lax;
             //cosZa = az / lax
-            dcm[(int)Cosine.Zx] = GlobA[N.z] / lax;
+            dcm[(int)Cosine.Zx] = endPoint[N.z] / lax;
 
             //cosXb = bx / lby
-            dcm[(int)Cosine.Xy] = GlobB[N.x] / lby;
+            dcm[(int)Cosine.Xy] = radiusPoint[N.x] / lby;
             //cosYb = by / lby
-            dcm[(int)Cosine.Yy] = GlobB[N.y] / lby;
+            dcm[(int)Cosine.Yy] = radiusPoint[N.y] / lby;
             //cosZb = bz / lby
-            dcm[(int)Cosine.Zy] = GlobB[N.z] / lby;
+            dcm[(int)Cosine.Zy] = radiusPoint[N.z] / lby;
 
             //cosXz = (cosYa * cosZb - cosZa * cosYb)
             dcm[(int)Cosine.Xz] = dcm[(int)Cosine.Yx] * dcm[(int)Cosine.Zy] - dcm[(int)Cosine.Zx] * dcm[(int)Cosine.Yy];
