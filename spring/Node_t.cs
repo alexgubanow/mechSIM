@@ -15,6 +15,7 @@ namespace spring
 
         public Node_t(float[] time, float[] coords, ref Node_t[] _Nodes, int[] neighbours, float _E, float _D, float ro)
         {
+            dt = time[1];
             r = new float[3] { 0, 0, _D / 2 };
             E = _E;
             Nodes = _Nodes;
