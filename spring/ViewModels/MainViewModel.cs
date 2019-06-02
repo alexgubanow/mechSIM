@@ -79,6 +79,15 @@ namespace spring.ViewModels
             }
             return tCounts;
         }
+        private float[] getLoad(float maxLoad, int Counts)
+        {
+            float[] tCounts = new float[Counts];
+            for (int i = 1; i < Counts; i++)
+            {
+                tCounts[i] = tCounts[i - 1] + maxLoad / Counts;
+            }
+            return tCounts;
+        }
 
         private async void Compute_Click()
         {
@@ -88,6 +97,10 @@ namespace spring.ViewModels
             int counts = 1000;
             float dt = 1E-7f;
             nodes = 6;
+            float maxUx = L / nodes / 100 * 2;
+            float A = (float)Math.PI * (float)Math.Pow(D, 2) / 4;
+            float maxLoad = ((E * A) / L / nodes) * maxUx;
+            float[] load = getLoad(maxLoad, counts);
             time = getT(dt, counts);
             rope = new Rope_t(time, nodes, L, E, D, ro);
             await Task.Run(Simulating);
