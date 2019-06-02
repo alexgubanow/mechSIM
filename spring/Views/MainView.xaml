@@ -12,10 +12,14 @@
     <DockPanel LastChildFill="True">
         <StackPanel DockPanel.Dock="Bottom" Margin="5">
             <StackPanel Orientation="Horizontal">
-                <lcl:lblTxTbox LabelTxt="E:" BoxTxt="{Binding Estr}" Margin="5,0,0,0"/>
-                <lcl:lblTxTbox LabelTxt="ro:" BoxTxt="{Binding rostr}" Margin="5,0,0,0"/>
-                <lcl:lblTxTbox LabelTxt="L:" BoxTxt="{Binding Lstr}" Margin="5,0,0,0"/>
-                <lcl:lblTxTbox LabelTxt="D:" BoxTxt="{Binding Dstr}" Margin="5,0,0,0"/>
+                <lcl:lblTxTbox LabelTxt="E:" BoxTxt="{Binding Path=Estr, 
+                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0"/>
+                <lcl:lblTxTbox LabelTxt="ro:" BoxTxt="{Binding Path=rostr,
+                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0"/>
+                <lcl:lblTxTbox LabelTxt="L:" BoxTxt="{Binding Path=Lstr,
+                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0"/>
+                <lcl:lblTxTbox LabelTxt="D:" BoxTxt="{Binding Path=Dstr,
+                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0"/>
             </StackPanel>
             <Button Content="Compute" Command="{Binding Compute}" Margin="5"/>
         </StackPanel>

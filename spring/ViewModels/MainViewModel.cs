@@ -23,8 +23,8 @@ namespace spring.ViewModels
 
         public IList<DataPoint> Points { get; set; }
 
-        float[] time;
-        Rope_t rope;
+        private float[] time;
+        private Rope_t rope;
 
         private string _Estr;
         public string Estr { get => _Estr; set { _Estr = value; float.TryParse(value, out E); } }
@@ -42,7 +42,17 @@ namespace spring.ViewModels
         private float D;
 
         private string _rostr;
-        public string rostr { get => _rostr; set { _rostr = value; float.TryParse(value, out ro); } }
+
+        public string rostr
+        {
+            get => _rostr; set
+            {
+                if (float.TryParse(value, out ro))
+                {
+                    _rostr = value;
+                }
+            }
+        }
 
         private float ro;
 
@@ -88,6 +98,7 @@ namespace spring.ViewModels
             }
             return tCounts;
         }
+
         private async void Compute_Click()
         {
             Points.Clear();
@@ -130,6 +141,7 @@ namespace spring.ViewModels
             //LineSeries4.Points.AddRange(Points);
             //ResPlotModel.InvalidatePlot(true);
         }
+
         private void Simulating()
         {
             for (int t = 1; t < time.Length; t++)
@@ -139,7 +151,5 @@ namespace spring.ViewModels
             MessageBox.Show("done");
             GC.Collect();
         }
-
     }
-
 }
