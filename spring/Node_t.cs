@@ -10,7 +10,7 @@ namespace spring
         private float E;
         private float A;
         private float dt;
-        private float[][][] tm;
+        public float[][][] tm;
         private float[] r;
 
         public Node_t(float[] time, float[] coords, ref Node_t[] _Nodes, int[] neighbours, float _E, float _D, float ro)
