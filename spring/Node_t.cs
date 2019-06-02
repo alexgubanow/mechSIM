@@ -4,46 +4,58 @@ namespace spring
 {
     public class Node_t
     {
-        public float[][] k;
-        public float[][] x;
-        public float[][] v;
-        public float[][] a;
-        public float[][] coord;
-        public float[][] F;
-        public float[][] Fext;
-        public int[] ngb;
-        public float massa;
+        public Node_t[] Nodes;
+        private int[] ngb;
+        private float m;
+        private float E;
+        private float A;
+        private float dt;
+        private float[][][] tm;
+        private float[] r;
 
-        public Node_t(float[] coords, int[] neighbours, int length, float E, float ro)
+        public Node_t(float[] time, float[] coords, ref Node_t[] _Nodes, int[] neighbours, float _E, float _D, float ro)
         {
-            E = Rope_E;
-            float A = (float)Math.PI * (float)Math.Pow(D, 2) / 4;
+            r = new float[3] { 0, 0, _D / 2 };
+            E = _E;
+            Nodes = _Nodes;
+            A = (float)Math.PI * (float)Math.Pow(_D, 2) / 4;
+            float L = 0;
             float vu = A * L;
-            float m = ro * vu;
-            k = new float[length][];
-            x = new float[length][];
-            v = new float[length][];
-            a = new float[length][];
-            coord = new float[length][];
-            F = new float[length][];
-            for (int t = 0; t < length; t++)
+            m = ro * vu;
+
+            ngb = neighbours;
+            tm = new float[time.Length][][];
+            for (int t = 0; t < time.Length; t++)
             {
-                k[t] = coords;
-                k[t][(int)C.y] = k[t][(int)C.y] + 1;
-                ngb = neighbours;
-                x[t] = new float[3];
-                v[t] = new float[3];
-                a[t] = new float[3];
-                coord[t] = coords;
-                F[t] = new float[3];
+                tm[t][N.c] = coords;
+                tm[t][N.x] = new float[3];
+                tm[t][N.v] = new float[3];
+                tm[t][N.a] = new float[3];
+                tm[t][N.f] = new float[3];
             }
         }
-        public void AddForce(int t, float[] Fglob)
+
+        public void Make(int t)
         {
-            for (int i = 0; i < 3; i++)
+            IterateOverContacts(t);
+            IntegrateForce(t);
+        }
+
+        private void IterateOverContacts(int t)
+        {
+            foreach (var np in ngb)
             {
-                F[t][i] += Fglob[i];
+                //get Fn from link between this point and np
+                float[] gFn = Element.GetFn(this.tm[t - 1], Nodes[np].tm[t - 1], this.r, A, E);
+                //push it to this force pull
+                this.tm[t][N.f][N.x] += gFn[N.x];
             }
+            //here need to read ext load
+        }
+
+        private void IntegrateForce(int t)
+        {
+            Integr.EulerExpl(ref tm[t], tm[t - 1], dt, m);
         }
     }
 }
