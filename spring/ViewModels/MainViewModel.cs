@@ -127,7 +127,7 @@ namespace spring.ViewModels
                 LineSeries1.Title = "node #" + node;
                 for (int t = 0; t < time.Length; t++)
                 {
-                    LineSeries1.Points.Add(new DataPoint(time[t], rope.Nodes[node].tm[t][N.f][C.x]));
+                    LineSeries1.Points.Add(new DataPoint(time[t], rope.Nodes[node].tm[t][N.c][C.x]));
                 }
                 LineSeriesAray.Add(LineSeries1);
             }

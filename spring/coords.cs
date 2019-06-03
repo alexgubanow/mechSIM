@@ -27,7 +27,7 @@ namespace spring
         //Z coordinate
         public const int z = 2;
     }
-    public class coords
+    public class crds
     {
         private enum Cosine { Xx, Yx, Zx, Xy, Yy, Zy, Xz, Yz, Zz, }
 
