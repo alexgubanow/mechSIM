@@ -18,11 +18,18 @@
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0"/>
                 <lcl:lblTxTbox LabelTxt="L:" BoxTxt="{Binding Path=Lstr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0"/>
+                <lcl:lblTxTbox LabelTxt="nodes:" BoxTxt="{Binding Path=nodesstr,
+                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0"/>
                 <lcl:lblTxTbox LabelTxt="D:" BoxTxt="{Binding Path=Dstr,
+                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0"/>
+                <lcl:lblTxTbox LabelTxt="Count:" BoxTxt="{Binding Path=Countstr,
+                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0"/>
+                <lcl:lblTxTbox LabelTxt="dt:" BoxTxt="{Binding Path=dtstr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0"/>
             </StackPanel>
             <Button Content="Compute" Command="{Binding Compute}" Margin="5"/>
         </StackPanel>
+        
         <!--<CheckBox DockPanel.Dock="Top" Content="Live Update" VerticalAlignment="Bottom"
                   Margin="5,0,0,0" IsChecked="{Binding IsLiveUpd}"/>-->
         <oxy:PlotView DockPanel.Dock="Top" Margin="5" Model="{Binding ResPlotModel}" 

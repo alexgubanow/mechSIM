@@ -68,7 +68,7 @@ namespace spring
                         //get Fn from link between this point and np
                         float[] gFn = Element.GetFn(node.tm[t - 1], Nodes[np].tm[t - 1], node.r, node.A, node.E);
                         //push it to this force pull
-                        node.tm[t][N.f][C.x] += gFn[C.x];
+                        node.tm[t][N.f][C.x] += 0 - gFn[C.x];
                     }
                     //here need to read ext load
                     node.tm[t][N.f][C.x] += load[node.NodeID][t];

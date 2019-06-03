@@ -22,6 +22,9 @@ namespace spring.ViewModels
         private float[] time;
         float[][] load;
         private Rope_t rope;
+        private string _nodesstr;
+        public string nodesstr { get => _nodesstr; set { _nodesstr = value; int.TryParse(value, out nodes); } }
+
         private int nodes;
         private string _Estr;
         public string Estr { get => _Estr; set { _Estr = value; float.TryParse(value, out E); } }
@@ -37,6 +40,16 @@ namespace spring.ViewModels
         public string Dstr { get => _Dstr; set { _Dstr = value; float.TryParse(value, out D); } }
 
         private float D;
+
+        private string _Countstr;
+        public string Countstr { get => _Countstr; set { _Countstr = value; int.TryParse(value, out Counts); } }
+
+        private int Counts;
+
+        private string _dtstr;
+        public string dtstr { get => _dtstr; set { _dtstr = value; float.TryParse(value, out dt); } }
+
+        private float dt;
 
         private string _rostr;
 
@@ -61,6 +74,9 @@ namespace spring.ViewModels
             Lstr = "25E-3";
             Dstr = "1E-3";
             rostr = "1040";
+            Countstr = "100";
+            dtstr = "1E-6";
+            nodesstr = "3";
             Points = new List<DataPoint>();
             ResPlotModel = new PlotModel { Title = "Forces in rope" };
             //ResPlotModel.DefaultColors = new List<OxyColor>() { OxyColor.FromRgb(255, 0, 0), OxyColor.FromRgb(255, 255, 0), OxyColor.FromRgb(0, 255, 255) };
@@ -103,14 +119,14 @@ namespace spring.ViewModels
             Points.Clear();
             LineSeriesAray.Clear();
             ResPlotModel.Series.Clear();
-            int counts = 1000;
-            float dt = 1E-7f;
-            nodes = 6;
-            float maxUx = L / nodes / 100 * 2;
+            //int counts = 1000;
+            //float dt = 1E-7f;
+            //nodes = 6;
+            float maxUx = 0.05f * L / nodes / 100;
             float A = (float)Math.PI * (float)Math.Pow(D, 2) / 4;
             float maxLoad = ((E * A) / L / nodes) * maxUx;
-            load = getLoad(maxLoad, nodes, counts);
-            time = getT(dt, counts);
+            load = getLoad(maxLoad, nodes, Counts);
+            time = getT(dt, Counts);
             rope = new Rope_t(time, nodes, L, E, D, ro, ref load);
             await Task.Run(Simulating);
         }
@@ -121,13 +137,20 @@ namespace spring.ViewModels
             {
                 rope.IterateOverNodes(t);
             }
+            LineSeries LineSeries2 = new LineSeries();
+            LineSeries2.Title = "Fext";
+            for (int t = 0; t < time.Length; t++)
+            {
+                LineSeries2.Points.Add(new DataPoint(time[t], load[0][t]));
+            }
+            LineSeriesAray.Add(LineSeries2);
             for (int node = 0; node < nodes; node++)
             {
                 LineSeries LineSeries1 = new LineSeries();
                 LineSeries1.Title = "node #" + node;
                 for (int t = 0; t < time.Length; t++)
                 {
-                    LineSeries1.Points.Add(new DataPoint(time[t], rope.Nodes[node].tm[t][N.c][C.x]));
+                    LineSeries1.Points.Add(new DataPoint(time[t], rope.Nodes[node].tm[t][N.f][C.x]));
                 }
                 LineSeriesAray.Add(LineSeries1);
             }
@@ -136,7 +159,7 @@ namespace spring.ViewModels
                 ResPlotModel.Series.Add(ls);
             }
             ResPlotModel.InvalidatePlot(true);
-            MessageBox.Show("done");
+            //MessageBox.Show("done");
             GC.Collect();
         }
     }

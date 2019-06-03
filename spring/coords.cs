@@ -79,9 +79,9 @@ namespace spring
             //cosXz = (cosYa * cosZb - cosZa * cosYb)
             dcm[(int)Cosine.Xz] = dcm[(int)Cosine.Yx] * dcm[(int)Cosine.Zy] - dcm[(int)Cosine.Zx] * dcm[(int)Cosine.Yy];
             //cosYz = -(cosXa * cosZb - cosZa * cosXb)
-            dcm[(int)Cosine.Xz] = -(dcm[(int)Cosine.Xx] * dcm[(int)Cosine.Zy] - dcm[(int)Cosine.Zx] * dcm[(int)Cosine.Xy]);
+            dcm[(int)Cosine.Yz] =0 -(dcm[(int)Cosine.Xx] * dcm[(int)Cosine.Zy] - dcm[(int)Cosine.Zx] * dcm[(int)Cosine.Xy]);
             //cosZz = (cosXa * cosYb - cosYa * cosXb)
-            dcm[(int)Cosine.Xz] = dcm[(int)Cosine.Xx] * dcm[(int)Cosine.Yy] - dcm[(int)Cosine.Yx] * dcm[(int)Cosine.Xy];
+            dcm[(int)Cosine.Zz] = dcm[(int)Cosine.Xx] * dcm[(int)Cosine.Yy] - dcm[(int)Cosine.Yx] * dcm[(int)Cosine.Xy];
             return dcm;
         }
 
