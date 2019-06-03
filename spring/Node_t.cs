@@ -4,7 +4,9 @@ namespace spring
 {
     public class Node_t
     {
-        public Node_t[] Nodes;
+        private Node_t[] Nodes;
+        private NodeFreedom freedom;
+        private float[][] load;
         private int[] ngb;
         private float m;
         private float E;
@@ -12,9 +14,13 @@ namespace spring
         private float dt;
         public float[][][] tm;
         private float[] r;
+        public int NodeID;
 
-        public Node_t(float[] time, float[] coords, ref Node_t[] _Nodes, int[] neighbours, float _E, float _D, float ro)
+        public Node_t(float[] time, float[] coords, ref Node_t[] _Nodes, NodeFreedom _freedom, int ID, int[] neighbours, float _E, float _D, float ro, ref float[][] _load)
         {
+            NodeID = ID;
+            load = _load;
+            freedom = _freedom;
             dt = time[1];
             r = new float[3] { 0, 0, _D / 2 };
             E = _E;
@@ -46,14 +52,36 @@ namespace spring
 
         private void IterateOverContacts(int t)
         {
-            foreach (var np in ngb)
+            switch (freedom)
             {
-                //get Fn from link between this point and np
-                float[] gFn = Element.GetFn(this.tm[t - 1], Nodes[np].tm[t - 1], this.r, A, E);
-                //push it to this force pull
-                this.tm[t][N.f][C.x] += gFn[C.x];
+                case NodeFreedom.x:
+                    break;
+                case NodeFreedom.y:
+                    break;
+                case NodeFreedom.z:
+                    break;
+                case NodeFreedom.xy:
+                    break;
+                case NodeFreedom.xz:
+                    break;
+                case NodeFreedom.yz:
+                    break;
+                case NodeFreedom.xyz:
+                    foreach (var np in ngb)
+                    {
+                        //get Fn from link between this point and np
+                        float[] gFn = Element.GetFn(this.tm[t - 1], Nodes[np].tm[t - 1], this.r, A, E);
+                        //push it to this force pull
+                        this.tm[t][N.f][C.x] += gFn[C.x];
+                    }
+                    //here need to read ext load
+                    this.tm[t][N.f][C.x] += load[NodeID][t];
+                    break;
+                case NodeFreedom.none:
+                    break;
+                default:
+                    break;
             }
-            //here need to read ext load
         }
 
         private void IntegrateForce(int t)

@@ -67,6 +67,7 @@
     <Compile Include="coords.cs" />
     <Compile Include="integr.cs" />
     <Compile Include="Events.cs" />
+    <Compile Include="NodeFreedom.cs" />
     <Compile Include="Rope_t.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
@@ -116,6 +117,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

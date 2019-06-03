@@ -15,13 +15,14 @@ namespace spring.ViewModels
         private readonly IEventAggregator _ea;
 
         public PlotModel ResPlotModel { get; set; }
-        List<LineSeries> LineSeriesAray { get; set; }
+        private List<LineSeries> LineSeriesAray { get; set; }
 
         public IList<DataPoint> Points { get; set; }
 
         private float[] time;
+        float[][] load;
         private Rope_t rope;
-        int nodes;
+        private int nodes;
         private string _Estr;
         public string Estr { get => _Estr; set { _Estr = value; float.TryParse(value, out E); } }
 
@@ -79,12 +80,20 @@ namespace spring.ViewModels
             }
             return tCounts;
         }
-        private float[] getLoad(float maxLoad, int Counts)
+
+        private float[][] getLoad(float maxLoad, int nodes, int Counts)
         {
-            float[] tCounts = new float[Counts];
-            for (int i = 1; i < Counts; i++)
+            float[][] tCounts = new float[nodes][];
+            for (int node = 0; node < nodes; node++)
             {
-                tCounts[i] = tCounts[i - 1] + maxLoad / Counts;
+                tCounts[node] = new float[Counts];
+                if (node == 0)
+                {
+                    for (int i = 1; i < Counts; i++)
+                    {
+                        tCounts[node][i] = tCounts[node][i - 1] + maxLoad / Counts;
+                    }
+                }
             }
             return tCounts;
         }
@@ -100,9 +109,9 @@ namespace spring.ViewModels
             float maxUx = L / nodes / 100 * 2;
             float A = (float)Math.PI * (float)Math.Pow(D, 2) / 4;
             float maxLoad = ((E * A) / L / nodes) * maxUx;
-            float[] load = getLoad(maxLoad, counts);
+            load = getLoad(maxLoad, nodes, counts);
             time = getT(dt, counts);
-            rope = new Rope_t(time, nodes, L, E, D, ro);
+            rope = new Rope_t(time, nodes, L, E, D, ro, ref load);
             await Task.Run(Simulating);
         }
 
