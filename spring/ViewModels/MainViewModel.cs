@@ -6,82 +6,36 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace spring.ViewModels
 {
-    public partial class MainViewModel : BindableBase
+    public class MainViewModel : BindableBase
     {
         private readonly IEventAggregator _ea;
 
-        public PlotModel ResPlotModel { get; set; }
-        private List<LineSeries> LineSeriesAray { get; set; }
-
-        public IList<DataPoint> Points { get; set; }
-
         private float[] time;
-        float[][] load;
+        private float[][] load;
         private Rope_t rope;
-        private string _nodesstr;
-        public string nodesstr { get => _nodesstr; set { _nodesstr = value; int.TryParse(value, out nodes); } }
 
-        private int nodes;
-        private string _Estr;
-        public string Estr { get => _Estr; set { _Estr = value; float.TryParse(value, out E); } }
-
-        private float E;
-
-        private string _Lstr;
-        public string Lstr { get => _Lstr; set { _Lstr = value; float.TryParse(value, out L); } }
-
-        private float L;
-
-        private string _Dstr;
-        public string Dstr { get => _Dstr; set { _Dstr = value; float.TryParse(value, out D); } }
-
-        private float D;
-
-        private string _Countstr;
-        public string Countstr { get => _Countstr; set { _Countstr = value; int.TryParse(value, out Counts); } }
-
-        private int Counts;
-
-        private string _dtstr;
-        public string dtstr { get => _dtstr; set { _dtstr = value; float.TryParse(value, out dt); } }
-
-        private float dt;
-
-        private string _rostr;
-
-        public string rostr
-        {
-            get => _rostr; set
-            {
-                if (float.TryParse(value, out ro))
-                {
-                    _rostr = value;
-                }
-            }
-        }
-
-        private float ro;
+        public int nodeCount { get; set; }
+        public float E { get; set; }
+        public float L { get; set; }
+        public float D { get; set; }
+        public int Counts { get; set; }
+        public float dt { get; set; }
+        public float ro { get; set; }
 
         public MainViewModel(IEventAggregator ea)
         {
             _ea = ea;
-            LineSeriesAray = new List<LineSeries>();
-            Estr = "2E6";
-            Lstr = "25E-3";
-            Dstr = "1E-3";
-            rostr = "1040";
-            Countstr = "100";
-            dtstr = "1E-6";
-            nodesstr = "3";
-            Points = new List<DataPoint>();
-            ResPlotModel = new PlotModel { Title = "Forces in rope" };
-            //ResPlotModel.DefaultColors = new List<OxyColor>() { OxyColor.FromRgb(255, 0, 0), OxyColor.FromRgb(255, 255, 0), OxyColor.FromRgb(0, 255, 255) };
-            ResPlotModel.InvalidatePlot(true);
             _ea.GetEvent<ComputeEvent>().Subscribe(() => Compute_Click());
+            _ea.GetEvent<NodesChangedEvent>().Subscribe((value) => nodeCount = value);
+            _ea.GetEvent<EChangedEvent>().Subscribe((value) => E = value);
+            _ea.GetEvent<LChangedEvent>().Subscribe((value) => L = value);
+            _ea.GetEvent<DChangedEvent>().Subscribe((value) => D = value);
+            _ea.GetEvent<CountsChangedEvent>().Subscribe((value) => Counts = value);
+            _ea.GetEvent<dtChangedEvent>().Subscribe((value) => dt = value);
+            _ea.GetEvent<roChangedEvent>().Subscribe((value) => ro = value);
         }
 
         private DelegateCommand _Compute;
@@ -116,18 +70,13 @@ namespace spring.ViewModels
 
         private async void Compute_Click()
         {
-            Points.Clear();
-            LineSeriesAray.Clear();
-            ResPlotModel.Series.Clear();
-            //int counts = 1000;
-            //float dt = 1E-7f;
-            //nodes = 6;
-            float maxUx = 0.05f * L / nodes / 100;
+            _ea.GetEvent<ClearPlotsEvent>().Publish();
+            float maxUx = 0.05f * L / nodeCount / 100;
             float A = (float)Math.PI * (float)Math.Pow(D, 2) / 4;
-            float maxLoad = ((E * A) / L / nodes) * maxUx;
-            load = getLoad(maxLoad, nodes, Counts);
+            float maxLoad = ((E * A) / L / nodeCount) * maxUx;
+            load = getLoad(maxLoad, nodeCount, Counts);
             time = getT(dt, Counts);
-            rope = new Rope_t(time, nodes, L, E, D, ro, ref load);
+            rope = new Rope_t(time, nodeCount, L, E, D, ro, ref load);
             await Task.Run(Simulating);
         }
 
@@ -137,30 +86,42 @@ namespace spring.ViewModels
             {
                 rope.IterateOverNodes(t);
             }
-            LineSeries LineSeries2 = new LineSeries();
-            LineSeries2.Title = "Fext";
-            for (int t = 0; t < time.Length; t++)
-            {
-                LineSeries2.Points.Add(new DataPoint(time[t], load[0][t]));
-            }
-            LineSeriesAray.Add(LineSeries2);
-            for (int node = 0; node < nodes; node++)
-            {
-                LineSeries LineSeries1 = new LineSeries();
-                LineSeries1.Title = "node #" + node;
-                for (int t = 0; t < time.Length; t++)
-                {
-                    LineSeries1.Points.Add(new DataPoint(time[t], rope.Nodes[node].tm[t][N.f][C.x]));
-                }
-                LineSeriesAray.Add(LineSeries1);
-            }
-            foreach (var ls in LineSeriesAray)
-            {
-                ResPlotModel.Series.Add(ls);
-            }
-            ResPlotModel.InvalidatePlot(true);
+            DrawPoints();
             //MessageBox.Show("done");
             GC.Collect();
+        }
+
+        private float[] ExtractArray(Node_t node, int deriv, int axis)
+        {
+            float[] tmp = new float[time.Length];
+            for (int t = 0; t < time.Length; t++)
+            {
+                tmp[t] = node.tm[t][deriv][axis];
+            }
+
+            return tmp;
+        }
+
+        private void DrawPoints()
+        {
+            _ea.GetEvent<DrawForceEvent>().Publish(new DataToDraw() { X = time, Y = load[0], Title = "Fext" });
+            foreach (var node in rope.Nodes)
+            {
+                float[] tmp = ExtractArray(node, N.f, C.x);
+                _ea.GetEvent<DrawForceEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID });
+                tmp = null;
+                tmp = ExtractArray(node, N.u, C.x);
+                _ea.GetEvent<DrawDisplEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID });
+                tmp = null;
+                tmp = ExtractArray(node, N.v, C.x);
+                _ea.GetEvent<DrawVelEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID });
+                tmp = null;
+                tmp = ExtractArray(node, N.a, C.x);
+                _ea.GetEvent<DrawAccelEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID });
+                tmp = null;
+                tmp = ExtractArray(node, N.c, C.x);
+                _ea.GetEvent<DrawCoordEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID });
+            }
         }
     }
 }

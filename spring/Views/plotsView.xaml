@@ -1,23 +1,17 @@
-﻿<UserControl x:Class="spring.Views.MainView"
+﻿<UserControl x:Class="spring.Views.plotsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:spring.Views"
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
-             xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:oxy="http://oxyplot.org/wpf"
-             xmlns:lcl="clr-namespace:spring"
-             mc:Ignorable="d" d:DesignHeight="500" d:DesignWidth="700">
-    <DockPanel LastChildFill="True">
-        <Button DockPanel.Dock="Bottom" Content="Compute" Command="{Binding Compute}" Margin="5"/>
-        <ContentControl DockPanel.Dock="Bottom" prism:RegionManager.RegionName="propsViewRegion"
-                            MinHeight="20"/>
-        <!--<ContentControl prism:RegionManager.RegionName="plotsViewRegion"/>-->
-
+             mc:Ignorable="d" >
+    <StackPanel>
         <TabControl>
             <TabItem Header="Displacement">
-        <ContentControl prism:RegionManager.RegionName="DisplPlotViewRegion"/>
+                <ContentControl prism:RegionManager.RegionName="DisplPlotViewRegion"/>
             </TabItem>
             <TabItem Header="Force">
                 <ContentControl prism:RegionManager.RegionName="ForcePlotViewRegion"/>
@@ -32,5 +26,5 @@
                 <ContentControl prism:RegionManager.RegionName="CoordPlotViewRegion"/>
             </TabItem>
         </TabControl>
-    </DockPanel>
+    </StackPanel>
 </UserControl>

@@ -55,9 +55,6 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsFormsIntegration" />
-    <Reference Include="ZedGraph, Version=5.1.7.430, Culture=neutral, PublicKeyToken=02a83cbd123fcd60, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZedGraph.5.1.7\lib\net35-Client\ZedGraph.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -65,19 +62,48 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="coords.cs" />
+    <Compile Include="DataToDraw.cs" />
     <Compile Include="integr.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="NodeFreedom.cs" />
     <Compile Include="NodeLoad.cs" />
     <Compile Include="Rope_t.cs" />
     <Compile Include="vectr.cs" />
+    <Compile Include="ViewModels\CoordPlotViewModel.cs" />
+    <Compile Include="ViewModels\VelPlotViewModel.cs" />
+    <Compile Include="ViewModels\DisplPlotViewModel.cs" />
+    <Compile Include="ViewModels\AccelPlotViewModel.cs" />
+    <Compile Include="ViewModels\ForcePlotViewModel.cs" />
+    <Compile Include="ViewModels\plotsViewModel.cs" />
+    <Compile Include="ViewModels\propsViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="lblTxTbox.xaml.cs">
       <DependentUpon>lblTxTbox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\CoordPlotView.xaml.cs">
+      <DependentUpon>CoordPlotView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\VelPlotView.xaml.cs">
+      <DependentUpon>VelPlotView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\DisplPlotView.xaml.cs">
+      <DependentUpon>DisplPlotView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AccelPlotView.xaml.cs">
+      <DependentUpon>AccelPlotView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ForcePlotView.xaml.cs">
+      <DependentUpon>ForcePlotView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\plotsView.xaml.cs">
+      <DependentUpon>plotsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\propsView.xaml.cs">
+      <DependentUpon>propsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ShellView.xaml.cs">
       <DependentUpon>ShellView.xaml</DependentUpon>
@@ -91,9 +117,37 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\CoordPlotView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\VelPlotView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\DisplPlotView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\AccelPlotView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ForcePlotView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\plotsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\propsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ShellView.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -119,7 +173,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -155,9 +208,6 @@
     </PackageReference>
     <PackageReference Include="Prism.Wpf">
       <Version>7.1.0.431</Version>
-    </PackageReference>
-    <PackageReference Include="ZedGraph">
-      <Version>5.1.7</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
