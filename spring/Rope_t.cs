@@ -5,9 +5,9 @@ namespace spring
     public class Rope_t
     {
         public Node_t[] Nodes;
-        private float[][] load;
+        private float[][][] load;
         private float dt;
-        public Rope_t(float[] time, int nCount, float L, float E, float D, float ro, ref float[][] _load)
+        public Rope_t(float[] time, int nCount, float L, float E, float D, float ro, ref float[][][] _load)
         {
             float dl = L / nCount;
             load = _load;
@@ -22,7 +22,7 @@ namespace spring
                 pos += dl;
             }
             Nodes[Nodes.Length - 1] = new Node_t(time.Length, new float[3] { pos, 0, 0 }, NodeFreedom.locked, NodeLoad.none, Nodes.Length - 1, new int[1] { Nodes.Length - 2 }, E, D);
-            Nodes[(int)Nodes.Length / 2].LoadType = NodeLoad.x;
+            Nodes[Nodes.Length / 2].LoadType = NodeLoad.x;
             foreach (var node in Nodes)
             {
                 EvalLinksLength(node, D, ro);
@@ -38,7 +38,7 @@ namespace spring
         }
         public void IntegrateForce(Node_t node, int t)
         {
-            Integr.EulerImpl(ref node.tm[t], node.tm[t - 1], dt, node.m);
+            Integr.Verlet(ref node.tm[t], node.tm[t - 1], dt, node.m);
         }
         public void EvalLinksLength(Node_t node, float _D, float ro)
         {
@@ -58,54 +58,35 @@ namespace spring
 
         private void IterateOverContacts(Node_t node, int t)
         {
-            switch (node.LoadType)
+            if (node.LoadType != NodeLoad.none)
             {
-                case NodeLoad.x:
-                    getLoading(node, t);
-                    break;
-                case NodeLoad.none:
-                    getForces(node, t);
-                    break;
-                default:
-                    break;
+                getLoading(node, t);
+            }
+            else
+            {
+                getForces(node, t);
             }
         }
 
         private void getLoading(Node_t node, int t)
         {
             //here need to read ext load
-            node.tm[t][(int)N.f][(int)C.x] += load[node.NodeID][t];
+            node.tm[t][(int)N.f] = vectr.Plus(node.tm[t][(int)N.f], load[node.NodeID][t]);
         }
 
         private void getForces(Node_t node, int t)
         {
-            switch (node.freedom)
+            if (node.freedom != NodeFreedom.locked)
             {
-                case NodeFreedom.x:
-                    break;
-                case NodeFreedom.y:
-                    break;
-                case NodeFreedom.z:
-                    break;
-                case NodeFreedom.xy:
-                    break;
-                case NodeFreedom.xz:
-                    break;
-                case NodeFreedom.yz:
-                    break;
-                case NodeFreedom.xyz:
-                    foreach (var np in node.ngb)
-                    {
-                        //get Fn from link between this point and np
-                        float[] gFn = Element.GetFn(node.tm[t - 1], Nodes[np].tm[t - 1], node.r, node.A, node.E);
-                        //push it to this force pull
-                        node.tm[t][(int)N.f][(int)C.x] += 0 - gFn[(int)C.x];
-                    }
-                    break;
-                case NodeFreedom.locked:
-                    break;
-                default:
-                    break;
+                foreach (var np in node.ngb)
+                {
+                    //get Fn from link between this point and np
+                    float[] gFn = Element.GetFn(node.tm[t - 1], Nodes[np].tm[t - 1], node.r, node.A, node.E);
+                    //dirty fix of dcm, just turn - to + and vs
+                    gFn = vectr.Minus(0, gFn);
+                    //push it to this force pull
+                    node.tm[t][(int)N.f] = vectr.Plus(node.tm[t][(int)N.f], gFn);
+                }
             }
         }
     }

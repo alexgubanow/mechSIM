@@ -45,10 +45,13 @@ namespace spring
 
         public static void Verlet(ref float[][] now, float[][] before, float dt, float m)
         {
-            now[(int)N.a][(int)C.x] = before[(int)N.f][(int)C.x] / m;
-            now[(int)N.v][(int)C.x] = before[(int)N.v][(int)C.x] + (hlf * (before[(int)N.a][(int)C.x] + now[(int)N.a][(int)C.x]) * dt);
-            now[(int)N.u][(int)C.x] = before[(int)N.u][(int)C.x] + before[(int)N.v][(int)C.x] * dt + (hlf * before[(int)N.a][(int)C.x] * P2(dt));
-            now[(int)N.p][(int)C.x] = before[(int)N.p][(int)C.x] + before[(int)N.u][(int)C.x];
+            for (int axis = 0; axis < 3; axis++)
+            {
+                now[(int)N.a][axis] = before[(int)N.f][axis] / m;
+                now[(int)N.v][axis] = before[(int)N.v][axis] + (hlf * (before[(int)N.a][axis] + now[(int)N.a][axis]) * dt);
+                now[(int)N.u][axis] = before[(int)N.u][axis] + before[(int)N.v][axis] * dt + (hlf * before[(int)N.a][axis] * P2(dt));
+                now[(int)N.p][axis] = before[(int)N.p][axis] + before[(int)N.u][axis];
+            }
         }
 
         public static void GearP(ref float[][] now, float[][] before, float dt, float m)

@@ -11,7 +11,7 @@ namespace spring.ViewModels
         private readonly IEventAggregator _ea;
 
         private float[] time;
-        private float[][] load;
+        private float[][][] load;
         private Rope_t rope;
 
         public int nodeCount { get; set; }
@@ -48,17 +48,19 @@ namespace spring.ViewModels
             return tCounts;
         }
 
-        private float[][] getLoad(float maxLoad, int nodes, int Counts)
+        private float[][][] getLoad(float maxLoad, NodeLoad load, int nodes, int Counts)
         {
-            float[][] tCounts = new float[nodes][];
+            float[][][] tCounts = new float[nodes][][];
             for (int node = 0; node < nodes; node++)
             {
-                tCounts[node] = new float[Counts];
-                if (node == (int)nodes / 2)
+                if (node == nodes / 2)
                 {
-                    for (int i = 1; i < Counts; i++)
+                    tCounts[node] = new float[Counts][];
+                    tCounts[node][0] = new float[3];
+                    for (int t = 1; t < Counts; t++)
                     {
-                        tCounts[node][i] = tCounts[node][i - 1] + maxLoad / Counts;
+                        tCounts[node][t] = new float[3];
+                        tCounts[node][t][(int)load] = tCounts[node][t - 1][(int)load] + maxLoad / Counts;
                     }
                 }
             }
@@ -71,7 +73,7 @@ namespace spring.ViewModels
             float maxUx = 0.05f * L / nodeCount / 100;
             float A = (float)Math.PI * (float)Math.Pow(D, 2) / 4;
             float maxLoad = ((E * A) / L / nodeCount) * maxUx;
-            load = getLoad(maxLoad, nodeCount, Counts);
+            load = getLoad(maxLoad, NodeLoad.x, nodeCount, Counts);
             time = getT(dt, Counts);
             rope = new Rope_t(time, nodeCount, L, E, D, ro, ref load);
             await Task.Run(Simulating);
@@ -86,6 +88,7 @@ namespace spring.ViewModels
             DrawPoints();
             GC.Collect();
         }
+
         private float[] ExtractArray(float[][][] tm, N deriv, C axis)
         {
             float[] tmp = new float[time.Length];
@@ -96,9 +99,11 @@ namespace spring.ViewModels
 
             return tmp;
         }
+
         private void DrawPoints()
         {
-            _ea.GetEvent<DrawForceEvent>().Publish(new DataToDraw() { X = time, Y = load[0], Title = "Fext" });
+            //float[] tmp = ExtractArray(load[0], N.p, C.x);
+            //_ea.GetEvent<DrawForceEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "Fext" });
             foreach (var node in rope.Nodes)
             {
                 float[] tmp = ExtractArray(node.tm, N.f, C.x);
