@@ -39,7 +39,7 @@ namespace spring
 
         public void IntegrateForce(int t)
         {
-            Integr.EulerExpl(ref tm[t], tm[t - 1], dt, m, t);
+            Integr.EulerExpl(ref tm[t], tm[t - 1], dt, m);
         }
     }
 }

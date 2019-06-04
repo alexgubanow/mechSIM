@@ -54,7 +54,7 @@ namespace spring.ViewModels
             for (int node = 0; node < nodes; node++)
             {
                 tCounts[node] = new float[Counts];
-                if (node == 0)
+                if (node == (int)nodes / 2)
                 {
                     for (int i = 1; i < Counts; i++)
                     {

@@ -4,7 +4,7 @@ namespace spring
 {
     public class Integr
     {
-        private const float hlf = 1 / 2;
+        private const float hlf = 1f / 2f;
         public static void EulerExpl(ref float[][] now, float[][] before, float dt, float m)
         {
             now[(int)N.a][(int)C.x] = before[(int)N.f][(int)C.x] / m;

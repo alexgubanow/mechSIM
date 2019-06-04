@@ -12,14 +12,15 @@ namespace spring
             load = _load;
             float pos = 0;
             Nodes = new Node_t[nCount];
-            Nodes[0] = new Node_t(time, new float[3] { pos, 0, 0 }, NodeFreedom.xyz, NodeLoad.x, 0, new int[1] { 1 }, E, D);
+            Nodes[0] = new Node_t(time, new float[3] { pos, 0, 0 }, NodeFreedom.locked, NodeLoad.none, 0, new int[1] { 1 }, E, D);
             pos += dl;
             for (int i = 1; i < Nodes.Length - 1; i++)
             {
                 Nodes[i] = new Node_t(time, new float[3] { pos, 0, 0 }, NodeFreedom.xyz, NodeLoad.none, i, new int[2] { i - 1, i + 1 }, E, D);
                 pos += dl;
             }
-            Nodes[Nodes.Length - 1] = new Node_t(time, new float[3] { pos, 0, 0 }, NodeFreedom.none, NodeLoad.none, Nodes.Length - 1, new int[1] { Nodes.Length - 2 }, E, D);
+            Nodes[Nodes.Length - 1] = new Node_t(time, new float[3] { pos, 0, 0 }, NodeFreedom.locked, NodeLoad.none, Nodes.Length - 1, new int[1] { Nodes.Length - 2 }, E, D);
+            Nodes[(int)Nodes.Length / 2].LoadType = NodeLoad.x;
             foreach (var node in Nodes)
             {
                 EvalLinksLength(node, D, ro);
@@ -96,7 +97,7 @@ namespace spring
                         node.tm[t][(int)N.f][(int)C.x] += 0 - gFn[(int)C.x];
                     }
                     break;
-                case NodeFreedom.none:
+                case NodeFreedom.locked:
                     break;
                 default:
                     break;
