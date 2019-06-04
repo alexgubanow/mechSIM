@@ -12,14 +12,14 @@ namespace spring
             load = _load;
             float pos = 0;
             Nodes = new Node_t[nCount];
-            Nodes[0] = new Node_t(time, new float[3] { pos, 0, 0 }, NodeFreedom.xyz, 0, new int[1] { 1 }, E, D);
+            Nodes[0] = new Node_t(time, new float[3] { pos, 0, 0 }, NodeFreedom.xyz, NodeLoad.x, 0, new int[1] { 1 }, E, D);
             pos += dl;
             for (int i = 1; i < Nodes.Length - 1; i++)
             {
-                Nodes[i] = new Node_t(time, new float[3] { pos, 0, 0 }, NodeFreedom.xyz, i, new int[2] { i - 1, i + 1 }, E, D);
+                Nodes[i] = new Node_t(time, new float[3] { pos, 0, 0 }, NodeFreedom.xyz, NodeLoad.none, i, new int[2] { i - 1, i + 1 }, E, D);
                 pos += dl;
             }
-            Nodes[Nodes.Length - 1] = new Node_t(time, new float[3] { pos, 0, 0 }, NodeFreedom.none, Nodes.Length - 1, new int[1] { Nodes.Length - 2 }, E, D);
+            Nodes[Nodes.Length - 1] = new Node_t(time, new float[3] { pos, 0, 0 }, NodeFreedom.none, NodeLoad.none, Nodes.Length - 1, new int[1] { Nodes.Length - 2 }, E, D);
             foreach (var node in Nodes)
             {
                 EvalLinksLength(node, D, ro);
@@ -34,6 +34,7 @@ namespace spring
                 node.IntegrateForce(t);
             }
         }
+
         public void EvalLinksLength(Node_t node, float _D, float ro)
         {
             node.A = (float)Math.PI * (float)Math.Pow(_D, 2) / 4;
@@ -47,6 +48,27 @@ namespace spring
         }
 
         private void IterateOverContacts(Node_t node, int t)
+        {
+            switch (node.LoadType)
+            {
+                case NodeLoad.x:
+                    getLoading(node, t);
+                    break;
+                case NodeLoad.none:
+                    getForces(node, t);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void getLoading(Node_t node, int t)
+        {
+            //here need to read ext load
+            node.tm[t][N.f][C.x] += load[node.NodeID][t];
+        }
+
+        private void getForces(Node_t node, int t)
         {
             switch (node.freedom)
             {
@@ -70,9 +92,6 @@ namespace spring
                         //push it to this force pull
                         node.tm[t][N.f][C.x] += 0 - gFn[C.x];
                     }
-                    //here need to read ext load
-                    node.tm[t][N.f][C.x] += load[node.NodeID][t];
-                    float dscd = node.tm[t][N.f][C.x];
                     break;
                 case NodeFreedom.none:
                     break;

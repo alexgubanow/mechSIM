@@ -5,6 +5,7 @@ namespace spring
     public class Node_t
     {
         public NodeFreedom freedom;
+        public NodeLoad LoadType;
         public int[] ngb;
         public float m;
         public float E;
@@ -14,10 +15,11 @@ namespace spring
         public float[] r;
         public int NodeID;
 
-        public Node_t(float[] time, float[] coords, NodeFreedom _freedom, int ID, int[] neighbours, float _E, float _D)
+        public Node_t(float[] time, float[] coords, NodeFreedom _freedom, NodeLoad _LoadType, int ID, int[] neighbours, float _E, float _D)
         {
             NodeID = ID;
             freedom = _freedom;
+            LoadType = _LoadType;
             dt = time[1];
             r = new float[3] { 0, 0, _D / 2 };
             E = _E;

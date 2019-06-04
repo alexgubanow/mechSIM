@@ -68,6 +68,7 @@
     <Compile Include="integr.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="NodeFreedom.cs" />
+    <Compile Include="NodeLoad.cs" />
     <Compile Include="Rope_t.cs" />
     <Compile Include="vectr.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />

@@ -70,7 +70,7 @@ namespace spring.ViewModels
         {
             _ea = ea;
             LineSeriesAray = new List<LineSeries>();
-            Estr = "200E6";
+            Estr = "2E6";
             Lstr = "25E-3";
             Dstr = "1E-3";
             rostr = "1040";
