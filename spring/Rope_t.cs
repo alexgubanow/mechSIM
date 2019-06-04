@@ -25,7 +25,6 @@ namespace spring
                 EvalLinksLength(node, D, ro);
             }
         }
-        
         public void IterateOverNodes(int t)
         {
             foreach (var node in Nodes)
@@ -41,7 +40,11 @@ namespace spring
             float L = 0;
             foreach (var link in node.ngb)
             {
-                L += crds.GetTotL(Nodes[node.NodeID].tm[0][N.c], Nodes[link].tm[0][N.c]);
+                L += crds.GetTotL(Nodes[node.NodeID].tm[0][(int)N.p], Nodes[link].tm[0][(int)N.p]);
+            }
+            if (L == 0)
+            {
+                throw new Exception();
             }
             float vu = node.A * L / 2;
             node.m = ro * vu;
@@ -65,7 +68,7 @@ namespace spring
         private void getLoading(Node_t node, int t)
         {
             //here need to read ext load
-            node.tm[t][N.f][C.x] += load[node.NodeID][t];
+            node.tm[t][(int)N.f][(int)C.x] += load[node.NodeID][t];
         }
 
         private void getForces(Node_t node, int t)
@@ -90,7 +93,7 @@ namespace spring
                         //get Fn from link between this point and np
                         float[] gFn = Element.GetFn(node.tm[t - 1], Nodes[np].tm[t - 1], node.r, node.A, node.E);
                         //push it to this force pull
-                        node.tm[t][N.f][C.x] += 0 - gFn[C.x];
+                        node.tm[t][(int)N.f][(int)C.x] += 0 - gFn[(int)C.x];
                     }
                     break;
                 case NodeFreedom.none:

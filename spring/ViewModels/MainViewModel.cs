@@ -1,10 +1,7 @@
-﻿using OxyPlot;
-using OxyPlot.Series;
-using Prism.Commands;
+﻿using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace spring.ViewModels
@@ -87,39 +84,36 @@ namespace spring.ViewModels
                 rope.IterateOverNodes(t);
             }
             DrawPoints();
-            //MessageBox.Show("done");
             GC.Collect();
         }
-
-        private float[] ExtractArray(Node_t node, int deriv, int axis)
+        private float[] ExtractArray(float[][][] tm, N deriv, C axis)
         {
             float[] tmp = new float[time.Length];
             for (int t = 0; t < time.Length; t++)
             {
-                tmp[t] = node.tm[t][deriv][axis];
+                tmp[t] = tm[t][(int)deriv][(int)axis];
             }
 
             return tmp;
         }
-
         private void DrawPoints()
         {
             _ea.GetEvent<DrawForceEvent>().Publish(new DataToDraw() { X = time, Y = load[0], Title = "Fext" });
             foreach (var node in rope.Nodes)
             {
-                float[] tmp = ExtractArray(node, N.f, C.x);
+                float[] tmp = ExtractArray(node.tm, N.f, C.x);
                 _ea.GetEvent<DrawForceEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID });
                 tmp = null;
-                tmp = ExtractArray(node, N.u, C.x);
+                tmp = ExtractArray(node.tm, N.u, C.x);
                 _ea.GetEvent<DrawDisplEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID });
                 tmp = null;
-                tmp = ExtractArray(node, N.v, C.x);
+                tmp = ExtractArray(node.tm, N.v, C.x);
                 _ea.GetEvent<DrawVelEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID });
                 tmp = null;
-                tmp = ExtractArray(node, N.a, C.x);
+                tmp = ExtractArray(node.tm, N.a, C.x);
                 _ea.GetEvent<DrawAccelEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID });
                 tmp = null;
-                tmp = ExtractArray(node, N.c, C.x);
+                tmp = ExtractArray(node.tm, N.p, C.x);
                 _ea.GetEvent<DrawCoordEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID });
             }
         }

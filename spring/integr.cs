@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace spring
+﻿namespace spring
 {
     public class Integr
     {
-        public static void EulerExpl(ref float[][] now, float[][] before, float dt, float m)
+        public static void EulerExpl(ref float[][] now, float[][] before, float dt, float m,int ff)
         {
-            now[N.a][C.x] = before[N.f][C.x] / m;
-            now[N.v][C.x] = before[N.v][C.x] + before[N.a][C.x] * dt;
-            now[N.u][C.x] = before[N.u][C.x] + before[N.v][C.x] * dt;
-            now[N.c][C.x] = before[N.c][C.x] + before[N.u][C.x];
+            now[(int)N.a][(int)C.x] = before[(int)N.f][(int)C.x] / m;
+            now[(int)N.v][(int)C.x] = before[(int)N.v][(int)C.x] + before[(int)N.a][(int)C.x] * dt;
+            now[(int)N.u][(int)C.x] = before[(int)N.u][(int)C.x] + before[(int)N.v][(int)C.x] * dt;
+            now[(int)N.p][(int)C.x] = before[(int)N.p][(int)C.x] + before[(int)N.u][(int)C.x];
         }
     }
 }

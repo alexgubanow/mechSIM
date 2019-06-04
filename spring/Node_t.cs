@@ -27,20 +27,19 @@ namespace spring
             tm = new float[time.Length][][];
             for (int t = 0; t < time.Length; t++)
             {
-                tm[t] = new float[6][];
-                tm[t][N.c] = coords;
-                tm[t][N.u] = new float[3];
-                tm[t][N.v] = new float[3];
-                tm[t][N.a] = new float[3];
-                tm[t][N.b] = new float[3];
-                tm[t][N.f] = new float[3];
+                tm[t] = new float[Enum.GetNames(typeof(N)).Length][];
+                for (int n = 0; n < tm[t].Length; n++)
+                {
+                    tm[t][n] = new float[3];
+                }
             }
+            tm[0][(int)N.p] = coords;
         }
 
 
         public void IntegrateForce(int t)
         {
-            Integr.EulerExpl(ref tm[t], tm[t - 1], dt, m);
+            Integr.EulerExpl(ref tm[t], tm[t - 1], dt, m, t);
         }
     }
 }

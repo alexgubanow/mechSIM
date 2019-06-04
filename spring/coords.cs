@@ -2,41 +2,49 @@
 
 namespace spring
 {
-    public class N
+    public enum N
     {
         //coordinates
-        public const int c = 0;
+        p,
+
         //displacement
-        public const int u = 1;
+        u,
+
         //velocity
-        public const int v = 2;
+        v,
+
         //acceleration
-        public const int a = 3;
+        a,
+
         //jerk
-        public const int b = 4;
+        b,
+
         //force
-        public const int f = 5;
+        f
     }
 
-    public class C
+    public enum C
     {
         //X coordinate
-        public const int x = 0;
+        x,
+
         //Y coordinate
-        public const int y = 1;
+        y,
+
         //Z coordinate
-        public const int z = 2;
+        z
     }
+
     public class crds
     {
-        private enum Cosine { Xx, Yx, Zx, Xy, Yy, Zy, Xz, Yz, Zz, }
+        private enum Cosine { Xx, Yx, Zx, Xy, Yy, Zy, Xz, Yz, Zz }
 
         public static float GetTotL(float[] zeroP, float[] targetP)
         {
             return (float)Math.Sqrt(
-                Math.Pow(targetP[C.x] - zeroP[C.x], 2) +
-                Math.Pow(targetP[C.y] - zeroP[C.y], 2) +
-                Math.Pow(targetP[C.z] - zeroP[C.z], 2));
+                Math.Pow(targetP[(int)C.x] - zeroP[(int)C.x], 2) +
+                Math.Pow(targetP[(int)C.y] - zeroP[(int)C.y], 2) +
+                Math.Pow(targetP[(int)C.z] - zeroP[(int)C.z], 2));
         }
 
         public static float[] GetDCM(float[] endPoint, float[] radiusPoint)
@@ -63,23 +71,23 @@ namespace spring
             //lbz = 0;
             float[] dcm = new float[9];
             //cosXa = ax / lax
-            dcm[(int)Cosine.Xx] = endPoint[C.x] / lax;
+            dcm[(int)Cosine.Xx] = endPoint[(int)C.x] / lax;
             //cosYa = ay / lax
-            dcm[(int)Cosine.Yx] = endPoint[C.y] / lax;
+            dcm[(int)Cosine.Yx] = endPoint[(int)C.y] / lax;
             //cosZa = az / lax
-            dcm[(int)Cosine.Zx] = endPoint[C.z] / lax;
+            dcm[(int)Cosine.Zx] = endPoint[(int)C.z] / lax;
 
             //cosXb = bx / lby
-            dcm[(int)Cosine.Xy] = radiusPoint[C.x] / lby;
+            dcm[(int)Cosine.Xy] = radiusPoint[(int)C.x] / lby;
             //cosYb = by / lby
-            dcm[(int)Cosine.Yy] = radiusPoint[C.y] / lby;
+            dcm[(int)Cosine.Yy] = radiusPoint[(int)C.y] / lby;
             //cosZb = bz / lby
-            dcm[(int)Cosine.Zy] = radiusPoint[C.z] / lby;
+            dcm[(int)Cosine.Zy] = radiusPoint[(int)C.z] / lby;
 
             //cosXz = (cosYa * cosZb - cosZa * cosYb)
             dcm[(int)Cosine.Xz] = dcm[(int)Cosine.Yx] * dcm[(int)Cosine.Zy] - dcm[(int)Cosine.Zx] * dcm[(int)Cosine.Yy];
             //cosYz = -(cosXa * cosZb - cosZa * cosXb)
-            dcm[(int)Cosine.Yz] =0 -(dcm[(int)Cosine.Xx] * dcm[(int)Cosine.Zy] - dcm[(int)Cosine.Zx] * dcm[(int)Cosine.Xy]);
+            dcm[(int)Cosine.Yz] = 0 - (dcm[(int)Cosine.Xx] * dcm[(int)Cosine.Zy] - dcm[(int)Cosine.Zx] * dcm[(int)Cosine.Xy]);
             //cosZz = (cosXa * cosYb - cosYa * cosXb)
             dcm[(int)Cosine.Zz] = dcm[(int)Cosine.Xx] * dcm[(int)Cosine.Yy] - dcm[(int)Cosine.Yx] * dcm[(int)Cosine.Xy];
             return dcm;
@@ -88,18 +96,18 @@ namespace spring
         public static float[] ToGlob(float[] dcm, float[] Lp)
         {
             float[] gA = new float[3];
-            gA[C.x] = dcm[(int)Cosine.Xx] * Lp[C.x] + dcm[(int)Cosine.Xy] * Lp[C.y] + dcm[(int)Cosine.Xz] * Lp[C.z];
-            gA[C.y] = dcm[(int)Cosine.Yx] * Lp[C.x] + dcm[(int)Cosine.Yy] * Lp[C.y] + dcm[(int)Cosine.Yz] * Lp[C.z];
-            gA[C.z] = dcm[(int)Cosine.Zx] * Lp[C.x] + dcm[(int)Cosine.Zy] * Lp[C.y] + dcm[(int)Cosine.Zz] * Lp[C.z];
+            gA[(int)C.x] = dcm[(int)Cosine.Xx] * Lp[(int)C.x] + dcm[(int)Cosine.Xy] * Lp[(int)C.y] + dcm[(int)Cosine.Xz] * Lp[(int)C.z];
+            gA[(int)C.y] = dcm[(int)Cosine.Yx] * Lp[(int)C.x] + dcm[(int)Cosine.Yy] * Lp[(int)C.y] + dcm[(int)Cosine.Yz] * Lp[(int)C.z];
+            gA[(int)C.z] = dcm[(int)Cosine.Zx] * Lp[(int)C.x] + dcm[(int)Cosine.Zy] * Lp[(int)C.y] + dcm[(int)Cosine.Zz] * Lp[(int)C.z];
             return gA;
         }
 
         public static float[] ToLoc(float[] dcm, float[] Gp)
         {
             float[] lA = new float[3];
-            lA[C.x] = dcm[(int)Cosine.Xx] * Gp[C.x] + dcm[(int)Cosine.Yx] * Gp[C.y] + dcm[(int)Cosine.Zx] * Gp[C.z];
-            lA[C.y] = dcm[(int)Cosine.Xy] * Gp[C.x] + dcm[(int)Cosine.Yy] * Gp[C.y] + dcm[(int)Cosine.Zy] * Gp[C.z];
-            lA[C.z] = dcm[(int)Cosine.Xz] * Gp[C.x] + dcm[(int)Cosine.Yz] * Gp[C.y] + dcm[(int)Cosine.Zz] * Gp[C.z];
+            lA[(int)C.x] = dcm[(int)Cosine.Xx] * Gp[(int)C.x] + dcm[(int)Cosine.Yx] * Gp[(int)C.y] + dcm[(int)Cosine.Zx] * Gp[(int)C.z];
+            lA[(int)C.y] = dcm[(int)Cosine.Xy] * Gp[(int)C.x] + dcm[(int)Cosine.Yy] * Gp[(int)C.y] + dcm[(int)Cosine.Zy] * Gp[(int)C.z];
+            lA[(int)C.z] = dcm[(int)Cosine.Xz] * Gp[(int)C.x] + dcm[(int)Cosine.Yz] * Gp[(int)C.y] + dcm[(int)Cosine.Zz] * Gp[(int)C.z];
             return lA;
         }
     }
