@@ -9,23 +9,6 @@ namespace spring
         private const float v3 = 1f;
         private const float v4 = 1f;
 
-        private const float hlf = 1f / 2f;
-        private const float sxt = 1f / 6f;
-
-        private static float P2(float value)
-        {
-            return (float)Math.Pow(value, 2);
-        }
-
-        private static float P3(float value)
-        {
-            return (float)Math.Pow(value, 3);
-        }
-
-        private static float P4(float value)
-        {
-            return (float)Math.Pow(value, 4);
-        }
 
         public static void EulerExpl(ref float[][] now, float[][] before, float dt, float m)
         {
@@ -48,8 +31,8 @@ namespace spring
             for (int axis = 0; axis < 3; axis++)
             {
                 now[(int)N.a][axis] = before[(int)N.f][axis] / m;
-                now[(int)N.v][axis] = before[(int)N.v][axis] + (hlf * (before[(int)N.a][axis] + now[(int)N.a][axis]) * dt);
-                now[(int)N.u][axis] = before[(int)N.u][axis] + before[(int)N.v][axis] * dt + (hlf * before[(int)N.a][axis] * P2(dt));
+                now[(int)N.v][axis] = before[(int)N.v][axis] + (maf.hlf * (before[(int)N.a][axis] + now[(int)N.a][axis]) * dt);
+                now[(int)N.u][axis] = before[(int)N.u][axis] + before[(int)N.v][axis] * dt + (maf.hlf * before[(int)N.a][axis] * maf.P2(dt));
                 now[(int)N.p][axis] = before[(int)N.p][axis] + before[(int)N.u][axis];
             }
         }
@@ -58,9 +41,9 @@ namespace spring
         {
             now[(int)N.b][(int)C.x] = before[(int)N.f][(int)C.x] / m * dt;
             now[(int)N.a][(int)C.x] = before[(int)N.a][(int)C.x] + before[(int)N.b][(int)C.x] * dt;
-            now[(int)N.v][(int)C.x] = before[(int)N.v][(int)C.x] + before[(int)N.a][(int)C.x] * dt + hlf * before[(int)N.b][(int)C.x] * P2(dt);
+            now[(int)N.v][(int)C.x] = before[(int)N.v][(int)C.x] + before[(int)N.a][(int)C.x] * dt + maf.hlf * before[(int)N.b][(int)C.x] * maf.P2(dt);
             now[(int)N.u][(int)C.x] = before[(int)N.u][(int)C.x] + before[(int)N.v][(int)C.x] * dt +
-                hlf * before[(int)N.a][(int)C.x] * P2(dt) + sxt * before[(int)N.b][(int)C.x] * P3(dt);
+                maf.hlf * before[(int)N.a][(int)C.x] * maf.P2(dt) + maf.sxt * before[(int)N.b][(int)C.x] * maf.P3(dt);
             now[(int)N.p][(int)C.x] = before[(int)N.p][(int)C.x] + before[(int)N.u][(int)C.x];
         }
 
@@ -71,7 +54,7 @@ namespace spring
             now[(int)N.b][(int)C.x] = before[(int)N.b][(int)C.x] + v4 * (da[(int)C.x] / dt);
             now[(int)N.a][(int)C.x] = before[(int)N.a][(int)C.x] + v3 * da[(int)C.x];
             now[(int)N.v][(int)C.x] = before[(int)N.v][(int)C.x] + v2 * da[(int)C.x] * dt;
-            now[(int)N.u][(int)C.x] = before[(int)N.u][(int)C.x] + v1 * da[(int)C.x] * P2(dt);
+            now[(int)N.u][(int)C.x] = before[(int)N.u][(int)C.x] + v1 * da[(int)C.x] * maf.P2(dt);
             now[(int)N.p][(int)C.x] = before[(int)N.p][(int)C.x] + before[(int)N.u][(int)C.x];
         }
 
