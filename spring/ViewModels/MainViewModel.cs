@@ -60,7 +60,9 @@ namespace spring.ViewModels
                     for (int t = 1; t < Counts; t++)
                     {
                         tCounts[node][t] = new float[3];
-                        tCounts[node][t][(int)load] = tCounts[node][t - 1][(int)load] + maxLoad / Counts;
+                        //(maxUx / (0 - t)) + maxUx
+                        tCounts[node][t][(int)load] = tCounts[node][t - 1][(int)load] + (maxLoad / (0 - t)) + maxLoad;
+                        //tCounts[node][t][(int)load] = tCounts[node][t - 1][(int)load] + maxLoad / Counts;
                     }
                 }
             }
@@ -70,7 +72,7 @@ namespace spring.ViewModels
         private async void Compute_Click()
         {
             _ea.GetEvent<ClearPlotsEvent>().Publish();
-            float maxUx = 0.05f * L / nodeCount / 100;
+            float maxUx = 0.01f * L / nodeCount / 100;
             float A = (float)Math.PI * (float)Math.Pow(D, 2) / 4;
             float maxLoad = ((E * A) / L / nodeCount) * maxUx;
             load = getLoad(maxLoad, NodeLoad.y, nodeCount, Counts);
