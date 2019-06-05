@@ -2,7 +2,7 @@
 {
     public class Element
     {
-        public static float[] GetFn(float[][] Bp, float[][] Np, float[] radiusPoint, float A, float E)
+        public static float[] GetFn(float[][] Bp, float[][] Np, float[] radiusPoint, float A, float E, float I)
         {
             float[] Fn = new float[3] { 0, 0, 0 };
             //getting length of link by measure between coords
@@ -20,7 +20,7 @@
             float oldUy2 = lBpUx[(int)C.y] - lNpUx[(int)C.y];
             //calc Fn of link
             Fn[(int)C.x] = E * A / oldL2 * oldUx2;
-            Fn[(int)C.y] = E * A / oldL2 * oldUy2;
+            Fn[(int)C.y] = 12f * E * I / maf.P3(oldL2) * oldUy2;
             //convert Fn to global coords and return
             return crds.ToLoc(dcm, Fn);
         }

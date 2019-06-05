@@ -82,7 +82,7 @@ namespace spring
                 foreach (var np in node.ngb)
                 {
                     //get Fn from link between this point and np
-                    float[] gFn = Element.GetFn(node.tm[t - 1], Nodes[np].tm[t - 1], node.r, node.A, node.E);
+                    float[] gFn = Element.GetFn(node.tm[t - 1], Nodes[np].tm[t - 1], node.r, node.A, node.E, node.I);
                     //dirty fix of dcm, just turn - to + and vs
                     gFn = vectr.Minus(0, gFn);
                     //push it to this force pull
