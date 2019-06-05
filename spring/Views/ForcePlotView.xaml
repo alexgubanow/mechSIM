@@ -10,6 +10,16 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel LastChildFill="True">
-        <oxy:PlotView DockPanel.Dock="Top" Margin="5" Model="{Binding awePlotModel}"/>
+        <TabControl>
+            <TabItem Header="X">
+                <oxy:PlotView DockPanel.Dock="Top" Margin="5" Model="{Binding awePlotModelX}"/>
+            </TabItem>
+            <TabItem Header="Y">
+                <oxy:PlotView DockPanel.Dock="Top" Margin="5" Model="{Binding awePlotModelY}"/>
+            </TabItem>
+            <TabItem Header="Z">
+                <oxy:PlotView DockPanel.Dock="Top" Margin="5" Model="{Binding awePlotModelZ}"/>
+            </TabItem>
+        </TabControl>
     </DockPanel>
 </UserControl>

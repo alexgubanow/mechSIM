@@ -7,6 +7,7 @@ namespace spring
     {
         public float[] Y { get; set; }
         public string Title { get; set; }
+        public C axis { get; set; }
         public float[] X { get; set; }
 
         public List<DataPoint> getDataPointList()
