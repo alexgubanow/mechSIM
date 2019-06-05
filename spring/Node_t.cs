@@ -10,6 +10,7 @@ namespace spring
         public float m;
         public float E;
         public float A;
+        public float I;
         public float[][][] tm;
         public float[] r;
         public int NodeID;

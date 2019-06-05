@@ -43,6 +43,7 @@ namespace spring
         public void EvalLinksLength(Node_t node, float _D, float ro)
         {
             node.A = (float)Math.PI * (float)Math.Pow(_D, 2) / 4;
+            node.I = maf.P3(node.A) / 12f;
             float L = 0;
             foreach (var link in node.ngb)
             {
