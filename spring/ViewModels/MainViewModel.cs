@@ -73,7 +73,7 @@ namespace spring.ViewModels
             float maxUx = 0.05f * L / nodeCount / 100;
             float A = (float)Math.PI * (float)Math.Pow(D, 2) / 4;
             float maxLoad = ((E * A) / L / nodeCount) * maxUx;
-            load = getLoad(maxLoad, NodeLoad.x, nodeCount, Counts);
+            load = getLoad(maxLoad, NodeLoad.y, nodeCount, Counts);
             time = getT(dt, Counts);
             rope = new Rope_t(time, nodeCount, L, E, D, ro, ref load);
             await Task.Run(Simulating);

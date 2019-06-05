@@ -22,7 +22,7 @@ namespace spring
                 pos += dl;
             }
             Nodes[Nodes.Length - 1] = new Node_t(time.Length, new float[3] { pos, 0, 0 }, NodeFreedom.locked, NodeLoad.none, Nodes.Length - 1, new int[1] { Nodes.Length - 2 }, E, D);
-            Nodes[Nodes.Length / 2].LoadType = NodeLoad.x;
+            Nodes[Nodes.Length / 2].LoadType = NodeLoad.y;
             foreach (var node in Nodes)
             {
                 EvalLinksLength(node, D, ro);
