@@ -17,10 +17,10 @@
             float[] lNpUx = crds.ToLoc(dcm, Np[(int)N.u]);
             //calc delta of Ux
             float oldUx2 = lBpUx[(int)C.x] - lNpUx[(int)C.x];
-            float oldUy2 = lBpUx[(int)C.y] - lNpUx[(int)C.y];
+            //float oldUy2 = lBpUx[(int)C.y] - lNpUx[(int)C.y];
             //calc Fn of link
             Fn[(int)C.x] = E * A / oldL2 * oldUx2;
-            Fn[(int)C.y] = 12f * E * I / maf.P3(oldL2) * oldUy2;
+            //Fn[(int)C.y] = 12f * E * I / maf.P3(oldL2) * oldUy2;
             //convert Fn to global coords and return
             return crds.ToLoc(dcm, Fn);
         }

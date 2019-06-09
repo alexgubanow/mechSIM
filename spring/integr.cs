@@ -9,7 +9,7 @@ namespace spring
         private const float v3 = 1f;
         private const float v4 = 1f;
 
-
+        
         public static void EulerExpl(ref float[][] now, float[][] before, float dt, float m)
         {
             now[(int)N.a][(int)C.x] = before[(int)N.f][(int)C.x] / m;
@@ -34,6 +34,17 @@ namespace spring
                 now[(int)N.v][axis] = before[(int)N.v][axis] + (maf.hlf * (before[(int)N.a][axis] + now[(int)N.a][axis]) * dt);
                 now[(int)N.u][axis] = before[(int)N.u][axis] + before[(int)N.v][axis] * dt + (maf.hlf * before[(int)N.a][axis] * maf.P2(dt));
                 now[(int)N.p][axis] = before[(int)N.p][axis] + before[(int)N.u][axis];
+            }
+        }
+        public static void VerletUSD(ref float[][] now, float[][] before, float dt, float m)
+        {
+            for (int axis = 0; axis < 3; axis++)
+            {
+                //now[(int)N.p][axis] = before[(int)N.p][axis] + before[(int)N.u][axis];
+                now[(int)N.u][axis] = now[(int)N.p][axis] - before[(int)N.p][axis];
+                now[(int)N.v][axis] = now[(int)N.u][axis] - before[(int)N.u][axis];
+                now[(int)N.a][axis] = now[(int)N.v][axis] - before[(int)N.v][axis];
+                now[(int)N.f][axis] = now[(int)N.a][axis] / m;
             }
         }
 

@@ -68,6 +68,7 @@
     <Compile Include="Rope_t.cs" />
     <Compile Include="vectr.cs" />
     <Compile Include="ViewModels\CoordPlotViewModel.cs" />
+    <Compile Include="ViewModels\Load.cs" />
     <Compile Include="ViewModels\VelPlotViewModel.cs" />
     <Compile Include="ViewModels\DisplPlotViewModel.cs" />
     <Compile Include="ViewModels\AccelPlotViewModel.cs" />
@@ -186,11 +187,17 @@
     <PackageReference Include="ControlzEx">
       <Version>3.0.2.4</Version>
     </PackageReference>
+    <PackageReference Include="DotNetDoctor.CSMatIO">
+      <Version>1.0.3</Version>
+    </PackageReference>
     <PackageReference Include="DryIoc.dll">
       <Version>3.0.2</Version>
     </PackageReference>
     <PackageReference Include="MahApps.Metro">
       <Version>1.6.5</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>12.0.2</Version>
     </PackageReference>
     <PackageReference Include="OxyPlot.Core">
       <Version>1.0.0</Version>

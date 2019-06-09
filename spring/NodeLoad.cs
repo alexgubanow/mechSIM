@@ -2,6 +2,6 @@
 {
     public enum NodeLoad
     {
-        x, y, z, none
+        u, a, f, p, none
     }
 }
