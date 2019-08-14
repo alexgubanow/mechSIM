@@ -31,13 +31,14 @@ namespace spring.Views
         {
             _regionManager.Regions["MainViewRegion"].Add(_container.Resolve<MainView>());
             //propsViewRegion
-            _regionManager.Regions["propsViewRegion"].Add(_container.Resolve<propsView>());
-            //_regionManager.Regions["plotsViewRegion"].Add(_container.Resolve<plotsView>());
-            _regionManager.Regions["ForcePlotViewRegion"].Add(_container.Resolve<ForcePlotView>());
-            _regionManager.Regions["DisplPlotViewRegion"].Add(_container.Resolve<DisplPlotView>());
-            _regionManager.Regions["AccelPlotViewRegion"].Add(_container.Resolve<AccelPlotView>());
-            _regionManager.Regions["VelPlotViewRegion"].Add(_container.Resolve<VelPlotView>());
-            _regionManager.Regions["CoordPlotViewRegion"].Add(_container.Resolve<CoordPlotView>());
+            //_regionManager.Regions["propsViewRegion"].Add(_container.Resolve<propsView>());
+            //_regionManager.Regions["ThrDViewRegion"].Add(_container.Resolve<ThrDView>());
+            ////_regionManager.Regions["plotsViewRegion"].Add(_container.Resolve<plotsView>());
+            //_regionManager.Regions["ForcePlotViewRegion"].Add(_container.Resolve<ForcePlotView>());
+            //_regionManager.Regions["DisplPlotViewRegion"].Add(_container.Resolve<DisplPlotView>());
+            //_regionManager.Regions["AccelPlotViewRegion"].Add(_container.Resolve<AccelPlotView>());
+            //_regionManager.Regions["VelPlotViewRegion"].Add(_container.Resolve<VelPlotView>());
+            //_regionManager.Regions["CoordPlotViewRegion"].Add(_container.Resolve<CoordPlotView>());
         }
     }
 }

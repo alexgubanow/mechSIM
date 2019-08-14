@@ -8,16 +8,64 @@
              xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:oxy="http://oxyplot.org/wpf"
              xmlns:lcl="clr-namespace:spring"
+             xmlns:h="http://helix-toolkit.org/wpf"
              mc:Ignorable="d" d:DesignHeight="500" d:DesignWidth="700">
     <DockPanel LastChildFill="True">
         <Button DockPanel.Dock="Bottom" Content="Compute" Command="{Binding Compute}" Margin="5"/>
         <ContentControl DockPanel.Dock="Bottom" prism:RegionManager.RegionName="propsViewRegion"
                             MinHeight="20"/>
         <!--<ContentControl prism:RegionManager.RegionName="plotsViewRegion"/>-->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <h:HelixViewport3D Grid.Column="0" Grid.Row="0"  Background="{h:LinearGradientBrush Gray, White}"
+                                ShowCameraInfo="True">
+                <h:HelixViewport3D.Camera>
+                    <OrthographicCamera Position="0,-80.22,0" LookDirection="0,80.22,0" UpDirection="0,0,1" Width="56"/>
+                </h:HelixViewport3D.Camera>
+                <h:SunLight/>
+                <!--<h:GridLinesVisual3D/>-->
+                <lcl:GridLines YAxisLineColor="#4B4B96" LengthDirection="1,0,0" Normal="0,-1,0" />
+            </h:HelixViewport3D>
+            <h:HelixViewport3D Grid.Column="1" Grid.Row="0" Background="{h:LinearGradientBrush Gray, White}"
+                                ShowCameraInfo="True">
+                <h:HelixViewport3D.DefaultCamera>
+                    <PerspectiveCamera Position="-20 -40 20" LookDirection="17 34 -17" UpDirection="0 0 1"/>
+                </h:HelixViewport3D.DefaultCamera>
+                <h:SunLight/>
+                <h:GridLinesVisual3D/>
+            </h:HelixViewport3D>
+            <h:HelixViewport3D Grid.Column="0" Grid.Row="1"  Background="{h:LinearGradientBrush Gray, White}"
+                                ShowCameraInfo="True">
+                <h:HelixViewport3D.Camera>
+                    <OrthographicCamera Position="-80.22,0,0" LookDirection="80.22,0,0" UpDirection="0,0,1" Width="56"/>
+                </h:HelixViewport3D.Camera>
+                <h:SunLight/>
+                <!--<h:GridLinesVisual3D/>-->
+                <lcl:GridLines XAxisLineColor="#4B964B" YAxisLineColor="#4B4B96" LengthDirection="0,1,0" Normal="1,0,0" />
+            </h:HelixViewport3D>
+            <h:HelixViewport3D Grid.Column="1" Grid.Row="1" Background="{h:LinearGradientBrush Gray, White}"
+                                ShowCameraInfo="True">
+                <h:HelixViewport3D.Camera>
+                    <OrthographicCamera Position="0,0,80.22" LookDirection="0,0,-80.22" UpDirection="0,1,0" Width="56"/>
+                </h:HelixViewport3D.Camera>
+                <h:SunLight/>
+                <lcl:GridLines/>
+            </h:HelixViewport3D>
 
-        <TabControl>
+        </Grid>
+        <!--<TabControl>
+            <TabItem Header="3D view">
+                <ContentControl prism:RegionManager.RegionName="ThrDViewRegion"/>
+            </TabItem>
             <TabItem Header="Displacement">
-        <ContentControl prism:RegionManager.RegionName="DisplPlotViewRegion"/>
+                <ContentControl prism:RegionManager.RegionName="DisplPlotViewRegion"/>
             </TabItem>
             <TabItem Header="Force">
                 <ContentControl prism:RegionManager.RegionName="ForcePlotViewRegion"/>
@@ -31,6 +79,6 @@
             <TabItem Header="Coordinates">
                 <ContentControl prism:RegionManager.RegionName="CoordPlotViewRegion"/>
             </TabItem>
-        </TabControl>
+        </TabControl>-->
     </DockPanel>
 </UserControl>
