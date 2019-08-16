@@ -13,6 +13,7 @@ namespace spring.ViewModels
 {
     public class DrawPlotEvent : PubSubEvent<DataToDraw> { }
     public class Update3dEvent : PubSubEvent<DataToDraw> { }
+    public class DrawTlineEvent : PubSubEvent<float> { }
     public class RemoveObjEvent : PubSubEvent { }
     public class PlotViewModel : BindableBase
     {
@@ -32,6 +33,7 @@ namespace spring.ViewModels
             _ea.GetEvent<DrawPlotEvent>().Subscribe((value) => DrawPoints(value));
             _ea.GetEvent<ClearPlotsEvent>().Subscribe(() => ClearPlot());
             _ea.GetEvent<RemoveObjEvent>().Subscribe(() => RemoveObj_Handle());
+            _ea.GetEvent<DrawTlineEvent>().Subscribe((value) => DrawTline(value));
             RopeCoords = new Point3DCollection
             {
                 new Point3D(0, 0, 0),
@@ -41,7 +43,7 @@ namespace spring.ViewModels
             };
 
             Rect3D BoundingBox = new Rect3D(0, 0, 0, 100, 100, 100);
-            double TickSize = 3;
+            //double TickSize = 3;
 
             //Objs3d.Add(new DefaultLights());
 
@@ -92,7 +94,7 @@ namespace spring.ViewModels
                 this.Objs3d.Add(new DefaultLights());
             }
 
-            this.Objs3d.Add(new BoxVisual3D {});
+            this.Objs3d.Add(new BoxVisual3D { });
         }
         private DelegateCommand _RemoveObj;
 
@@ -117,7 +119,7 @@ namespace spring.ViewModels
                     awePlotModelX.InvalidatePlot(true);
                     break;
                 case C.y:
-                    awePlotModelY.  Series.Add(aweLineSeries);
+                    awePlotModelY.Series.Add(aweLineSeries);
                     awePlotModelY.InvalidatePlot(true);
                     break;
                 case C.z:
@@ -127,6 +129,33 @@ namespace spring.ViewModels
                 default:
                     break;
             }
+        }
+        private void DrawTline(float t)
+        {
+            LineSeries aweLineSeriesX = new LineSeries { Title = "current time" };
+            aweLineSeriesX.Points.AddRange(new DataPoint[2] { new DataPoint(t, -1f), new DataPoint(t, 1f) });
+            LineSeries aweLineSeriesY = new LineSeries { Title = "current time" };
+            aweLineSeriesY.Points.AddRange(new DataPoint[2] { new DataPoint(t, -1f), new DataPoint(t, 1f) });
+            LineSeries aweLineSeriesZ = new LineSeries { Title = "current time" };
+            aweLineSeriesZ.Points.AddRange(new DataPoint[2] { new DataPoint(t, -1f), new DataPoint(t, 1f) });
+            if (awePlotModelX.Series.Count > 0)
+            {
+                awePlotModelX.Series.RemoveAt(0);
+            }
+            awePlotModelX.Series.Insert(0, aweLineSeriesX);
+            awePlotModelX.InvalidatePlot(true);
+            if (awePlotModelY.Series.Count > 0)
+            {
+                awePlotModelY.Series.RemoveAt(0);
+            }
+            awePlotModelY.Series.Insert(0, aweLineSeriesY);
+            awePlotModelY.InvalidatePlot(true);
+            if (awePlotModelZ.Series.Count > 0)
+            {
+                awePlotModelZ.Series.RemoveAt(0);
+            }
+            awePlotModelZ.Series.Insert(0, aweLineSeriesZ);
+            awePlotModelZ.InvalidatePlot(true);
         }
         void RemoveObj_Handle()
         {

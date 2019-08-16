@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace spring.ViewModels
 {
+    public class DrawEvent : PubSubEvent { }
     public class MainViewModel : BindableBase
     {
         private readonly IEventAggregator _ea;
@@ -21,6 +22,8 @@ namespace spring.ViewModels
         public float E { get; set; }
         public float L { get; set; }
         public float D { get; set; }
+        private float _CurrT;
+        public float CurrT { get => _CurrT; set { _CurrT = value; _ea.GetEvent<DrawTlineEvent>().Publish(CurrT); } }
         public int Counts { get; set; }
         public float dt { get; set; }
         private int selDeriv;
@@ -31,6 +34,7 @@ namespace spring.ViewModels
         {
             _ea = ea;
             SelDeriv = 0;
+            _CurrT = 0;
             _ea.GetEvent<ComputeEvent>().Subscribe(() => Compute_Click());
             //DrawEvent
             _ea.GetEvent<DrawEvent>().Subscribe(() => DrawPoints());
@@ -38,11 +42,14 @@ namespace spring.ViewModels
             _ea.GetEvent<EChangedEvent>().Subscribe((value) => E = value);
             _ea.GetEvent<LChangedEvent>().Subscribe((value) => L = value);
             _ea.GetEvent<DChangedEvent>().Subscribe((value) => D = value);
-            _ea.GetEvent<CountsChangedEvent>().Subscribe((value) => Counts = value);
+            _ea.GetEvent<CountsChangedEvent>().Subscribe((value) =>
+            {
+                Counts = value;
+            });
             _ea.GetEvent<dtChangedEvent>().Subscribe((value) => dt = value);
             _ea.GetEvent<roChangedEvent>().Subscribe((value) => ro = value);
         }
-
+        
         private DelegateCommand _Compute;
 
         public DelegateCommand Compute => _Compute ?? (_Compute = new DelegateCommand(() => _ea.GetEvent<ComputeEvent>().Publish()));
@@ -178,15 +185,18 @@ namespace spring.ViewModels
 
             return tmp;
         }
-
         private void DrawPoints()
         {
             if (rope != null && load != null)
             {
+                CurrT = 0;
                 _ea.GetEvent<ClearPlotsEvent>().Publish();
-                float[] fdv = ExtractArray(load[rope.Nodes.Length / 2], C.x);
+                //DrawTlineEvent
+                _ea.GetEvent<DrawTlineEvent>().Publish(CurrT);
+
                 if ((N)SelDeriv == N.f)
                 {
+                    float[] fdv = ExtractArray(load[rope.Nodes.Length / 2], C.x);
                     _ea.GetEvent<DrawPlotEvent>().Publish(new DataToDraw() { X = time, Y = fdv, Title = "Fext" });
                 }
                 foreach (var node in rope.Nodes)
