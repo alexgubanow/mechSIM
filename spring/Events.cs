@@ -5,6 +5,7 @@ namespace spring
     //ClearPlotsEvent
     public class ClearPlotsEvent : PubSubEvent { }
     public class ComputeEvent : PubSubEvent { }
+    public class DrawEvent : PubSubEvent { }
     public class NodesChangedEvent : PubSubEvent<int> { }
     public class EChangedEvent : PubSubEvent<float> { }
     public class LChangedEvent : PubSubEvent<float> { }

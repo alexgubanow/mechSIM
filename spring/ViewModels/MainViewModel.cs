@@ -23,12 +23,17 @@ namespace spring.ViewModels
         public float D { get; set; }
         public int Counts { get; set; }
         public float dt { get; set; }
+        private int selDeriv;
+        public int SelDeriv { get => selDeriv; set { selDeriv = value; _ea.GetEvent<DrawEvent>().Publish(); } }
         public float ro { get; set; }
 
         public MainViewModel(IEventAggregator ea)
         {
             _ea = ea;
+            SelDeriv = 0;
             _ea.GetEvent<ComputeEvent>().Subscribe(() => Compute_Click());
+            //DrawEvent
+            _ea.GetEvent<DrawEvent>().Subscribe(() => DrawPoints());
             _ea.GetEvent<NodesChangedEvent>().Subscribe((value) => nodeCount = value);
             _ea.GetEvent<EChangedEvent>().Subscribe((value) => E = value);
             _ea.GetEvent<LChangedEvent>().Subscribe((value) => L = value);
@@ -39,6 +44,7 @@ namespace spring.ViewModels
         }
 
         private DelegateCommand _Compute;
+
         public DelegateCommand Compute => _Compute ?? (_Compute = new DelegateCommand(() => _ea.GetEvent<ComputeEvent>().Publish()));
 
         private float[] getT(float dt, int Counts)
@@ -59,7 +65,7 @@ namespace spring.ViewModels
                 float maxUx = 0.01f * L / nodeCount / 100;
                 float A = (float)Math.PI * (float)Math.Pow(D, 2) / 4;
                 float maxLoad = ((E * A) / L / nodeCount) * maxUx;
-                if (node == nodes /2)
+                if (node == nodes / 2)
                 {
                     tCounts[node] = new float[Counts][];
                     tCounts[node][0] = new float[3];
@@ -127,7 +133,7 @@ namespace spring.ViewModels
             //    //try
             //    //{
 
-                    
+
             //    //}
             //    //catch (Exception)
             //    //{
@@ -136,7 +142,7 @@ namespace spring.ViewModels
             //    //    //MessageBox.Show("Invalid binary MAT-file! Please select a valid binary MAT-file.",
             //    //    //    "Invalid MAT-file", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             //    //}
-                    
+
             //}
             rope = new Rope_t(time, nodeCount, L, E, D, ro, ref load);
             await Task.Run(Simulating);
@@ -175,17 +181,24 @@ namespace spring.ViewModels
 
         private void DrawPoints()
         {
-            float[] fdv = ExtractArray(load[rope.Nodes.Length /2 ], C.x);
-            _ea.GetEvent<DrawPlotEvent>().Publish(new DataToDraw() { X = time, Y = fdv, Title = "Fext" });
-            foreach (var node in rope.Nodes)
+            if (rope != null && load != null)
             {
-                float[] tmp = ExtractArray(node.tm, N.f, C.x);
-                _ea.GetEvent<DrawPlotEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID, axis = C.x });
-                tmp = ExtractArray(node.tm, N.f, C.y);
-                _ea.GetEvent<DrawPlotEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID, axis = C.y });
-                tmp = ExtractArray(node.tm, N.f, C.z);
-                _ea.GetEvent<DrawPlotEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID, axis = C.z });
-                tmp = null;
+                _ea.GetEvent<ClearPlotsEvent>().Publish();
+                float[] fdv = ExtractArray(load[rope.Nodes.Length / 2], C.x);
+                if ((N)SelDeriv == N.f)
+                {
+                    _ea.GetEvent<DrawPlotEvent>().Publish(new DataToDraw() { X = time, Y = fdv, Title = "Fext" });
+                }
+                foreach (var node in rope.Nodes)
+                {
+                    float[] tmp = ExtractArray(node.tm, (N)SelDeriv, C.x);
+                    _ea.GetEvent<DrawPlotEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID, axis = C.x });
+                    tmp = ExtractArray(node.tm, (N)SelDeriv, C.y);
+                    _ea.GetEvent<DrawPlotEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID, axis = C.y });
+                    tmp = ExtractArray(node.tm, (N)SelDeriv, C.z);
+                    _ea.GetEvent<DrawPlotEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID, axis = C.z });
+                    tmp = null;
+                }
             }
         }
     }

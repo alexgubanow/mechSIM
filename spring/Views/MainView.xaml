@@ -13,7 +13,14 @@
     <DockPanel LastChildFill="True">
         <Button DockPanel.Dock="Bottom" Content="Compute" Command="{Binding Compute}" Margin="5"/>
         <ContentControl DockPanel.Dock="Bottom" prism:RegionManager.RegionName="propsViewRegion" MinHeight="20"/>
-        <controls:DropDownButton DockPanel.Dock="Top"/>
+        <ComboBox DockPanel.Dock="Top" SelectedIndex="{Binding SelDeriv, Mode=TwoWay}">
+            <ComboBoxItem Content="Coordinates"/>
+            <ComboBoxItem Content="Displacement"/>
+            <ComboBoxItem Content="Velosity"/>
+            <ComboBoxItem Content="Acceleration"/>
+            <ComboBoxItem Content="Jerk"/>
+            <ComboBoxItem Content="Force"/>
+        </ComboBox>
         <ContentControl prism:RegionManager.RegionName="PlotViewRegion" Margin="0,5,0,0"/>       
     </DockPanel>
 </UserControl>

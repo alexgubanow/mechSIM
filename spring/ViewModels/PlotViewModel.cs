@@ -13,11 +13,11 @@ namespace spring.ViewModels
         public PlotViewModel(IEventAggregator ea)
         {
             _ea = ea;
-            awePlotModelX = new PlotModel { Title = "Derivatives in X axis" };
+            awePlotModelX = new PlotModel { Title = "X axis" };
             awePlotModelX.InvalidatePlot(true);
-            awePlotModelY = new PlotModel { Title = "Derivatives in Y axis" };
+            awePlotModelY = new PlotModel { Title = "Y axis" };
             awePlotModelY.InvalidatePlot(true);
-            awePlotModelZ = new PlotModel { Title = "Derivatives in Z axis" };
+            awePlotModelZ = new PlotModel { Title = "Z axis" };
             awePlotModelZ.InvalidatePlot(true);
             _ea.GetEvent<DrawPlotEvent>().Subscribe((value) => DrawPoints(value));
             _ea.GetEvent<ClearPlotsEvent>().Subscribe(() => ClearPlot());
