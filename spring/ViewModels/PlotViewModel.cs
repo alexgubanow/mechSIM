@@ -5,21 +5,21 @@ using Prism.Mvvm;
 
 namespace spring.ViewModels
 {
-    public class DrawForceEvent : PubSubEvent<DataToDraw> { }
-    public class ForcePlotViewModel : BindableBase
+    public class DrawPlotEvent : PubSubEvent<DataToDraw> { }
+    public class PlotViewModel : BindableBase
     {
         private readonly IEventAggregator _ea;
 
-        public ForcePlotViewModel(IEventAggregator ea)
+        public PlotViewModel(IEventAggregator ea)
         {
             _ea = ea;
-            awePlotModelX = new PlotModel { Title = "Forces in X axis of rope" };
+            awePlotModelX = new PlotModel { Title = "Derivatives in X axis" };
             awePlotModelX.InvalidatePlot(true);
-            awePlotModelY = new PlotModel { Title = "Forces in Y axis of rope" };
+            awePlotModelY = new PlotModel { Title = "Derivatives in Y axis" };
             awePlotModelY.InvalidatePlot(true);
-            awePlotModelZ = new PlotModel { Title = "Forces in Z axis of rope" };
+            awePlotModelZ = new PlotModel { Title = "Derivatives in Z axis" };
             awePlotModelZ.InvalidatePlot(true);
-            _ea.GetEvent<DrawForceEvent>().Subscribe((value) => DrawPoints(value));
+            _ea.GetEvent<DrawPlotEvent>().Subscribe((value) => DrawPoints(value));
             _ea.GetEvent<ClearPlotsEvent>().Subscribe(() => ClearPlot());
         }
 

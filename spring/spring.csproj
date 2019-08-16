@@ -60,7 +60,6 @@
     </ApplicationDefinition>
     <Compile Include="coords.cs" />
     <Compile Include="DataToDraw.cs" />
-    <Compile Include="GridLines.cs" />
     <Compile Include="integr.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="maf.cs" />
@@ -68,42 +67,19 @@
     <Compile Include="NodeLoad.cs" />
     <Compile Include="Rope_t.cs" />
     <Compile Include="vectr.cs" />
-    <Compile Include="ViewModels\CoordPlotViewModel.cs" />
+    <Compile Include="ViewModels\PlotViewModel.cs" />
     <Compile Include="ViewModels\Load.cs" />
-    <Compile Include="ViewModels\VelPlotViewModel.cs" />
-    <Compile Include="ViewModels\DisplPlotViewModel.cs" />
-    <Compile Include="ViewModels\AccelPlotViewModel.cs" />
-    <Compile Include="ViewModels\ForcePlotViewModel.cs" />
-    <Compile Include="ViewModels\plotsViewModel.cs" />
     <Compile Include="ViewModels\propsViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="lblTxTbox.xaml.cs">
       <DependentUpon>lblTxTbox.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\CoordPlotView.xaml.cs">
-      <DependentUpon>CoordPlotView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ThrDView.xaml.cs">
-      <DependentUpon>ThrDView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\VelPlotView.xaml.cs">
-      <DependentUpon>VelPlotView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\DisplPlotView.xaml.cs">
-      <DependentUpon>DisplPlotView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\AccelPlotView.xaml.cs">
-      <DependentUpon>AccelPlotView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ForcePlotView.xaml.cs">
-      <DependentUpon>ForcePlotView.xaml</DependentUpon>
+    <Compile Include="Views\PlotView.xaml.cs">
+      <DependentUpon>PlotView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\plotsView.xaml.cs">
-      <DependentUpon>plotsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\propsView.xaml.cs">
       <DependentUpon>propsView.xaml</DependentUpon>
@@ -120,37 +96,13 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\CoordPlotView.xaml">
+    <Page Include="Views\PlotView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ThrDView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\VelPlotView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\DisplPlotView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\AccelPlotView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ForcePlotView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\MainView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\plotsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\propsView.xaml">
       <SubType>Designer</SubType>

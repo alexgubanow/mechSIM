@@ -176,26 +176,16 @@ namespace spring.ViewModels
         private void DrawPoints()
         {
             float[] fdv = ExtractArray(load[rope.Nodes.Length /2 ], C.x);
-            _ea.GetEvent<DrawForceEvent>().Publish(new DataToDraw() { X = time, Y = fdv, Title = "Fext" });
+            _ea.GetEvent<DrawPlotEvent>().Publish(new DataToDraw() { X = time, Y = fdv, Title = "Fext" });
             foreach (var node in rope.Nodes)
             {
-                foreach (C ax in Enum.GetValues(typeof(C)))
-                {
-                    float[] tmp = ExtractArray(node.tm, N.f, ax);
-                    _ea.GetEvent<DrawForceEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID, axis = ax });
-                    tmp = null;
-                    tmp = ExtractArray(node.tm, N.u, ax);
-                    _ea.GetEvent<DrawDisplEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID, axis = ax });
-                    tmp = null;
-                    tmp = ExtractArray(node.tm, N.v, ax);
-                    _ea.GetEvent<DrawVelEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID, axis = ax });
-                    tmp = null;
-                    tmp = ExtractArray(node.tm, N.a, ax);
-                    _ea.GetEvent<DrawAccelEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID, axis = ax });
-                    tmp = null;
-                    tmp = ExtractArray(node.tm, N.p, ax);
-                    _ea.GetEvent<DrawCoordEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID, axis = ax });
-                }
+                float[] tmp = ExtractArray(node.tm, N.f, C.x);
+                _ea.GetEvent<DrawPlotEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID, axis = C.x });
+                tmp = ExtractArray(node.tm, N.f, C.y);
+                _ea.GetEvent<DrawPlotEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID, axis = C.y });
+                tmp = ExtractArray(node.tm, N.f, C.z);
+                _ea.GetEvent<DrawPlotEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID, axis = C.z });
+                tmp = null;
             }
         }
     }

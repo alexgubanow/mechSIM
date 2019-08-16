@@ -5,9 +5,9 @@ namespace spring.Views
     /// <summary>
     /// Interaction logic for ForcePlotView.xaml
     /// </summary>
-    public partial class VelPlotView : UserControl
+    public partial class PlotView : UserControl
     {
-        public VelPlotView()
+        public PlotView()
         {
             InitializeComponent();
         }
