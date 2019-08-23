@@ -68,13 +68,13 @@ namespace spring.ViewModels
             Objs3d.Add(new CubeVisual3D
             {
                 Center = new Point3D(1, 0, 6),
-                SideLength = 2,
+                SideLength = 1,
                 Fill = Brushes.Gray
             });
             Objs3d.Add(new CubeVisual3D
             {
-                Center = new Point3D(10, 0, 6),
-                SideLength = 2,
+                Center = new Point3D(13, 0, 6),
+                SideLength = 1,
                 Fill = Brushes.Gray
             });
         }
@@ -130,13 +130,19 @@ namespace spring.ViewModels
                 });
                 Objs3d.Add(new LinesVisual3D
                 {
-                    Points = { new Point3D(7, 0, 2), new Point3D(9, 0, 4) },
+                    Points = { new Point3D(7, 0, 2), new Point3D(10, 0, 2) },
                     Thickness = 2,
                     Color = Brushes.Blue.Color
                 });
                 Objs3d.Add(new LinesVisual3D
                 {
-                    Points = { new Point3D(9, 0, 4), new Point3D(10, 0, 6) },
+                    Points = { new Point3D(10, 0, 2), new Point3D(12, 0, 4) },
+                    Thickness = 2,
+                    Color = Brushes.Blue.Color
+                });
+                Objs3d.Add(new LinesVisual3D
+                {
+                    Points = { new Point3D(12, 0, 4), new Point3D(13, 0, 6) },
                     Thickness = 2,
                     Color = Brushes.Blue.Color
                 });
@@ -144,12 +150,12 @@ namespace spring.ViewModels
         }
         private void DrawTline(float t)
         {
-            Application.Current.Dispatcher.Invoke(delegate
-            {
-                awePlotModelX.PlotView.ShowTracker(new TrackerHitResult() { Text = t.ToString(), DataPoint = new DataPoint(t, 0) });
-                awePlotModelY.PlotView.ShowTracker(new TrackerHitResult() { Text = t.ToString(), DataPoint = new DataPoint(t, 0) });
-                awePlotModelZ.PlotView.ShowTracker(new TrackerHitResult() { Text = t.ToString(), DataPoint = new DataPoint(t, 0) });
-            });
+            //Application.Current.Dispatcher.Invoke(delegate
+            //{
+            //    awePlotModelX.PlotView.ShowTracker(new TrackerHitResult() { Text = t.ToString(), DataPoint = new DataPoint(t, 0) });
+            //    awePlotModelY.PlotView.ShowTracker(new TrackerHitResult() { Text = t.ToString(), DataPoint = new DataPoint(t, 0) });
+            //    awePlotModelZ.PlotView.ShowTracker(new TrackerHitResult() { Text = t.ToString(), DataPoint = new DataPoint(t, 0) });
+            //});
             //LineSeries aweLineSeriesX = new LineSeries { Title = "current time" };
             //aweLineSeriesX.Points.AddRange(new DataPoint[2] { new DataPoint(t, -1f), new DataPoint(t, 1f) });
             //LineSeries aweLineSeriesY = new LineSeries { Title = "current time" };

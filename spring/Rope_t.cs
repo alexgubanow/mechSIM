@@ -24,16 +24,14 @@ namespace spring
                 pos += dl;
             }
             Nodes[Nodes.Length - 1] = new Node_t(time.Length, new float[3] { pos, 0, 0 }, NodeFreedom.locked, NodeLoad.none, Nodes.Length - 1, new int[1] { Nodes.Length - 2 }, E, D);
-            Nodes[0].tm[0][(int)N.p] = new float[] { 0, float.Parse("12.5e-4", CultureInfo.InvariantCulture), 0 };
-            Nodes[1].tm[0][(int)N.p] = new float[] { float.Parse("24.6202e-4", CultureInfo.InvariantCulture), float.Parse("8.1588e-4", CultureInfo.InvariantCulture), 0 };
-            Nodes[2].tm[0][(int)N.p] = new float[] { float.Parse("49.2404e-4", CultureInfo.InvariantCulture), float.Parse("3.8176e-4", CultureInfo.InvariantCulture), 0 };
-            Nodes[3].tm[0][(int)N.p] = new float[] { float.Parse("74.2404e-4", CultureInfo.InvariantCulture), float.Parse("3.8176e-4", CultureInfo.InvariantCulture), 0 };
-            Nodes[4].tm[0][(int)N.p] = new float[] { float.Parse("99.2404e-4", CultureInfo.InvariantCulture), float.Parse("3.8176e-4", CultureInfo.InvariantCulture), 0 };
-            Nodes[5].tm[0][(int)N.p] = new float[] { float.Parse("124.2404e-4", CultureInfo.InvariantCulture), float.Parse("3.8176e-4", CultureInfo.InvariantCulture), 0 };
-            Nodes[6].tm[0][(int)N.p] = new float[] { float.Parse("149.2404e-4", CultureInfo.InvariantCulture), float.Parse("3.8176e-4", CultureInfo.InvariantCulture), 0 };
-            Nodes[7].tm[0][(int)N.p] = new float[] { float.Parse("174.2404e-4", CultureInfo.InvariantCulture), float.Parse("3.8176e-4", CultureInfo.InvariantCulture), 0 };
-            Nodes[8].tm[0][(int)N.p] = new float[] { float.Parse("198.8606e-4", CultureInfo.InvariantCulture), float.Parse("8.1588e-4", CultureInfo.InvariantCulture), 0 };
-            Nodes[9].tm[0][(int)N.p] = new float[] { float.Parse("223.4808e-4", CultureInfo.InvariantCulture), float.Parse("12.5e-4", CultureInfo.InvariantCulture), 0 };
+
+            Nodes[0].tm[0][(int)N.p] = new float[] { float.Parse("1e-3", CultureInfo.InvariantCulture), float.Parse("6e-3", CultureInfo.InvariantCulture), 0 };
+            Nodes[1].tm[0][(int)N.p] = new float[] { float.Parse("2e-3", CultureInfo.InvariantCulture), float.Parse("4e-3", CultureInfo.InvariantCulture), 0 };
+            Nodes[2].tm[0][(int)N.p] = new float[] { float.Parse("4e-3", CultureInfo.InvariantCulture), float.Parse("2e-3", CultureInfo.InvariantCulture), 0 };
+            Nodes[3].tm[0][(int)N.p] = new float[] { float.Parse("7e-3", CultureInfo.InvariantCulture), float.Parse("2e-3", CultureInfo.InvariantCulture), 0 };
+            Nodes[4].tm[0][(int)N.p] = new float[] { float.Parse("10e-3", CultureInfo.InvariantCulture), float.Parse("2e-3", CultureInfo.InvariantCulture), 0 };
+            Nodes[5].tm[0][(int)N.p] = new float[] { float.Parse("12e-3", CultureInfo.InvariantCulture), float.Parse("4e-3", CultureInfo.InvariantCulture), 0 };
+            Nodes[6].tm[0][(int)N.p] = new float[] { float.Parse("13e-3", CultureInfo.InvariantCulture), float.Parse("6e-3", CultureInfo.InvariantCulture), 0 };
             Nodes[Nodes.Length / 2].LoadType = NodeLoad.f;
             //Nodes[Nodes.Length - 1].freedom = NodeFreedom.xyz;
             foreach (var node in Nodes)
