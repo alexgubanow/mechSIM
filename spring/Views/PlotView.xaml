@@ -20,7 +20,20 @@
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <oxy:PlotView Grid.Column="0" Grid.Row="0" Model="{Binding awePlotModelY}"/>
+        <!--<oxy:PlotView Grid.Column="0" Grid.Row="0" Model="{Binding awePlotModelY}"/>-->
+        <oxy:PlotView Grid.Column="0" Grid.Row="0" Model="{Binding Path=awePlotModelY}" >
+            <oxy:PlotView.DefaultTrackerTemplate>
+                <ControlTemplate>
+                    <oxy:TrackerControl Position="{Binding Position}" 
+                                        HorizontalLineVisibility="Collapsed" 
+                                        LineExtents="{Binding PlotModel.PlotArea}" LineStroke="Blue">
+                        <oxy:TrackerControl.Content>
+                            <TextBlock Text="{Binding}" Margin="0" />
+                        </oxy:TrackerControl.Content>
+                    </oxy:TrackerControl>
+                </ControlTemplate>
+            </oxy:PlotView.DefaultTrackerTemplate>
+        </oxy:PlotView>
         <oxy:PlotView Grid.Column="0" Grid.Row="1" Model="{Binding awePlotModelZ}"/>
         <oxy:PlotView Grid.Column="1" Grid.Row="1" Model="{Binding awePlotModelX}"/>
         <h:HelixViewport3D Grid.Column="1" Grid.Row="0" ItemsSource="{Binding Objs3d, Mode=TwoWay}"

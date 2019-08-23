@@ -25,18 +25,20 @@ namespace spring.ViewModels
             _ea = ea;
             Objs3d = new ObservableCollection<Visual3D>();
             awePlotModelX = new PlotModel { Title = "X axis" };
-            awePlotModelX.InvalidatePlot(true);
             awePlotModelY = new PlotModel { Title = "Y axis" };
-            awePlotModelY.InvalidatePlot(true);
             awePlotModelZ = new PlotModel { Title = "Z axis" };
+            awePlotModelX.InvalidatePlot(true);
+            awePlotModelY.InvalidatePlot(true);
             awePlotModelZ.InvalidatePlot(true);
             _ea.GetEvent<DrawPlotEvent>().Subscribe((value) => DrawPoints(value));
             _ea.GetEvent<Draw3dPlotEvent>().Subscribe((value) => Draw3d(value));
             _ea.GetEvent<ClearPlotsEvent>().Subscribe(() => ClearPlot());
             _ea.GetEvent<Load3dEvent>().Subscribe(() => Load3d());
-            _ea.GetEvent<DrawTlineEvent>().Subscribe((value) => DrawTline(value));
+            //_ea.GetEvent<DrawTlineEvent>().Subscribe((value) => DrawTline(value));
+            _ea.GetEvent<DrawTlineEvent>().Subscribe((value) => Position = value);
         }
 
+        public float Position { get; set; }
         public PlotModel awePlotModelX { get; set; }
         public PlotModel awePlotModelY { get; set; }
         public PlotModel awePlotModelZ { get; set; }
@@ -65,13 +67,13 @@ namespace spring.ViewModels
             });
             Objs3d.Add(new CubeVisual3D
             {
-                Center = new Point3D(0, 0, 10),
+                Center = new Point3D(1, 0, 6),
                 SideLength = 2,
                 Fill = Brushes.Gray
             });
             Objs3d.Add(new CubeVisual3D
             {
-                Center = new Point3D(20, 0, 10),
+                Center = new Point3D(10, 0, 6),
                 SideLength = 2,
                 Fill = Brushes.Gray
             });
@@ -110,31 +112,31 @@ namespace spring.ViewModels
                 Clear3d();
                 Objs3d.Add(new LinesVisual3D
                 {
-                    Points = { new Point3D(r.Next(d) - d / 2, 0, r.Next(d) - d / 2), new Point3D(r.Next(d) - d / 2, 0, r.Next(d) - d / 2) },
+                    Points = { new Point3D(1, 0, 6), new Point3D(2, 0, 4) },
                     Thickness = 2,
                     Color = Brushes.Blue.Color
                 });
                 Objs3d.Add(new LinesVisual3D
                 {
-                    Points = { new Point3D(r.Next(d) - d / 2, 0, r.Next(d) - d / 2), new Point3D(r.Next(d) - d / 2, 0, r.Next(d) - d / 2) },
+                    Points = { new Point3D(2, 0, 4), new Point3D(4, 0, 2) },
                     Thickness = 2,
                     Color = Brushes.Blue.Color
                 });
                 Objs3d.Add(new LinesVisual3D
                 {
-                    Points = { new Point3D(r.Next(d) - d / 2, 0, r.Next(d) - d / 2), new Point3D(r.Next(d) - d / 2, 0, r.Next(d) - d / 2) },
+                    Points = { new Point3D(4, 0, 2), new Point3D(7, 0, 2) },
                     Thickness = 2,
                     Color = Brushes.Blue.Color
                 });
                 Objs3d.Add(new LinesVisual3D
                 {
-                    Points = { new Point3D(r.Next(d) - d / 2, 0, r.Next(d) - d / 2), new Point3D(r.Next(d) - d / 2, 0, r.Next(d) - d / 2) },
+                    Points = { new Point3D(7, 0, 2), new Point3D(9, 0, 4) },
                     Thickness = 2,
                     Color = Brushes.Blue.Color
                 });
                 Objs3d.Add(new LinesVisual3D
                 {
-                    Points = { new Point3D(r.Next(d) - d / 2, 0, r.Next(d) - d / 2), new Point3D(r.Next(d) - d / 2, 0, r.Next(d) - d / 2) },
+                    Points = { new Point3D(9, 0, 4), new Point3D(10, 0, 6) },
                     Thickness = 2,
                     Color = Brushes.Blue.Color
                 });
@@ -142,30 +144,36 @@ namespace spring.ViewModels
         }
         private void DrawTline(float t)
         {
-            LineSeries aweLineSeriesX = new LineSeries { Title = "current time" };
-            aweLineSeriesX.Points.AddRange(new DataPoint[2] { new DataPoint(t, -1f), new DataPoint(t, 1f) });
-            LineSeries aweLineSeriesY = new LineSeries { Title = "current time" };
-            aweLineSeriesY.Points.AddRange(new DataPoint[2] { new DataPoint(t, -1f), new DataPoint(t, 1f) });
-            LineSeries aweLineSeriesZ = new LineSeries { Title = "current time" };
-            aweLineSeriesZ.Points.AddRange(new DataPoint[2] { new DataPoint(t, -1f), new DataPoint(t, 1f) });
-            if (awePlotModelX.Series.Count > 0)
+            Application.Current.Dispatcher.Invoke(delegate
             {
-                awePlotModelX.Series.RemoveAt(0);
-            }
-            awePlotModelX.Series.Insert(0, aweLineSeriesX);
-            awePlotModelX.InvalidatePlot(true);
-            if (awePlotModelY.Series.Count > 0)
-            {
-                awePlotModelY.Series.RemoveAt(0);
-            }
-            awePlotModelY.Series.Insert(0, aweLineSeriesY);
-            awePlotModelY.InvalidatePlot(true);
-            if (awePlotModelZ.Series.Count > 0)
-            {
-                awePlotModelZ.Series.RemoveAt(0);
-            }
-            awePlotModelZ.Series.Insert(0, aweLineSeriesZ);
-            awePlotModelZ.InvalidatePlot(true);
+                awePlotModelX.PlotView.ShowTracker(new TrackerHitResult() { Text = t.ToString(), DataPoint = new DataPoint(t, 0) });
+                awePlotModelY.PlotView.ShowTracker(new TrackerHitResult() { Text = t.ToString(), DataPoint = new DataPoint(t, 0) });
+                awePlotModelZ.PlotView.ShowTracker(new TrackerHitResult() { Text = t.ToString(), DataPoint = new DataPoint(t, 0) });
+            });
+            //LineSeries aweLineSeriesX = new LineSeries { Title = "current time" };
+            //aweLineSeriesX.Points.AddRange(new DataPoint[2] { new DataPoint(t, -1f), new DataPoint(t, 1f) });
+            //LineSeries aweLineSeriesY = new LineSeries { Title = "current time" };
+            //aweLineSeriesY.Points.AddRange(new DataPoint[2] { new DataPoint(t, -1f), new DataPoint(t, 1f) });
+            //LineSeries aweLineSeriesZ = new LineSeries { Title = "current time" };
+            //aweLineSeriesZ.Points.AddRange(new DataPoint[2] { new DataPoint(t, -1f), new DataPoint(t, 1f) });
+            //if (awePlotModelX.Series.Count > 0)
+            //{
+            //    awePlotModelX.Series.RemoveAt(0);
+            //}
+            //awePlotModelX.Series.Insert(0, aweLineSeriesX);
+            //awePlotModelX.InvalidatePlot(true);
+            //if (awePlotModelY.Series.Count > 0)
+            //{
+            //    awePlotModelY.Series.RemoveAt(0);
+            //}
+            //awePlotModelY.Series.Insert(0, aweLineSeriesY);
+            //awePlotModelY.InvalidatePlot(true);
+            //if (awePlotModelZ.Series.Count > 0)
+            //{
+            //    awePlotModelZ.Series.RemoveAt(0);
+            //}
+            //awePlotModelZ.Series.Insert(0, aweLineSeriesZ);
+            //awePlotModelZ.InvalidatePlot(true);
         }
     }
 }
