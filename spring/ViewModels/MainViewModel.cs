@@ -1,15 +1,13 @@
-﻿using Microsoft.Win32;
-using Newtonsoft.Json;
-using Prism.Commands;
+﻿using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace spring.ViewModels
 {
     public class DrawEvent : PubSubEvent { }
+
     public class MainViewModel : BindableBase
     {
         private readonly IEventAggregator _ea;
@@ -18,38 +16,33 @@ namespace spring.ViewModels
         private float[][][] load;
         private Rope_t rope;
 
-        public int nodeCount { get; set; }
-        public float E { get; set; }
-        public float L { get; set; }
-        public float D { get; set; }
+        public props Props { get; set; }
+        public float DeltaTe2 { get => Props.dt * 100; }
         private float _CurrT;
         public float CurrT { get => _CurrT; set { _CurrT = value; _ea.GetEvent<DrawTlineEvent>().Publish(CurrT); } }
-        public int Counts { get; set; }
-        public float dt { get; set; }
+        public float EndT { get => Props.dt * Props.Counts; }
+
         private int selDeriv;
         public int SelDeriv { get => selDeriv; set { selDeriv = value; _ea.GetEvent<DrawEvent>().Publish(); } }
-        public float ro { get; set; }
 
         public MainViewModel(IEventAggregator ea)
         {
             _ea = ea;
+            Props = new props();
             SelDeriv = 0;
             _CurrT = 0;
             _ea.GetEvent<ComputeEvent>().Subscribe(() => Compute_Click());
             //DrawEvent
             _ea.GetEvent<DrawEvent>().Subscribe(() => DrawPoints());
-            _ea.GetEvent<NodesChangedEvent>().Subscribe((value) => nodeCount = value);
-            _ea.GetEvent<EChangedEvent>().Subscribe((value) => E = value);
-            _ea.GetEvent<LChangedEvent>().Subscribe((value) => L = value);
-            _ea.GetEvent<DChangedEvent>().Subscribe((value) => D = value);
-            _ea.GetEvent<CountsChangedEvent>().Subscribe((value) =>
-            {
-                Counts = value;
-            });
-            _ea.GetEvent<dtChangedEvent>().Subscribe((value) => dt = value);
-            _ea.GetEvent<roChangedEvent>().Subscribe((value) => ro = value);
+            _ea.GetEvent<NodesChangedEvent>().Subscribe((value) => Props.nodes = value);
+            _ea.GetEvent<EChangedEvent>().Subscribe((value) => Props.E = value);
+            _ea.GetEvent<LChangedEvent>().Subscribe((value) => Props.L = value);
+            _ea.GetEvent<DChangedEvent>().Subscribe((value) => Props.D = value);
+            _ea.GetEvent<CountsChangedEvent>().Subscribe((value) => { Props.Counts = value; });
+            _ea.GetEvent<dtChangedEvent>().Subscribe((value) => Props.dt = value);
+            _ea.GetEvent<roChangedEvent>().Subscribe((value) => Props.ro = value);
         }
-        
+
         private DelegateCommand _Compute;
 
         public DelegateCommand Compute => _Compute ?? (_Compute = new DelegateCommand(() => _ea.GetEvent<ComputeEvent>().Publish()));
@@ -69,9 +62,9 @@ namespace spring.ViewModels
             float[][][] tCounts = new float[nodes][][];
             for (int node = 0; node < nodes; node++)
             {
-                float maxUx = 0.01f * L / nodeCount / 100;
-                float A = (float)Math.PI * (float)Math.Pow(D, 2) / 4;
-                float maxLoad = ((E * A) / L / nodeCount) * maxUx;
+                float maxUx = 0.01f * Props.L / nodes / 100;
+                float A = (float)Math.PI * (float)Math.Pow(Props.D, 2) / 4;
+                float maxLoad = ((Props.E * A) / Props.L / nodes) * maxUx;
                 if (node == nodes / 2)
                 {
                     tCounts[node] = new float[Counts][];
@@ -79,33 +72,36 @@ namespace spring.ViewModels
                     for (int t = 1; t < Counts; t++)
                     {
                         tCounts[node][t] = new float[3];
-                        switch (ltype)
+                        if (t < Counts / 2)
                         {
-                            case NodeLoad.u:
-                                maxUx = 0.01f * L / nodeCount / 100;
-                                float ut = (float)Math.Sin(2 * Math.PI * 0.5 * time[t]) * maxUx;
-                                //float ut = (maxUx / (0 - t)) + maxUx;
-                                tCounts[node][t][(int)axis] = ut;
-                                //tCounts[node][t][0] = ((E * A) / L / nodeCount) * ut;
-                                break;
+                            switch (ltype)
+                            {
+                                case NodeLoad.u:
+                                    maxUx = 0.01f * Props.L / nodes / 100;
+                                    float ut = (float)Math.Sin(2 * Math.PI * 0.5 * time[t]) * maxUx;
+                                    //float ut = (maxUx / (0 - t)) + maxUx;
+                                    tCounts[node][t][(int)axis] = ut;
+                                    //tCounts[node][t][0] = ((E * A) / L / nodeCount) * ut;
+                                    break;
 
-                            case NodeLoad.a:
-                                break;
+                                case NodeLoad.a:
+                                    break;
 
-                            case NodeLoad.f:
-                                //(maxUx / (0 - t)) + maxUx
-                                tCounts[node][t][(int)axis] = tCounts[node][t - 1][(int)axis] + (maxLoad / (0 - t)) + maxLoad;
-                                //tCounts[node][t][0] = tCounts[node][t - 1][0] + maxLoad / Counts;
-                                break;
+                                case NodeLoad.f:
+                                    //(maxUx / (0 - t)) + maxUx
+                                    tCounts[node][t][(int)axis] = tCounts[node][t - 1][(int)axis] + (maxLoad / (0 - t)) + maxLoad;
+                                    //tCounts[node][t][0] = tCounts[node][t - 1][0] + maxLoad / Counts;
+                                    break;
 
-                            case NodeLoad.p:
-                                break;
+                                case NodeLoad.p:
+                                    break;
 
-                            case NodeLoad.none:
-                                break;
+                                case NodeLoad.none:
+                                    break;
 
-                            default:
-                                break;
+                                default:
+                                    break;
+                            }
                         }
                     }
                 }
@@ -116,8 +112,8 @@ namespace spring.ViewModels
         private async void Compute_Click()
         {
             _ea.GetEvent<ClearPlotsEvent>().Publish();
-            time = getT(dt, Counts);
-            load = getLoad(NodeLoad.f, C.x, nodeCount, Counts);
+            time = getT(Props.dt, Props.Counts);
+            load = getLoad(NodeLoad.f, C.y, Props.nodes, Props.Counts);
             //OpenFileDialog openFileDialog = new OpenFileDialog();
             //if (openFileDialog.ShowDialog() == true)
             //{
@@ -139,8 +135,6 @@ namespace spring.ViewModels
             //    ////txtOutput.Text = txtOutput.Text + "Attempting to read the file '" + fileName + "'...";
             //    //try
             //    //{
-
-
             //    //}
             //    //catch (Exception)
             //    //{
@@ -151,7 +145,7 @@ namespace spring.ViewModels
             //    //}
 
             //}
-            rope = new Rope_t(time, nodeCount, L, E, D, ro, ref load);
+            rope = new Rope_t(time, Props.nodes, Props.L, Props.E, Props.D, Props.ro, ref load);
             await Task.Run(Simulating);
         }
 
@@ -174,6 +168,7 @@ namespace spring.ViewModels
             }
             return tmp;
         }
+
         private void DrawPoints()
         {
             if (rope != null && load != null)

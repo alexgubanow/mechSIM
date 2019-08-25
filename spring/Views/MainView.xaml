@@ -11,18 +11,34 @@
              xmlns:h="http://helix-toolkit.org/wpf"
              mc:Ignorable="d" d:DesignHeight="500" d:DesignWidth="700">
     <DockPanel LastChildFill="True">
-        <ComboBox DockPanel.Dock="Top" SelectedIndex="{Binding SelDeriv, Mode=TwoWay}">
-            <ComboBoxItem Content="Coordinates"/>
-            <ComboBoxItem Content="Displacement"/>
-            <ComboBoxItem Content="Velosity"/>
-            <ComboBoxItem Content="Acceleration"/>
-            <ComboBoxItem Content="Jerk"/>
-            <ComboBoxItem Content="Force"/>
-        </ComboBox>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <lcl:lblTxTbox LabelTxt="E:" BoxTxt="{Binding Path=Props.Estr, 
+                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0"/>
+            <lcl:lblTxTbox LabelTxt="ro:" BoxTxt="{Binding Path=Props.rostr,
+                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0"/>
+            <lcl:lblTxTbox LabelTxt="L:" BoxTxt="{Binding Path=Props.Lstr,
+                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0"/>
+            <lcl:lblTxTbox LabelTxt="nodes:" BoxTxt="{Binding Path=Props.nodesstr,
+                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0"/>
+            <lcl:lblTxTbox LabelTxt="D:" BoxTxt="{Binding Path=Props.Dstr,
+                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0"/>
+            <lcl:lblTxTbox LabelTxt="Count:" BoxTxt="{Binding Path=Props.Countstr,
+                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0"/>
+            <lcl:lblTxTbox LabelTxt="dt:" BoxTxt="{Binding Path=Props.dtstr,
+                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0"/>
+            <ComboBox SelectedIndex="{Binding SelDeriv, Mode=TwoWay}" Margin="5,0,0,0">
+                <ComboBoxItem Content="Coordinates"/>
+                <ComboBoxItem Content="Displacement"/>
+                <ComboBoxItem Content="Velosity"/>
+                <ComboBoxItem Content="Acceleration"/>
+                <ComboBoxItem Content="Jerk"/>
+                <ComboBoxItem Content="Force"/>
+            </ComboBox>
+        </StackPanel>
         <Button DockPanel.Dock="Bottom" Content="Compute" Command="{Binding Compute}" Margin="5"/>
-        <ContentControl DockPanel.Dock="Bottom" prism:RegionManager.RegionName="propsViewRegion" MinHeight="20"/>
-        <Slider DockPanel.Dock="Bottom" Height="22" Margin="5" Value="{Binding CurrT, Mode=TwoWay}"
-                Maximum="0.1" Minimum="0" SmallChange="0.00001" LargeChange="0.001"/>
+        <Slider DockPanel.Dock="Bottom" Height="22" Margin="5" Value="{Binding CurrT, Mode=TwoWay}" 
+                Maximum="{Binding EndT}" Minimum="0" SmallChange="{Binding Path=Props.dt}"
+                LargeChange="{Binding Path=DeltaTe2}"/>
         <ContentControl prism:RegionManager.RegionName="PlotViewRegion" Margin="0,5,0,0"/>
     </DockPanel>
 </UserControl>
