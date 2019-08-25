@@ -22,7 +22,7 @@
             Fn[(int)C.x] = E * A / oldL2 * oldUx2;
             //Fn[(int)C.y] = 12f * E * I / maf.P3(oldL2) * oldUy2;
             //convert Fn to global coords and return
-            return crds.ToLoc(dcm, Fn);
+            return crds.ToGlob(dcm, Fn);
         }
     }
 }
