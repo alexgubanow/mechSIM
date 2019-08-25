@@ -103,7 +103,6 @@ namespace spring.ViewModels
                 }
             }
         }
-        private readonly Random r = new Random();
         private void Draw3d(float t)
         {
             Application.Current.Dispatcher.Invoke(delegate
@@ -116,11 +115,23 @@ namespace spring.ViewModels
                     Thickness = 2,
                     Color = Brushes.Blue.Color
                 });
+                Objs3d.Add(new SphereVisual3D
+                {
+                    Center = new Point3D(2, 0, 4),
+                    Radius = .5,
+                    Fill = Brushes.Black
+                });
                 Objs3d.Add(new LinesVisual3D
                 {
                     Points = { new Point3D(2, 0, 4), new Point3D(4, 0, 2) },
                     Thickness = 2,
                     Color = Brushes.Blue.Color
+                });
+                Objs3d.Add(new SphereVisual3D
+                {
+                    Center = new Point3D(4, 0, 2),
+                    Radius = .5,
+                    Fill = Brushes.Black
                 });
                 Objs3d.Add(new LinesVisual3D
                 {
@@ -128,17 +139,35 @@ namespace spring.ViewModels
                     Thickness = 2,
                     Color = Brushes.Blue.Color
                 });
+                Objs3d.Add(new SphereVisual3D
+                {
+                    Center = new Point3D(7, 0, 2),
+                    Radius = .5,
+                    Fill = Brushes.Black
+                });
                 Objs3d.Add(new LinesVisual3D
                 {
                     Points = { new Point3D(7, 0, 2), new Point3D(10, 0, 2) },
                     Thickness = 2,
                     Color = Brushes.Blue.Color
                 });
+                Objs3d.Add(new SphereVisual3D
+                {
+                    Center = new Point3D(10, 0, 2),
+                    Radius = .5,
+                    Fill = Brushes.Black
+                });
                 Objs3d.Add(new LinesVisual3D
                 {
                     Points = { new Point3D(10, 0, 2), new Point3D(12, 0, 4) },
                     Thickness = 2,
                     Color = Brushes.Blue.Color
+                });
+                Objs3d.Add(new SphereVisual3D
+                {
+                    Center = new Point3D(12, 0, 4),
+                    Radius = .5,
+                    Fill = Brushes.Black
                 });
                 Objs3d.Add(new LinesVisual3D
                 {

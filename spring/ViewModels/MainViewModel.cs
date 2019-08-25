@@ -117,7 +117,7 @@ namespace spring.ViewModels
         {
             _ea.GetEvent<ClearPlotsEvent>().Publish();
             time = getT(dt, Counts);
-            load = getLoad(NodeLoad.f, C.y, nodeCount, Counts);
+            load = getLoad(NodeLoad.f, C.x, nodeCount, Counts);
             //OpenFileDialog openFileDialog = new OpenFileDialog();
             //if (openFileDialog.ShowDialog() == true)
             //{

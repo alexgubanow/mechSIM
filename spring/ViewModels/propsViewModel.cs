@@ -14,7 +14,7 @@ namespace spring.ViewModels
             Dstr = "1E-3";
             rostr = "1040";
             Countstr = "3000";
-            dtstr = "1E-6";
+            dtstr = "1E-7";
             nodesstr = "7";
         }
         private string _nodesstr;
