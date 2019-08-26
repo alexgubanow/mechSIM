@@ -15,7 +15,7 @@ using System.Windows.Media.Media3D;
 
 namespace spring.ViewModels
 {
-    public class CurrTChangedEvent : PubSubEvent<float> { }
+    public class CurrTChangedEvent : PubSubEvent<int> { }
 
     public class SelDerivChangedEvent : PubSubEvent<int> { }
 
@@ -32,10 +32,10 @@ namespace spring.ViewModels
         public Node_t[] Nodes;
 
         public props Props { get; set; }
-        public float EndT { get => Props.Counts; }
+        public float EndT { get => Props.Counts - 1; }
 
         private int _CurrT;
-        public int CurrT { get => _CurrT; set { _CurrT = value; UpdTline(value); } }
+        public int CurrT { get => _CurrT; set { _CurrT = value; Draw3d(value, SelDeriv); } }
 
         private int selDeriv;
         public int SelDeriv { get => selDeriv; set { selDeriv = value; if (Nodes != null) { ShowDeriv(value); } } }
@@ -44,9 +44,6 @@ namespace spring.ViewModels
         {
         }
 
-        private void UpdTline(float time)
-        {
-        }
 
         public Point3DCollection RopeCoords { get; set; }
         public ObservableCollection<Visual3D> Objs3d { get; set; }
@@ -354,6 +351,31 @@ namespace spring.ViewModels
             });
         }
 
+        private void UpdTline(int t, int Deriv)
+        {
+            Application.Current.Dispatcher.Invoke(delegate
+            {
+                for (int obj = 4; obj < Objs3d.Count - 1; obj++)
+                {
+
+                    //Objs3d[obj].SetValue(new DependencyProperty, "" );
+
+                    //Objs3d.Add(new LinesVisual3D
+                    //{
+                    //    Points = { new Point3D(Nodes[node].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.y] * 10E2),
+                    //        new Point3D(Nodes[node + 1].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[node + 1].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[node + 1].tm[t][(int)N.p][(int)C.y] * 10E2) },
+                    //    Thickness = 2,
+                    //    Color = Brushes.Blue.Color
+                    //});
+                    //Objs3d.Add(new SphereVisual3D
+                    //{
+                    //    Center = new Point3D(Nodes[node].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.y] * 10E2),
+                    //    Radius = .5,
+                    //    Fill = Brushes.Black
+                    //});
+                }
+            });
+        }
         private void DrawTline(float t)
         {
             //Application.Current.Dispatcher.Invoke(delegate
