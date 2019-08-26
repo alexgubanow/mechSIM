@@ -1,46 +1,78 @@
-﻿using Prism.Commands;
+﻿using HelixToolkit.Wpf;
+using OxyPlot;
+using OxyPlot.Series;
+using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Media3D;
 
 namespace spring.ViewModels
 {
-    public class DrawEvent : PubSubEvent { }
+    public class CurrTChangedEvent : PubSubEvent<float> { }
+
+    public class SelDerivChangedEvent : PubSubEvent<int> { }
+
+    public class GotResultsEvent : PubSubEvent { }
+
+    public class Load3dEvent : PubSubEvent { }
 
     public class MainViewModel : BindableBase
     {
         private readonly IEventAggregator _ea;
 
-        private float[] time;
+        public float[] time;
         private float[][][] load;
-        private Rope_t rope;
+        public Node_t[] Nodes;
 
         public props Props { get; set; }
-        public float DeltaTe2 { get => Props.dt * 100; }
-        private float _CurrT;
-        public float CurrT { get => _CurrT; set { _CurrT = value; _ea.GetEvent<DrawTlineEvent>().Publish(CurrT); } }
-        public float EndT { get => Props.dt * Props.Counts; }
+        public float EndT { get => Props.Counts; }
+
+        private int _CurrT;
+        public int CurrT { get => _CurrT; set { _CurrT = value; UpdTline(value); } }
 
         private int selDeriv;
-        public int SelDeriv { get => selDeriv; set { selDeriv = value; _ea.GetEvent<DrawEvent>().Publish(); } }
+        public int SelDeriv { get => selDeriv; set { selDeriv = value; if (Nodes != null) { ShowDeriv(value); } } }
+
+        private void ShowDeriv(int Derivative)
+        {
+        }
+
+        private void UpdTline(float time)
+        {
+        }
+
+        public Point3DCollection RopeCoords { get; set; }
+        public ObservableCollection<Visual3D> Objs3d { get; set; }
+
+        public PlotModel awePlotModelX { get; set; }
+        public PlotModel awePlotModelY { get; set; }
+        public PlotModel awePlotModelZ { get; set; }
 
         public MainViewModel(IEventAggregator ea)
         {
             _ea = ea;
             Props = new props();
-            SelDeriv = 0;
+            selDeriv = 0;
             _CurrT = 0;
+            Objs3d = new ObservableCollection<Visual3D>();
+            awePlotModelX = new PlotModel { Title = "X axis" };
+            awePlotModelY = new PlotModel { Title = "Y axis" };
+            awePlotModelZ = new PlotModel { Title = "Z axis" };
+            awePlotModelX.InvalidatePlot(true);
+            awePlotModelY.InvalidatePlot(true);
+            awePlotModelZ.InvalidatePlot(true);
+            //_ea.GetEvent<GotResultsEvent>().Subscribe(() => ShowResults());
+            //_ea.GetEvent<ClearPlotsEvent>().Subscribe(() => ClearPlot());
             _ea.GetEvent<ComputeEvent>().Subscribe(() => Compute_Click());
-            //DrawEvent
-            _ea.GetEvent<DrawEvent>().Subscribe(() => DrawPoints());
-            _ea.GetEvent<NodesChangedEvent>().Subscribe((value) => Props.nodes = value);
-            _ea.GetEvent<EChangedEvent>().Subscribe((value) => Props.E = value);
-            _ea.GetEvent<LChangedEvent>().Subscribe((value) => Props.L = value);
-            _ea.GetEvent<DChangedEvent>().Subscribe((value) => Props.D = value);
-            _ea.GetEvent<CountsChangedEvent>().Subscribe((value) => { Props.Counts = value; });
-            _ea.GetEvent<dtChangedEvent>().Subscribe((value) => Props.dt = value);
-            _ea.GetEvent<roChangedEvent>().Subscribe((value) => Props.ro = value);
+            //Load3dEvent
+            //_ea.GetEvent<Load3dEvent>().Subscribe(() => Load3d());
         }
 
         private DelegateCommand _Compute;
@@ -111,9 +143,13 @@ namespace spring.ViewModels
 
         private async void Compute_Click()
         {
-            _ea.GetEvent<ClearPlotsEvent>().Publish();
+            Nodes = null;
+            //_ea.GetEvent<ClearPlotsEvent>().Publish();
             time = getT(Props.dt, Props.Counts);
             load = getLoad(NodeLoad.f, C.y, Props.nodes, Props.Counts);
+
+            #region load file
+
             //OpenFileDialog openFileDialog = new OpenFileDialog();
             //if (openFileDialog.ShowDialog() == true)
             //{
@@ -143,20 +179,132 @@ namespace spring.ViewModels
             //    //    //MessageBox.Show("Invalid binary MAT-file! Please select a valid binary MAT-file.",
             //    //    //    "Invalid MAT-file", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             //    //}
-
             //}
-            rope = new Rope_t(time, Props.nodes, Props.L, Props.E, Props.D, Props.ro, ref load);
+
+            #endregion load file
+
+            SetupNodesPositions();
+            foreach (var node in Nodes)
+            {
+                Rope_t.EvalLinksLength(Nodes, node.NodeID, Props.D, Props.ro);
+            }
             await Task.Run(Simulating);
+        }
+
+        private void SetupNodesPositions()
+        {
+            float dl = Props.L / Props.nodes;
+            float pos = 0;
+            Nodes = new Node_t[Props.nodes];
+            Nodes[0] = new Node_t(Props.Counts, new float[3] { pos, 0, 0 }, NodeFreedom.locked, NodeLoad.none, 0, new int[1] { 1 }, Props.E, Props.D);
+            pos += dl;
+            for (int i = 1; i < Nodes.Length - 1; i++)
+            {
+                Nodes[i] = new Node_t(Props.Counts, new float[3] { pos, 0, 0 }, NodeFreedom.xyz, NodeLoad.none, i, new int[2] { i - 1, i + 1 }, Props.E, Props.D);
+                pos += dl;
+            }
+            Nodes[Nodes.Length - 1] = new Node_t(Props.Counts, new float[3] { pos, 0, 0 }, NodeFreedom.locked, NodeLoad.none, Nodes.Length - 1, new int[1] { Nodes.Length - 2 }, Props.E, Props.D);
+
+            Nodes[0].tm[0][(int)N.p] = new float[] { float.Parse("1e-3", CultureInfo.InvariantCulture), float.Parse("6e-3", CultureInfo.InvariantCulture), 0 };
+            Nodes[1].tm[0][(int)N.p] = new float[] { float.Parse("2e-3", CultureInfo.InvariantCulture), float.Parse("4e-3", CultureInfo.InvariantCulture), 0 };
+            Nodes[2].tm[0][(int)N.p] = new float[] { float.Parse("4e-3", CultureInfo.InvariantCulture), float.Parse("2e-3", CultureInfo.InvariantCulture), 0 };
+            Nodes[3].tm[0][(int)N.p] = new float[] { float.Parse("7e-3", CultureInfo.InvariantCulture), float.Parse("2e-3", CultureInfo.InvariantCulture), 0 };
+            Nodes[4].tm[0][(int)N.p] = new float[] { float.Parse("10e-3", CultureInfo.InvariantCulture), float.Parse("2e-3", CultureInfo.InvariantCulture), 0 };
+            Nodes[5].tm[0][(int)N.p] = new float[] { float.Parse("12e-3", CultureInfo.InvariantCulture), float.Parse("4e-3", CultureInfo.InvariantCulture), 0 };
+            Nodes[6].tm[0][(int)N.p] = new float[] { float.Parse("13e-3", CultureInfo.InvariantCulture), float.Parse("6e-3", CultureInfo.InvariantCulture), 0 };
+            Nodes[Nodes.Length / 2].LoadType = NodeLoad.f;
+            //Nodes[Nodes.Length - 1].freedom = NodeFreedom.xyz;
         }
 
         private void Simulating()
         {
             for (int t = 1; t < time.Length; t++)
             {
-                rope.IterateOverNodes(t);
+                Rope_t.IterateOverNodes(Nodes, t, Props.dt, load);
             }
-            DrawPoints();
+            //_ea.GetEvent<GotResultsEvent>().Publish();
+            ShowResults(SelDeriv);
             GC.Collect();
+        }
+
+        private void ClearDataView()
+        {
+            CurrT = 0;
+            awePlotModelX.Series.Clear();
+            awePlotModelY.Series.Clear();
+            awePlotModelZ.Series.Clear();
+        }
+
+        private void Load3d()
+        {
+            Rect3D BoundingBox = new Rect3D(0, 0, 0, 100, 100, 100);
+            Objs3d.Add(new DefaultLights());
+
+            double bbSize = Math.Max(Math.Max(BoundingBox.SizeX, BoundingBox.SizeY), BoundingBox.SizeZ);
+
+            Objs3d.Add(new GridLinesVisual3D
+            {
+                Center = new Point3D(0, 0, 0),
+                Length = BoundingBox.SizeX,
+                Width = BoundingBox.SizeY,
+                MinorDistance = 3,
+                MajorDistance = bbSize,
+                Thickness = bbSize / 1000,
+                Fill = Brushes.Gray
+            });
+        }
+
+        private void ShowResults(int Deriv)
+        {
+            ClearDataView();
+            if (Nodes != null)
+            {
+                DrawPoints(Deriv);
+                Draw3d(CurrT, Deriv);
+            }
+        }
+
+        private void DrawPoints(int Deriv)
+        {
+            if ((N)SelDeriv == N.f)
+            {
+                plotData("Fext", load[Nodes.Length / 2]);
+            }
+            foreach (var node in Nodes)
+            {
+                float[][] tmp = ExtractArray(node.tm, (N)SelDeriv);
+                plotData("node #" + node.NodeID, tmp);
+                tmp = null;
+            }
+        }
+
+        public List<DataPoint> getDataPointList(float[] X, float[][] Y, C axis)
+        {
+            List<DataPoint> tmp = new List<DataPoint>();
+            for (int t = 0; t < X.Length; t++)
+            {
+                tmp.Add(new DataPoint(X[t], Y[t][(int)axis]));
+            }
+            return tmp;
+        }
+
+        private void plotData(string title, float[][] Y)
+        {
+            List<DataPoint> data = getDataPointList(time, Y, C.x);
+            LineSeries aweLineSeries = new LineSeries { Title = title };
+            aweLineSeries.Points.AddRange(data);
+            awePlotModelX.Series.Add(aweLineSeries);
+            awePlotModelX.InvalidatePlot(true);
+            data = getDataPointList(time, Y, C.y);
+            aweLineSeries = new LineSeries { Title = title };
+            aweLineSeries.Points.AddRange(data);
+            awePlotModelY.Series.Add(aweLineSeries);
+            awePlotModelY.InvalidatePlot(true);
+            data = getDataPointList(time, Y, C.z);
+            aweLineSeries = new LineSeries { Title = title };
+            aweLineSeries.Points.AddRange(data);
+            awePlotModelZ.Series.Add(aweLineSeries);
+            awePlotModelZ.InvalidatePlot(true);
         }
 
         private float[][] ExtractArray(float[][][] tm, N deriv)
@@ -169,26 +317,75 @@ namespace spring.ViewModels
             return tmp;
         }
 
-        private void DrawPoints()
+        private void Draw3d(int t, int Deriv)
         {
-            if (rope != null && load != null)
+            Application.Current.Dispatcher.Invoke(delegate
             {
-                CurrT = 0;
-                _ea.GetEvent<ClearPlotsEvent>().Publish();
-                _ea.GetEvent<DrawTlineEvent>().Publish(CurrT);
-                _ea.GetEvent<Draw3dPlotEvent>().Publish(CurrT);
+                Objs3d.Clear();
+                Load3d();
+                Objs3d.Add(new CubeVisual3D
+                {
+                    Center = new Point3D(Nodes[0].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[0].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[0].tm[t][(int)N.p][(int)C.y] * 10E2),
+                    SideLength = 1,
+                    Fill = Brushes.Gray
+                });
+                Objs3d.Add(new CubeVisual3D
+                {
+                    Center = new Point3D(Nodes[Nodes.Length - 1].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[Nodes.Length - 1].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[Nodes.Length - 1].tm[t][(int)N.p][(int)C.y] * 10E2),
+                    SideLength = 1,
+                    Fill = Brushes.Gray
+                });
+                for (int node = 0; node < Nodes.Length - 1; node++)
+                {
+                    Objs3d.Add(new LinesVisual3D
+                    {
+                        Points = { new Point3D(Nodes[node].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.y] * 10E2),
+                            new Point3D(Nodes[node + 1].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[node + 1].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[node + 1].tm[t][(int)N.p][(int)C.y] * 10E2) },
+                        Thickness = 2,
+                        Color = Brushes.Blue.Color
+                    });
+                    Objs3d.Add(new SphereVisual3D
+                    {
+                        Center = new Point3D(Nodes[node].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.y] * 10E2),
+                        Radius = .5,
+                        Fill = Brushes.Black
+                    });
+                }
+            });
+        }
 
-                if ((N)SelDeriv == N.f)
-                {
-                    _ea.GetEvent<DrawPlotEvent>().Publish(new DataToDraw() { X = time, Y = load[rope.Nodes.Length / 2], Title = "Fext" });
-                }
-                foreach (var node in rope.Nodes)
-                {
-                    float[][] tmp = ExtractArray(node.tm, (N)SelDeriv);
-                    _ea.GetEvent<DrawPlotEvent>().Publish(new DataToDraw() { X = time, Y = tmp, Title = "node #" + node.NodeID });
-                    tmp = null;
-                }
-            }
+        private void DrawTline(float t)
+        {
+            //Application.Current.Dispatcher.Invoke(delegate
+            //{
+            //    awePlotModelX.PlotView.ShowTracker(new TrackerHitResult() { Text = t.ToString(), DataPoint = new DataPoint(t, 0) });
+            //    awePlotModelY.PlotView.ShowTracker(new TrackerHitResult() { Text = t.ToString(), DataPoint = new DataPoint(t, 0) });
+            //    awePlotModelZ.PlotView.ShowTracker(new TrackerHitResult() { Text = t.ToString(), DataPoint = new DataPoint(t, 0) });
+            //});
+            //LineSeries aweLineSeriesX = new LineSeries { Title = "current time" };
+            //aweLineSeriesX.Points.AddRange(new DataPoint[2] { new DataPoint(t, -1f), new DataPoint(t, 1f) });
+            //LineSeries aweLineSeriesY = new LineSeries { Title = "current time" };
+            //aweLineSeriesY.Points.AddRange(new DataPoint[2] { new DataPoint(t, -1f), new DataPoint(t, 1f) });
+            //LineSeries aweLineSeriesZ = new LineSeries { Title = "current time" };
+            //aweLineSeriesZ.Points.AddRange(new DataPoint[2] { new DataPoint(t, -1f), new DataPoint(t, 1f) });
+            //if (awePlotModelX.Series.Count > 0)
+            //{
+            //    awePlotModelX.Series.RemoveAt(0);
+            //}
+            //awePlotModelX.Series.Insert(0, aweLineSeriesX);
+            //awePlotModelX.InvalidatePlot(true);
+            //if (awePlotModelY.Series.Count > 0)
+            //{
+            //    awePlotModelY.Series.RemoveAt(0);
+            //}
+            //awePlotModelY.Series.Insert(0, aweLineSeriesY);
+            //awePlotModelY.InvalidatePlot(true);
+            //if (awePlotModelZ.Series.Count > 0)
+            //{
+            //    awePlotModelZ.Series.RemoveAt(0);
+            //}
+            //awePlotModelZ.Series.Insert(0, aweLineSeriesZ);
+            //awePlotModelZ.InvalidatePlot(true);
         }
     }
 }
