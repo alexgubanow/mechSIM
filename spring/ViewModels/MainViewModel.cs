@@ -94,7 +94,7 @@ namespace spring.ViewModels
                 float maxUx = 0.01f * Props.L / nodes / 100;
                 float A = (float)Math.PI * (float)Math.Pow(Props.D, 2) / 4;
                 float maxLoad = ((Props.E * A) / Props.L / nodes) * maxUx;
-                if (node == nodes / 2)
+                if (node != 0 && node != nodes - 1)
                 {
                     tCounts[node] = new float[Counts][];
                     tCounts[node][0] = new float[3];
