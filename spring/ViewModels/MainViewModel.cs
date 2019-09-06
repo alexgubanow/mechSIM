@@ -7,7 +7,6 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -43,7 +42,6 @@ namespace spring.ViewModels
         private void ShowDeriv(int Derivative)
         {
         }
-
 
         public Point3DCollection RopeCoords { get; set; }
         public ObservableCollection<Visual3D> Objs3d { get; set; }
@@ -101,36 +99,34 @@ namespace spring.ViewModels
                     for (int t = 1; t < Counts; t++)
                     {
                         tCounts[node][t] = new float[3];
-                        if (t < Counts / 2)
+                        switch (ltype)
                         {
-                            switch (ltype)
-                            {
-                                case NodeLoad.u:
-                                    maxUx = 0.01f * Props.L / nodes / 100;
-                                    float ut = (float)Math.Sin(2 * Math.PI * 0.5 * time[t]) * maxUx;
-                                    //float ut = (maxUx / (0 - t)) + maxUx;
-                                    tCounts[node][t][(int)axis] = ut;
-                                    //tCounts[node][t][0] = ((E * A) / L / nodeCount) * ut;
-                                    break;
+                            case NodeLoad.u:
+                                maxUx = 0.01f * Props.L / nodes / 100;
+                                float ut = (float)Math.Sin(2 * Math.PI * 0.5 * time[t]) * maxUx;
+                                //float ut = (maxUx / (0 - t)) + maxUx;
+                                tCounts[node][t][(int)axis] = ut;
+                                //tCounts[node][t][0] = ((E * A) / L / nodeCount) * ut;
+                                break;
 
-                                case NodeLoad.a:
-                                    break;
+                            case NodeLoad.a:
+                                break;
 
-                                case NodeLoad.f:
-                                    //(maxUx / (0 - t)) + maxUx
-                                    tCounts[node][t][(int)axis] = tCounts[node][t - 1][(int)axis] + (maxLoad / (0 - t)) + maxLoad;
-                                    //tCounts[node][t][0] = tCounts[node][t - 1][0] + maxLoad / Counts;
-                                    break;
+                            case NodeLoad.f:
+                                //(maxUx / (0 - t)) + maxUx
+                                tCounts[node][t][(int)axis] = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t]) * maxUx);
+                                //tCounts[node][t][(int)axis] = 0 - (tCounts[node][t - 1][(int)axis] + (maxLoad / (0 - t)) + maxLoad);
+                                //tCounts[node][t][0] = tCounts[node][t - 1][0] + maxLoad / Counts;
+                                break;
 
-                                case NodeLoad.p:
-                                    break;
+                            case NodeLoad.p:
+                                break;
 
-                                case NodeLoad.none:
-                                    break;
+                            case NodeLoad.none:
+                                break;
 
-                                default:
-                                    break;
-                            }
+                            default:
+                                break;
                         }
                     }
                 }
@@ -202,15 +198,19 @@ namespace spring.ViewModels
             }
             Nodes[Nodes.Length - 1] = new Node_t(Props.Counts, new float[3] { pos, 0, 0 }, NodeFreedom.locked, NodeLoad.none, Nodes.Length - 1, new int[1] { Nodes.Length - 2 }, Props.E, Props.D);
 
-            Nodes[0].tm[0][(int)N.p] = new float[] { float.Parse("1e-3", CultureInfo.InvariantCulture), float.Parse("6e-3", CultureInfo.InvariantCulture), 0 };
-            Nodes[1].tm[0][(int)N.p] = new float[] { float.Parse("2e-3", CultureInfo.InvariantCulture), float.Parse("4e-3", CultureInfo.InvariantCulture), 0 };
-            Nodes[2].tm[0][(int)N.p] = new float[] { float.Parse("4e-3", CultureInfo.InvariantCulture), float.Parse("2e-3", CultureInfo.InvariantCulture), 0 };
-            Nodes[3].tm[0][(int)N.p] = new float[] { float.Parse("7e-3", CultureInfo.InvariantCulture), float.Parse("2e-3", CultureInfo.InvariantCulture), 0 };
-            Nodes[4].tm[0][(int)N.p] = new float[] { float.Parse("10e-3", CultureInfo.InvariantCulture), float.Parse("2e-3", CultureInfo.InvariantCulture), 0 };
-            Nodes[5].tm[0][(int)N.p] = new float[] { float.Parse("12e-3", CultureInfo.InvariantCulture), float.Parse("4e-3", CultureInfo.InvariantCulture), 0 };
-            Nodes[6].tm[0][(int)N.p] = new float[] { float.Parse("13e-3", CultureInfo.InvariantCulture), float.Parse("6e-3", CultureInfo.InvariantCulture), 0 };
+            //Nodes[0].tm[0][(int)N.p] = new float[] { float.Parse("1e-3", CultureInfo.InvariantCulture), float.Parse("6e-3", CultureInfo.InvariantCulture), 0 };
+            //Nodes[1].tm[0][(int)N.p] = new float[] { float.Parse("2e-3", CultureInfo.InvariantCulture), float.Parse("4e-3", CultureInfo.InvariantCulture), 0 };
+            //Nodes[2].tm[0][(int)N.p] = new float[] { float.Parse("4e-3", CultureInfo.InvariantCulture), float.Parse("2e-3", CultureInfo.InvariantCulture), 0 };
+            //Nodes[3].tm[0][(int)N.p] = new float[] { float.Parse("7e-3", CultureInfo.InvariantCulture), float.Parse("2e-3", CultureInfo.InvariantCulture), 0 };
+            //Nodes[4].tm[0][(int)N.p] = new float[] { float.Parse("10e-3", CultureInfo.InvariantCulture), float.Parse("2e-3", CultureInfo.InvariantCulture), 0 };
+            //Nodes[5].tm[0][(int)N.p] = new float[] { float.Parse("12e-3", CultureInfo.InvariantCulture), float.Parse("4e-3", CultureInfo.InvariantCulture), 0 };
+            //Nodes[6].tm[0][(int)N.p] = new float[] { float.Parse("13e-3", CultureInfo.InvariantCulture), float.Parse("6e-3", CultureInfo.InvariantCulture), 0 };
             Nodes[Nodes.Length / 2].LoadType = NodeLoad.f;
             //Nodes[Nodes.Length - 1].freedom = NodeFreedom.xyz;
+            for (int i = 0; i < Nodes.Length; i++)
+            {
+                Nodes[i].tm[0][(int)N.p] = new float[] { i * dl, 10E-1F * (float)Math.Pow((i * dl) - Props.L / 2, 2) + 1E-3f, 0 };
+            }
         }
 
         private void Simulating()
@@ -323,13 +323,13 @@ namespace spring.ViewModels
                 Objs3d.Add(new CubeVisual3D
                 {
                     Center = new Point3D(Nodes[0].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[0].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[0].tm[t][(int)N.p][(int)C.y] * 10E2),
-                    SideLength = 1,
+                    SideLength = .8,
                     Fill = Brushes.Gray
                 });
                 Objs3d.Add(new CubeVisual3D
                 {
                     Center = new Point3D(Nodes[Nodes.Length - 1].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[Nodes.Length - 1].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[Nodes.Length - 1].tm[t][(int)N.p][(int)C.y] * 10E2),
-                    SideLength = 1,
+                    SideLength = .8,
                     Fill = Brushes.Gray
                 });
                 for (int node = 0; node < Nodes.Length - 1; node++)
@@ -344,7 +344,7 @@ namespace spring.ViewModels
                     Objs3d.Add(new SphereVisual3D
                     {
                         Center = new Point3D(Nodes[node].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.y] * 10E2),
-                        Radius = .5,
+                        Radius = .3,
                         Fill = Brushes.Black
                     });
                 }
@@ -357,7 +357,6 @@ namespace spring.ViewModels
             {
                 for (int obj = 4; obj < Objs3d.Count - 1; obj++)
                 {
-
                     //Objs3d[obj].SetValue(new DependencyProperty, "" );
 
                     //Objs3d.Add(new LinesVisual3D
@@ -376,6 +375,7 @@ namespace spring.ViewModels
                 }
             });
         }
+
         private void DrawTline(float t)
         {
             //Application.Current.Dispatcher.Invoke(delegate
