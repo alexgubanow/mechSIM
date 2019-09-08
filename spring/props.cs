@@ -2,29 +2,29 @@
 {
     public class props
     {
-        public props(string _E, string _L, string _D, string _ro, string _Counts, string _dt, string _nodes, string _initDrop)
-        {
-            Estr = _E;
-            Lstr = _L;
-            Dstr = _D;
-            rostr = _ro;
-            Countstr = _Counts;
-            dtstr = _dt;
-            nodesstr = _nodes;
-            initDropstr = _initDrop;
-        }
+        //public props(string _E, string _L, string _D, string _ro, string _Counts, string _dt, string _nodes, string _initDrop)
+        //{
+        //    Estr = _E;
+        //    Lstr = _L;
+        //    Dstr = _D;
+        //    rostr = _ro;
+        //    Countstr = _Counts;
+        //    dtstr = _dt;
+        //    nodesstr = _nodes;
+        //    initDropstr = _initDrop;
+        //}
 
-        public props(float _E, float _L, float _D, float _ro, int _Counts, float _dt, int _nodes, float _initDrop)
-        {
-            E = _E;
-            L = _L;
-            D = _D;
-            ro = _ro;
-            Counts = _Counts;
-            dt = _dt;
-            nodes = _nodes;
-            initDrop = _initDrop;
-        }
+        //public props(float _E, float _L, float _D, float _ro, int _Counts, float _dt, int _nodes, float _initDrop)
+        //{
+        //    E = _E;
+        //    L = _L;
+        //    D = _D;
+        //    ro = _ro;
+        //    Counts = _Counts;
+        //    dt = _dt;
+        //    nodes = _nodes;
+        //    initDrop = _initDrop;
+        //}
 
         public props()
         {
@@ -36,8 +36,20 @@
             dt = 1E-7f;
             nodes = 7;
             initDrop = 1E-1f;
+            MaxU = 2E-3f;
         }
-        //initDrop
+        public float MaxU;
+
+        public string MaxUstr
+        {
+            get => MaxU.ToString(); set
+            {
+                if (float.TryParse(value, out float tmp))
+                {
+                    MaxU = tmp;
+                }
+            }
+        }
         public float initDrop;
 
         public string initDropstr

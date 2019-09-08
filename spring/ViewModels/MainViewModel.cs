@@ -82,9 +82,9 @@ namespace spring.ViewModels
 
         private float[][][] getLoad(NodeLoad ltype, C axis, int nodes, int Counts)
         {
-            float maxUx = 0.01f * Props.L / nodes / 100;
+            //float maxUx = 0.01f * Props.L / nodes ;
             float A = (float)Math.PI * (float)Math.Pow(Props.D, 2) / 4;
-            float maxLoad = ((Props.E * A) / Props.L / nodes) * maxUx;
+            float maxLoad = ((Props.E * A) / Props.L / nodes) * Props.MaxU;
             float period = Props.Counts * Props.dt;
             float freq = 1 / period;
 
@@ -102,8 +102,7 @@ namespace spring.ViewModels
                         switch (ltype)
                         {
                             case NodeLoad.u:
-                                maxUx = 0.01f * Props.L / nodes / 100;
-                                float ut = (float)Math.Sin(2 * Math.PI * 0.5 * time[t]) * maxUx;
+                                float ut = (float)Math.Sin(2 * Math.PI * 0.5 * time[t]) * Props.MaxU;
                                 //float ut = (maxUx / (0 - t)) + maxUx;
                                 tCounts[node][t][(int)axis] = ut;
                                 //tCounts[node][t][0] = ((E * A) / L / nodeCount) * ut;

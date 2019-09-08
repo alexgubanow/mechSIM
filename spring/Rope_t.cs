@@ -32,7 +32,7 @@ namespace spring
                 }
                 else
                 {
-                    getForces(Nodes, node.NodeID, t);
+                    node.GetForces(Nodes, t);
                 }
                 if (node.LoadType != NodeLoad.f && node.LoadType != NodeLoad.none)
                 {
@@ -80,20 +80,5 @@ namespace spring
             Integr.Verlet(ref node.tm[t], node.tm[t - 1], dt, node.m);
         }
 
-        private static void getForces(Node_t[] Nodes, int NodeID, int t)
-        {
-            if (Nodes[NodeID].freedom != NodeFreedom.locked)
-            {
-                foreach (var np in Nodes[NodeID].ngb)
-                {
-                    //get Fn from link between this point and np
-                    float[] gFn = Element.GetFn(Nodes[NodeID].tm[t - 1], Nodes[np].tm[t - 1], Nodes[NodeID].r, Nodes[NodeID].A, Nodes[NodeID].E, Nodes[NodeID].I);
-                    //dirty fix of dcm, just turn - to + and vs
-                    gFn = vectr.Minus(0, gFn);
-                    //push it to this force pull
-                    Nodes[NodeID].tm[t][(int)N.f] = vectr.Plus(Nodes[NodeID].tm[t][(int)N.f], gFn);
-                }
-            }
-        }
     }
 }
