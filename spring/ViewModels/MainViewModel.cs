@@ -39,7 +39,6 @@ namespace spring.ViewModels
         private int selDeriv;
         public int SelDeriv { get => selDeriv; set { selDeriv = value; if (Nodes != null) { DrawPoints(value); } } }
 
-
         public Point3DCollection RopeCoords { get; set; }
         public ObservableCollection<Visual3D> Objs3d { get; set; }
 
@@ -83,12 +82,16 @@ namespace spring.ViewModels
 
         private float[][][] getLoad(NodeLoad ltype, C axis, int nodes, int Counts)
         {
+            float maxUx = 0.01f * Props.L / nodes / 100;
+            float A = (float)Math.PI * (float)Math.Pow(Props.D, 2) / 4;
+            float maxLoad = ((Props.E * A) / Props.L / nodes) * maxUx;
+            float period = Props.Counts * Props.dt;
+            float freq = 1 / period;
+
+
             float[][][] tCounts = new float[nodes][][];
             for (int node = 0; node < nodes; node++)
             {
-                float maxUx = 0.01f * Props.L / nodes / 100;
-                float A = (float)Math.PI * (float)Math.Pow(Props.D, 2) / 4;
-                float maxLoad = ((Props.E * A) / Props.L / nodes) * maxUx;
                 if (node != 0 && node != nodes - 1)
                 {
                     tCounts[node] = new float[Counts][];
@@ -111,8 +114,8 @@ namespace spring.ViewModels
 
                             case NodeLoad.f:
                                 //(maxUx / (0 - t)) + maxUx
-                                //tCounts[node][t][(int)axis] = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t]) * maxUx);
-                                tCounts[node][t][(int)axis] = (tCounts[node][t - 1][(int)axis] + (maxLoad / (0 - t)) + maxLoad);
+                                tCounts[node][t][(int)axis] = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
+                                //tCounts[node][t][(int)axis] = (tCounts[node][t - 1][(int)axis] + (maxLoad / (0 - t)) + maxLoad);
                                 //tCounts[node][t][0] = tCounts[node][t - 1][0] + maxLoad / Counts;
                                 break;
 
@@ -202,7 +205,10 @@ namespace spring.ViewModels
             //Nodes[4].tm[0][(int)N.p] = new float[] { float.Parse("10e-3", CultureInfo.InvariantCulture), float.Parse("2e-3", CultureInfo.InvariantCulture), 0 };
             //Nodes[5].tm[0][(int)N.p] = new float[] { float.Parse("12e-3", CultureInfo.InvariantCulture), float.Parse("4e-3", CultureInfo.InvariantCulture), 0 };
             //Nodes[6].tm[0][(int)N.p] = new float[] { float.Parse("13e-3", CultureInfo.InvariantCulture), float.Parse("6e-3", CultureInfo.InvariantCulture), 0 };
-            Nodes[Nodes.Length / 2].LoadType = NodeLoad.f;
+            if (Nodes.Length > 2)
+            {
+                Nodes[Nodes.Length / 2].LoadType = NodeLoad.f;
+            }
             //Nodes[Nodes.Length - 1].freedom = NodeFreedom.xyz;
             for (int i = 0; i < Nodes.Length; i++)
             {
