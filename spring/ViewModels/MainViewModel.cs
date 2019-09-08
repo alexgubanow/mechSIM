@@ -37,11 +37,8 @@ namespace spring.ViewModels
         public int CurrT { get => _CurrT; set { _CurrT = value; Draw3d(value, SelDeriv); } }
 
         private int selDeriv;
-        public int SelDeriv { get => selDeriv; set { selDeriv = value; if (Nodes != null) { ShowDeriv(value); } } }
+        public int SelDeriv { get => selDeriv; set { selDeriv = value; if (Nodes != null) { DrawPoints(value); } } }
 
-        private void ShowDeriv(int Derivative)
-        {
-        }
 
         public Point3DCollection RopeCoords { get; set; }
         public ObservableCollection<Visual3D> Objs3d { get; set; }
@@ -115,7 +112,7 @@ namespace spring.ViewModels
                             case NodeLoad.f:
                                 //(maxUx / (0 - t)) + maxUx
                                 //tCounts[node][t][(int)axis] = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t]) * maxUx);
-                                tCounts[node][t][(int)axis] = 0 - (tCounts[node][t - 1][(int)axis] + (maxLoad / (0 - t)) + maxLoad);
+                                tCounts[node][t][(int)axis] = (tCounts[node][t - 1][(int)axis] + (maxLoad / (0 - t)) + maxLoad);
                                 //tCounts[node][t][0] = tCounts[node][t - 1][0] + maxLoad / Counts;
                                 break;
 
@@ -253,7 +250,6 @@ namespace spring.ViewModels
 
         private void ShowResults(int Deriv)
         {
-            ClearDataView();
             if (Nodes != null)
             {
                 DrawPoints(Deriv);
@@ -263,6 +259,7 @@ namespace spring.ViewModels
 
         private void DrawPoints(int Deriv)
         {
+            ClearDataView();
             if ((N)SelDeriv == N.f)
             {
                 plotData("Fext", load[Nodes.Length / 2]);
