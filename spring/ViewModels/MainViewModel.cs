@@ -114,8 +114,8 @@ namespace spring.ViewModels
 
                             case NodeLoad.f:
                                 //(maxUx / (0 - t)) + maxUx
-                                tCounts[node][t][(int)axis] = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t]) * maxUx);
-                                //tCounts[node][t][(int)axis] = 0 - (tCounts[node][t - 1][(int)axis] + (maxLoad / (0 - t)) + maxLoad);
+                                //tCounts[node][t][(int)axis] = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t]) * maxUx);
+                                tCounts[node][t][(int)axis] = 0 - (tCounts[node][t - 1][(int)axis] + (maxLoad / (0 - t)) + maxLoad);
                                 //tCounts[node][t][0] = tCounts[node][t - 1][0] + maxLoad / Counts;
                                 break;
 
@@ -209,7 +209,7 @@ namespace spring.ViewModels
             //Nodes[Nodes.Length - 1].freedom = NodeFreedom.xyz;
             for (int i = 0; i < Nodes.Length; i++)
             {
-                Nodes[i].tm[0][(int)N.p] = new float[] { i * dl, 10E-1F * (float)Math.Pow((i * dl) - Props.L / 2, 2) + 1E-3f, 0 };
+                Nodes[i].tm[0][(int)N.p] = new float[] { i * dl, Props.initDrop * (float)Math.Pow((i * dl) - Props.L / 2, 2) + 1E-3f, 0 };
             }
         }
 
