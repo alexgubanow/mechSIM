@@ -36,16 +36,16 @@ namespace spring
         }
         public void GetForces(Node_t[] Nodes, int t)
         {
-            if (Nodes[NodeID].freedom != NodeFreedom.locked)
+            if (freedom != NodeFreedom.locked)
             {
-                foreach (var np in Nodes[NodeID].ngb)
+                foreach (var np in ngb)
                 {
                     //get Fn from link between this point and np
-                    float[] gFn = Element.GetFn(Nodes[NodeID].tm[t - 1], Nodes[np].tm[t - 1], Nodes[NodeID].r, Nodes[NodeID].A, Nodes[NodeID].E, Nodes[NodeID].I);
+                    float[] gFn = Element.GetFn(tm[t - 1], Nodes[np].tm[t - 1], r, A, E, I);
                     //dirty fix of dcm, just turn - to + and vs
                     gFn = vectr.Minus(0, gFn);
                     //push it to this force pull
-                    Nodes[NodeID].tm[t][(int)N.f] = vectr.Plus(Nodes[NodeID].tm[t][(int)N.f], gFn);
+                    tm[t][(int)N.f] = vectr.Plus(tm[t][(int)N.f], gFn);
                 }
             }
         }
