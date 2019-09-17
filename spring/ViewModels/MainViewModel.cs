@@ -92,42 +92,47 @@ namespace spring.ViewModels
             float[][][] tCounts = new float[nodes][][];
             for (int node = 0; node < nodes; node++)
             {
-                if (node != 0 && node != nodes - 1)
+                tCounts[node] = new float[Counts][];
+                tCounts[node][0] = new float[3];
+                for (int t = 1; t < Counts; t++)
                 {
-                    tCounts[node] = new float[Counts][];
-                    tCounts[node][0] = new float[3];
-                    for (int t = 1; t < Counts; t++)
+                    tCounts[node][t] = new float[3];
+                    if (node == 0)
                     {
-                        tCounts[node][t] = new float[3];
-                        switch (ltype)
-                        {
-                            case NodeLoad.u:
-                                float ut = (float)Math.Sin(2 * Math.PI * 0.5 * time[t]) * Props.MaxU;
-                                //float ut = (maxUx / (0 - t)) + maxUx;
-                                tCounts[node][t][(int)axis] = ut;
-                                //tCounts[node][t][0] = ((E * A) / L / nodeCount) * ut;
-                                break;
-
-                            case NodeLoad.a:
-                                break;
-
-                            case NodeLoad.f:
-                                //(maxUx / (0 - t)) + maxUx
-                                tCounts[node][t][(int)axis] = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
-                                //tCounts[node][t][(int)axis] = (tCounts[node][t - 1][(int)axis] + (maxLoad / (0 - t)) + maxLoad);
-                                //tCounts[node][t][0] = tCounts[node][t - 1][0] + maxLoad / Counts;
-                                break;
-
-                            case NodeLoad.p:
-                                break;
-
-                            case NodeLoad.none:
-                                break;
-
-                            default:
-                                break;
-                        }
+                        tCounts[node][t][(int)axis] = 0-((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
                     }
+                    else if (node == nodes - 1)
+                    {
+                        tCounts[node][t][(int)axis] = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
+                    }
+                    //switch (ltype)
+                    //{
+                    //    case NodeLoad.u:
+                    //        float ut = (float)Math.Sin(2 * Math.PI * 0.5 * time[t]) * Props.MaxU;
+                    //        //float ut = (maxUx / (0 - t)) + maxUx;
+                    //        tCounts[node][t][(int)axis] = ut;
+                    //        //tCounts[node][t][0] = ((E * A) / L / nodeCount) * ut;
+                    //        break;
+
+                    //    case NodeLoad.a:
+                    //        break;
+
+                    //    case NodeLoad.f:
+                    //        //(maxUx / (0 - t)) + maxUx
+                    //        tCounts[node][t][(int)axis] = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
+                    //        //tCounts[node][t][(int)axis] = (tCounts[node][t - 1][(int)axis] + (maxLoad / (0 - t)) + maxLoad);
+                    //        //tCounts[node][t][0] = tCounts[node][t - 1][0] + maxLoad / Counts;
+                    //        break;
+
+                    //    case NodeLoad.p:
+                    //        break;
+
+                    //    case NodeLoad.none:
+                    //        break;
+
+                    //    default:
+                    //        break;
+                    //}
                 }
             }
             return tCounts;
@@ -138,7 +143,7 @@ namespace spring.ViewModels
             Nodes = null;
             //_ea.GetEvent<ClearPlotsEvent>().Publish();
             time = getT(Props.dt, Props.Counts);
-            load = getLoad(NodeLoad.f, C.y, Props.nodes, Props.Counts);
+            load = getLoad(NodeLoad.f, C.x, Props.nodes, Props.Counts);
 
             #region load file
 
@@ -188,18 +193,18 @@ namespace spring.ViewModels
             float dl = Props.L / Props.nodes;
             float pos = 0;
             Nodes = new Node_t[Props.nodes];
-            Nodes[0] = new Node_t(Props.Counts, new float[3] { pos, 0, 0 }, NodeFreedom.locked, NodeLoad.none, 0, new int[1] { 1 }, Props.E, Props.D);
+            Nodes[0] = new Node_t(Props.Counts, new float[3] { pos, 0, 0 }, NodeFreedom.xyz, NodeLoad.f, 0, new int[1] { 1 }, Props.E, Props.D);
             pos += dl;
             for (int i = 1; i < Nodes.Length - 1; i++)
             {
                 Nodes[i] = new Node_t(Props.Counts, new float[3] { pos, 0, 0 }, NodeFreedom.xyz, NodeLoad.none, i, new int[2] { i - 1, i + 1 }, Props.E, Props.D);
                 pos += dl;
             }
-            Nodes[Nodes.Length - 1] = new Node_t(Props.Counts, new float[3] { pos, 0, 0 }, NodeFreedom.locked, NodeLoad.none, Nodes.Length - 1, new int[1] { Nodes.Length - 2 }, Props.E, Props.D);
-            if (Nodes.Length > 2)
-            {
-                Nodes[Nodes.Length / 2].LoadType = NodeLoad.f;
-            }
+            Nodes[Nodes.Length - 1] = new Node_t(Props.Counts, new float[3] { pos, 0, 0 }, NodeFreedom.xyz, NodeLoad.f, Nodes.Length - 1, new int[1] { Nodes.Length - 2 }, Props.E, Props.D);
+            //if (Nodes.Length > 2)
+            //{
+            //    Nodes[Nodes.Length / 2].LoadType = NodeLoad.f;
+            //}
             for (int i = 0; i < Nodes.Length; i++)
             {
                 Nodes[i].tm[0][(int)N.p] = new float[] { i * dl, Props.initDrop * (float)Math.Pow((i * dl) - Props.L / 2, 2) + 1E-3f, 0 };
