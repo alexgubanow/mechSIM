@@ -1,30 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace spring
+﻿namespace spring
 {
     public class vectr
     {
-        public static float[] Minus(float vec, float[] arg)
+        public static void Invert(ref float[] vec)
         {
-            float[] res = new float[arg.Length];
-            for (int i = 0; i < arg.Length; i++)
-            {
-                res[i] = vec - arg[i];
-            }
-            return res;
-        }
-        public static float[] Minus(float[] vec, float arg)
-        {
-            float[] res = new float[vec.Length];
             for (int i = 0; i < vec.Length; i++)
             {
-                res[i] = vec[i] - arg;
+                vec[i] = 0 - vec[i];
             }
-            return res;
+        }
+
+        public static void Minus(ref float[] vec, float arg)
+        {
+            for (int i = 0; i < vec.Length; i++)
+            {
+                vec[i] -= arg;
+            }
+        }
+
+        public static void Minus(ref float[] vec, float[] arg)
+        {
+            for (int i = 0; i < vec.Length; i++)
+            {
+                vec[i] -= arg[i];
+            }
         }
         public static float[] Minus(float[] vec, float[] arg)
         {
@@ -35,14 +34,22 @@ namespace spring
             }
             return res;
         }
-        public static float[] Plus(float[] vec, float arg)
+
+        public static void Plus(ref float[] vec, float arg)
         {
-            float[] res = new float[vec.Length];
             for (int i = 0; i < vec.Length; i++)
             {
-                res[i] = vec[i] + arg;
+                vec[i] += arg;
             }
-            return res;
+        }
+
+        public static void Plus(ref float[] vec, float[] arg)
+        {
+            for (int i = 0; i < vec.Length; i++)
+            {
+                vec[i] += arg[i];
+                //vec[i] = vec[i]+ arg[i];
+            }
         }
         public static float[] Plus(float[] vec, float[] arg)
         {

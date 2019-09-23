@@ -36,19 +36,60 @@ namespace spring
         }
         public void GetForces(Node_t[] Nodes, int t)
         {
-            if (freedom != NodeFreedom.locked)
+            if (freedom != NodeFreedom.locked && (LoadType == NodeLoad.f|| LoadType == NodeLoad.none))
             {
+                /*getting element forces*/
                 foreach (var np in ngb)
                 {
                     //get Fn from link between this point and np
                     float[] gFn = Element.GetFn(tm[t - 1], Nodes[np].tm[t - 1], r, A, E, I);
                     //dirty fix of dcm, just turn - to + and vs
-                    gFn = vectr.Minus(0, gFn);
+                    vectr.Invert(ref gFn);
                     //push it to this force pull
-                    tm[t][(int)N.f] = vectr.Plus(tm[t][(int)N.f], gFn);
+                    vectr.Plus(ref tm[t][(int)N.f], gFn);
                 }
             }
         }
+        public void Integrate(int now, int before, float dt)
+        {
+            if (LoadType == NodeLoad.f || LoadType == NodeLoad.none)
+            {
+                Integr.Integrate(Integr.Types.Verlet, ref tm[now], tm[before], dt, m);
+            }
+            else if(LoadType == NodeLoad.p )
+            {
+                Integr.Integrate(Integr.Types.UVAF_P, ref tm[now], tm[before], dt, m);
+            }
+        }
 
+        //private void GetLoad(int t, float[] load)
+        //{
+        //    switch (LoadType)
+        //    {
+        //        case N.p:
+        //            tm[t][(int)LoadType] = load;
+        //            break;
+
+        //        case N.u:
+        //            tm[t][(int)LoadType] = load;
+        //            break;
+
+        //        case N.v:
+        //            break;
+
+        //        case N.a:
+        //            break;
+
+        //        case N.b:
+        //            break;
+
+        //        case N.f:
+        //            tm[t][(int)LoadType] = vectr.Plus(tm[t][(int)LoadType], load);
+        //            break;
+
+        //        default:
+        //            break;
+        //    }
+        //}
     }
 }

@@ -27,9 +27,7 @@ namespace spring.ViewModels
         private readonly IEventAggregator _ea;
 
         public float[] time;
-        private float[][][] load;
-        public Node_t[] Nodes;
-
+        private Rope_t model;
         public props Props { get; set; }
         public float EndT { get => Props.Counts - 1; }
 
@@ -37,7 +35,7 @@ namespace spring.ViewModels
         public int CurrT { get => _CurrT; set { _CurrT = value; Draw3d(value, SelDeriv); } }
 
         private int selDeriv;
-        public int SelDeriv { get => selDeriv; set { selDeriv = value; if (Nodes != null) { DrawPoints(value); } } }
+        public int SelDeriv { get => selDeriv; set { selDeriv = value; if (model != null) { DrawPoints(value); } } }
 
         public Point3DCollection RopeCoords { get; set; }
         public ObservableCollection<Visual3D> Objs3d { get; set; }
@@ -140,10 +138,10 @@ namespace spring.ViewModels
 
         private async void Compute_Click()
         {
-            Nodes = null;
+            model = null;
             //_ea.GetEvent<ClearPlotsEvent>().Publish();
             time = getT(Props.dt, Props.Counts);
-            load = getLoad(NodeLoad.f, C.x, Props.nodes, Props.Counts);
+            float[][][] load = getLoad(NodeLoad.f, C.x, Props.nodes, Props.Counts);
 
             #region load file
 
@@ -180,42 +178,18 @@ namespace spring.ViewModels
 
             #endregion load file
 
-            SetupNodesPositions();
-            foreach (var node in Nodes)
-            {
-                Rope_t.EvalLinksLength(Nodes, node.NodeID, Props.D, Props.ro);
-            }
+            model = new Rope_t(Props.nodes, load);
+            model.SetupNodesPositions(Props.Counts, Props.initDrop, Props.L, Props.E, Props.D);
+            model.EvalLinksLength(Props.D, Props.ro);
             await Task.Run(Simulating);
         }
 
-        private void SetupNodesPositions()
-        {
-            float dl = Props.L / Props.nodes;
-            float pos = 0;
-            Nodes = new Node_t[Props.nodes];
-            Nodes[0] = new Node_t(Props.Counts, new float[3] { pos, 0, 0 }, NodeFreedom.xyz, NodeLoad.f, 0, new int[1] { 1 }, Props.E, Props.D);
-            pos += dl;
-            for (int i = 1; i < Nodes.Length - 1; i++)
-            {
-                Nodes[i] = new Node_t(Props.Counts, new float[3] { pos, 0, 0 }, NodeFreedom.xyz, NodeLoad.none, i, new int[2] { i - 1, i + 1 }, Props.E, Props.D);
-                pos += dl;
-            }
-            Nodes[Nodes.Length - 1] = new Node_t(Props.Counts, new float[3] { pos, 0, 0 }, NodeFreedom.xyz, NodeLoad.f, Nodes.Length - 1, new int[1] { Nodes.Length - 2 }, Props.E, Props.D);
-            //if (Nodes.Length > 2)
-            //{
-            //    Nodes[Nodes.Length / 2].LoadType = NodeLoad.f;
-            //}
-            for (int i = 0; i < Nodes.Length; i++)
-            {
-                Nodes[i].tm[0][(int)N.p] = new float[] { i * dl, Props.initDrop * (float)Math.Pow((i * dl) - Props.L / 2, 2) + 1E-3f, 0 };
-            }
-        }
 
         private void Simulating()
         {
             for (int t = 1; t < time.Length; t++)
             {
-                Rope_t.IterateOverNodes(Nodes, t, Props.dt, load);
+                model.IterateOverNodes(t, Props.dt);
             }
             //_ea.GetEvent<GotResultsEvent>().Publish();
             ShowResults(SelDeriv);
@@ -251,7 +225,7 @@ namespace spring.ViewModels
 
         private void ShowResults(int Deriv)
         {
-            if (Nodes != null)
+            if (model.Nodes != null)
             {
                 DrawPoints(Deriv);
                 Draw3d(CurrT, Deriv);
@@ -261,11 +235,11 @@ namespace spring.ViewModels
         private void DrawPoints(int Deriv)
         {
             ClearDataView();
-            if ((N)SelDeriv == N.f)
-            {
-                plotData("Fext", load[Nodes.Length / 2]);
-            }
-            foreach (var node in Nodes)
+            //if ((N)SelDeriv == N.f)
+            //{
+            //    plotData("Fext", model.load[model.Nodes.Length / 2]);
+            //}
+            foreach (var node in model.Nodes)
             {
                 float[][] tmp = ExtractArray(node.tm, (N)SelDeriv);
                 plotData("node #" + node.NodeID, tmp);
@@ -320,28 +294,28 @@ namespace spring.ViewModels
                 Load3d();
                 Objs3d.Add(new CubeVisual3D
                 {
-                    Center = new Point3D(Nodes[0].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[0].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[0].tm[t][(int)N.p][(int)C.y] * 10E2),
+                    Center = new Point3D(model.Nodes[0].tm[t][(int)N.p][(int)C.x] * 10E2, model.Nodes[0].tm[t][(int)N.p][(int)C.z] * 10E2, model.Nodes[0].tm[t][(int)N.p][(int)C.y] * 10E2),
                     SideLength = .8,
                     Fill = Brushes.Gray
                 });
                 Objs3d.Add(new CubeVisual3D
                 {
-                    Center = new Point3D(Nodes[Nodes.Length - 1].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[Nodes.Length - 1].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[Nodes.Length - 1].tm[t][(int)N.p][(int)C.y] * 10E2),
+                    Center = new Point3D(model.Nodes[model.Nodes.Length - 1].tm[t][(int)N.p][(int)C.x] * 10E2, model.Nodes[model.Nodes.Length - 1].tm[t][(int)N.p][(int)C.z] * 10E2, model.Nodes[model.Nodes.Length - 1].tm[t][(int)N.p][(int)C.y] * 10E2),
                     SideLength = .8,
                     Fill = Brushes.Gray
                 });
-                for (int node = 0; node < Nodes.Length - 1; node++)
+                for (int node = 0; node < model.Nodes.Length - 1; node++)
                 {
                     Objs3d.Add(new LinesVisual3D
                     {
-                        Points = { new Point3D(Nodes[node].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.y] * 10E2),
-                            new Point3D(Nodes[node + 1].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[node + 1].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[node + 1].tm[t][(int)N.p][(int)C.y] * 10E2) },
+                        Points = { new Point3D(model.Nodes[node].tm[t][(int)N.p][(int)C.x] * 10E2, model.Nodes[node].tm[t][(int)N.p][(int)C.z] * 10E2, model.Nodes[node].tm[t][(int)N.p][(int)C.y] * 10E2),
+                            new Point3D(model.Nodes[node + 1].tm[t][(int)N.p][(int)C.x] * 10E2, model.Nodes[node + 1].tm[t][(int)N.p][(int)C.z] * 10E2, model.Nodes[node + 1].tm[t][(int)N.p][(int)C.y] * 10E2) },
                         Thickness = 2,
                         Color = Brushes.Blue.Color
                     });
                     Objs3d.Add(new SphereVisual3D
                     {
-                        Center = new Point3D(Nodes[node].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.y] * 10E2),
+                        Center = new Point3D(model.Nodes[node].tm[t][(int)N.p][(int)C.x] * 10E2, model.Nodes[node].tm[t][(int)N.p][(int)C.z] * 10E2, model.Nodes[node].tm[t][(int)N.p][(int)C.y] * 10E2),
                         Radius = .3,
                         Fill = Brushes.Black
                     });

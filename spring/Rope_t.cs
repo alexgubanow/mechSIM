@@ -1,84 +1,57 @@
 ﻿using System;
-using System.Globalization;
 
 namespace spring
 {
     public class Rope_t
     {
-        public static void EvalLinksLength(Node_t[] Nodes, int NodeID, float _D, float ro)
+        public Node_t[] Nodes;
+        public float[][][] load;
+        public Rope_t(int nodeCount, float[][][] _load)
         {
-            Nodes[NodeID].A = (float)Math.PI * (float)Math.Pow(_D, 2) / 4;
-            Nodes[NodeID].I = maf.P3(Nodes[NodeID].A) / 12f;
-            float L = 0;
-            foreach (var link in Nodes[NodeID].ngb)
-            {
-                L += crds.GetTotL(Nodes[NodeID].tm[0][(int)N.p], Nodes[link].tm[0][(int)N.p]);
-            }
-            if (L == 0)
-            {
-                throw new Exception();
-            }
-            float vu = Nodes[NodeID].A * L / 2;
-            Nodes[NodeID].m = ro * vu;
+            Nodes = new Node_t[nodeCount];
+            load = _load;
         }
-
-        public static void IterateOverNodes(Node_t[] Nodes, int t, float dt, float[][][] load)
+        public void SetupNodesPositions(int Counts, float initDrop, float L, float E, float D)
+        {
+            float dl = L / Nodes.Length;
+            Nodes[0] = new Node_t(Counts, new float[3] { 0, initDrop * (float)Math.Pow((0 * dl) - (L - dl) / 2, 2) + 1E-3f, 0 }, NodeFreedom.xyz, NodeLoad.f, 0, new int[1] { 1 }, E, D);
+            for (int i = 1; i < Nodes.Length - 1; i++)
+            {
+                Nodes[i] = new Node_t(Counts, new float[3] { i * dl, initDrop * (float)Math.Pow((i * dl) - (L - dl) / 2, 2) + 1E-3f, 0 }, NodeFreedom.xyz, NodeLoad.none, i, new int[2] { i - 1, i + 1 }, E, D);
+            }
+            Nodes[Nodes.Length - 1] = new Node_t(Counts, new float[3] { (Nodes.Length - 1) * dl, initDrop * (float)Math.Pow(((Nodes.Length - 1) * dl) - (L - dl) / 2, 2) + 1E-3f, 0 }, NodeFreedom.xyz, NodeLoad.f, Nodes.Length - 1, new int[1] { Nodes.Length - 2 }, E, D);
+        }
+        public void EvalLinksLength(float _D, float ro)
         {
             foreach (var node in Nodes)
             {
-                if (node.LoadType == NodeLoad.f)
+                node.A = (float)Math.PI * (float)Math.Pow(_D, 2) / 4;
+                node.I = maf.P3(node.A) / 12f;
+                float L = 0;
+                foreach (var link in node.ngb)
                 {
-                    getLoad(node, t, N.f, load[node.NodeID][t]);
+                    L += crds.GetTotL(node.tm[0][(int)N.p], Nodes[link].tm[0][(int)N.p]);
                 }
-                else
+                if (L == 0)
                 {
-                    node.GetForces(Nodes, t);
+                    throw new Exception();
                 }
-                if (node.LoadType != NodeLoad.f && node.LoadType != NodeLoad.none)
-                {
-                    Integr.VerletUSD(ref node.tm[t], node.tm[t - 1], dt, node.m);
-                }
-                else
-                {
-                    IntegrateForce(node, t, dt);
-                }
+                float vu = node.A * L / 2;
+                node.m = ro * vu;
             }
         }
 
-        private static void getLoad(Node_t node, int t, N typ, float[] load)
+        public void IterateOverNodes(int t, float dt)
         {
-            switch (typ)
+            foreach (var node in Nodes)
             {
-                case N.p:
-                    node.tm[t][(int)typ] = load;
-                    break;
-
-                case N.u:
-                    node.tm[t][(int)typ] = load;
-                    break;
-
-                case N.v:
-                    break;
-
-                case N.a:
-                    break;
-
-                case N.b:
-                    break;
-
-                case N.f:
-                    node.tm[t][(int)typ] = vectr.Plus(node.tm[t][(int)typ], load);
-                    break;
-
-                default:
-                    break;
+                /*get loading*/
+                vectr.Plus(ref node.tm[t][(int)node.LoadType], load[node.NodeID][t]);
+                /*calc force*/
+                node.GetForces(Nodes, t);
+                /*integrate*/
+                node.Integrate(t, t - 1, dt);
             }
         }
-
-        public static void IntegrateForce(Node_t node, int t, float dt)
-        {
-            Integr.Verlet(ref node.tm[t], node.tm[t - 1], dt, node.m);
-        }
-
     }
 }
