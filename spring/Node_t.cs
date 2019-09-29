@@ -6,23 +6,16 @@ namespace spring
     {
         public NodeFreedom freedom;
         public NodeLoad LoadType;
-        public int[] ngb;
-        public float m;
-        public float E;
-        public float A;
-        public float I;
+        public int[] Elems;
         public float[][][] tm;
-        public float[] r;
         public int NodeID;
 
-        public Node_t(int tCounts, float[] coords, NodeFreedom _freedom, NodeLoad _LoadType, int ID, int[] neighbours, float _E, float _D)
+        public Node_t(int tCounts, float[] coords, NodeFreedom _freedom, NodeLoad _LoadType, int ID, int[] _Elems)
         {
             NodeID = ID;
             freedom = _freedom;
             LoadType = _LoadType;
-            r = new float[3] { 0, 0, _D / 2 };
-            E = _E;
-            ngb = neighbours;
+            Elems = _Elems;
             tm = new float[tCounts][][];
             for (int t = 0; t < tCounts; t++)
             {
@@ -34,15 +27,15 @@ namespace spring
             }
             tm[0][(int)N.p] = coords;
         }
-        public void GetForces(Node_t[] Nodes, int t)
+        public void GetForces(Element_t[] Elems, int t)
         {
             if (freedom != NodeFreedom.locked && (LoadType == NodeLoad.f|| LoadType == NodeLoad.none))
             {
                 /*getting element forces*/
-                foreach (var np in ngb)
+                foreach (var element in Elems)
                 {
                     //get Fn from link between this point and np
-                    float[] gFn = Element.GetFn(tm[t - 1], Nodes[np].tm[t - 1], r, A, E, I);
+                    float[] gFn = element.GetFn(tm[t - 1], Nodes[np].tm[t - 1]);
                     //dirty fix of dcm, just turn - to + and vs
                     vectr.Invert(ref gFn);
                     //push it to this force pull
@@ -62,34 +55,5 @@ namespace spring
             }
         }
 
-        //private void GetLoad(int t, float[] load)
-        //{
-        //    switch (LoadType)
-        //    {
-        //        case N.p:
-        //            tm[t][(int)LoadType] = load;
-        //            break;
-
-        //        case N.u:
-        //            tm[t][(int)LoadType] = load;
-        //            break;
-
-        //        case N.v:
-        //            break;
-
-        //        case N.a:
-        //            break;
-
-        //        case N.b:
-        //            break;
-
-        //        case N.f:
-        //            tm[t][(int)LoadType] = vectr.Plus(tm[t][(int)LoadType], load);
-        //            break;
-
-        //        default:
-        //            break;
-        //    }
-        //}
     }
 }

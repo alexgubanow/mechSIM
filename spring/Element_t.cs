@@ -1,8 +1,16 @@
 ﻿namespace spring
 {
-    public class Element
+    public class Element_t
     {
-        public static float[] GetFn(float[][] Bp, float[][] Np, float[] radiusPoint, float A, float E, float I)
+        public float m;
+        public float E;
+        public float A;
+        public float I;
+        public int n1;
+        public int n2;
+        public float[][][] tm;
+        public float[] radiusPoint;
+        public float[] GetFn(float[][] Bp, float[][] Np, float[] radiusPoint, float A, float E, float I)
         {
             float[] Fn = new float[3] { 0, 0, 0 };
             //getting length of link by measure between coords

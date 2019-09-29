@@ -178,9 +178,7 @@ namespace spring.ViewModels
 
             #endregion load file
 
-            model = new Rope_t(Props.nodes, load);
-            model.SetupNodesPositions(Props.Counts, Props.initDrop, Props.L, Props.E, Props.D);
-            model.EvalLinksLength(Props.D, Props.ro);
+            model = new Rope_t(Props, load);
             await Task.Run(Simulating);
         }
 

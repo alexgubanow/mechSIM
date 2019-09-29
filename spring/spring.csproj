@@ -85,7 +85,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Element.cs" />
+    <Compile Include="Element_t.cs" />
     <Page Include="lblTxTbox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
