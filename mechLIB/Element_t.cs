@@ -1,13 +1,13 @@
-﻿namespace spring
+﻿namespace mechLIB
 {
-    public class Element_t
+    public unsafe class Element_t
     {
         public float m;
         public float E;
         public float A;
         public float I;
-        public int n1;
-        public int n2;
+        public Node_t n1;
+        public Node_t n2;
         public float[][][] tm;
         public float[] radiusPoint;
         public float[] GetFn(float[][] Bp, float[][] Np, float[] radiusPoint, float A, float E, float I)

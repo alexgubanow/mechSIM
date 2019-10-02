@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace spring
+namespace mechLIB
 {
     public class Rope_t
     {

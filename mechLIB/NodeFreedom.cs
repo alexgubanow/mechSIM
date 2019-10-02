@@ -1,4 +1,4 @@
-﻿namespace spring
+﻿namespace mechLIB
 {
     public enum NodeFreedom
     {

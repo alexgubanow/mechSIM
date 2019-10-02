@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace spring
+namespace mechLIB
 {
-    public class Node_t
+    public unsafe class Node_t
     {
         public NodeFreedom freedom;
         public NodeLoad LoadType;
