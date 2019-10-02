@@ -60,14 +60,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="coords.cs" />
-    <Compile Include="integr.cs" />
     <Compile Include="Events.cs" />
-    <Compile Include="maf.cs" />
-    <Compile Include="NodeFreedom.cs" />
-    <Compile Include="NodeLoad.cs" />
-    <Compile Include="Rope_t.cs" />
-    <Compile Include="vectr.cs" />
     <Compile Include="ViewModels\Load.cs" />
     <Compile Include="props.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
@@ -85,7 +78,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Element_t.cs" />
     <Page Include="lblTxTbox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -100,7 +92,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Node_t.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

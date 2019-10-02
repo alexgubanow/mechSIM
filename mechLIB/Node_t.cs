@@ -6,6 +6,7 @@ namespace mechLIB
     {
         public NodeFreedom freedom;
         public NodeLoad LoadType;
+        public deriv_t[] deriv;
         public int[] Elems;
         public float[][][] tm;
         public int NodeID;
