@@ -1,4 +1,6 @@
-﻿namespace spring
+﻿using mechLIB;
+
+namespace spring
 {
     public class props
     {
@@ -28,128 +30,106 @@
 
         public props()
         {
-            E = 2E6f;
-            L = 25E-3f;
-            D = 1E-3f;
-            ro = 1040;
-            Counts = 3000;
-            dt = 1E-7f;
-            nodes = 7;
-            initDrop = 1E-1f;
-            MaxU = 2E-3f;
+            store.E = 2E6f;
+            store.L = 25E-3f;
+            store.D = 1E-3f;
+            store.ro = 1040;
+            store.Counts = 3000;
+            store.dt = 1E-7f;
+            store.nodes = 7;
+            store.initDrop = 1E-1f;
+            store.MaxU = 2E-3f;
         }
-        public float MaxU;
+        public props_t store;
 
         public string MaxUstr
         {
-            get => MaxU.ToString(); set
+            get => store.MaxU.ToString(); set
             {
                 if (float.TryParse(value, out float tmp))
                 {
-                    MaxU = tmp;
+                    store.MaxU = tmp;
                 }
             }
         }
-        public float initDrop;
-
         public string initDropstr
         {
-            get => initDrop.ToString(); set
+            get => store.initDrop.ToString(); set
             {
                 if (float.TryParse(value, out float tmp))
                 {
-                    initDrop = tmp;
+                    store.initDrop = tmp;
                 }
             }
         }
-
-        public int nodes;
-
         public string nodesstr
         {
-            get => nodes.ToString(); set
+            get => store.nodes.ToString(); set
             {
                 if (int.TryParse(value, out int tmp))
                 {
-                    nodes = tmp;
+                    store.nodes = tmp;
                 }
             }
         }
-
-        public float E;
-
         public string Estr
         {
-            get => E.ToString(); set
+            get => store.E.ToString(); set
             {
                 if (float.TryParse(value, out float tmp))
                 {
-                    E = tmp;
+                    store.E = tmp;
                 }
             }
         }
-
-        public float L;
-
         public string Lstr
         {
-            get => L.ToString(); set
+            get => store.L.ToString(); set
             {
                 if (float.TryParse(value, out float tmp))
                 {
-                    L = tmp;
+                    store.L = tmp;
                 }
             }
         }
-
-        public float D;
-
         public string Dstr
         {
-            get => D.ToString(); set
+            get => store.D.ToString(); set
             {
                 if (float.TryParse(value, out float tmp))
                 {
-                    D = tmp;
+                    store.D = tmp;
                 }
             }
         }
-
-        public int Counts;
-
         public string Countstr
         {
-            get => Counts.ToString(); set
+            get => store.Counts.ToString(); set
             {
                 if (int.TryParse(value, out int tmp))
                 {
-                    Counts = tmp;
+                    store.Counts = tmp;
                 }
             }
         }
-
-        public float dt;
-
         public string dtstr
         {
-            get => dt.ToString(); set
+            get => store.dt.ToString(); set
             {
                 if (float.TryParse(value, out float tmp))
                 {
-                    dt = tmp;
+                    store.dt = tmp;
                 }
             }
         }
-
-        public float ro;
 
         public string rostr
         {
-            get => ro.ToString(); set
+            get => store.ro.ToString(); set
             {
                 if (float.TryParse(value, out float tmp))
                 {
-                    ro = tmp;
+                    store.ro = tmp;
                 }
             }
         }

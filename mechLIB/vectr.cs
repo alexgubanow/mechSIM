@@ -29,30 +29,24 @@
             res.z = arg1.z - arg2.z;    
         }
 
-        public static void Plus(ref float[] vec, float arg)
+        public static void Plus(ref xyz_t vec, float arg)
         {
-            for (int i = 0; i < vec.Length; i++)
-            {
-                vec[i] += arg;
-            }
+            vec.x += arg;
+            vec.y += arg;
+            vec.z += arg;
         }
 
-        public static void Plus(ref float[] vec, float[] arg)
+        public static void Plus(ref xyz_t vec, xyz_t arg)
         {
-            for (int i = 0; i < vec.Length; i++)
-            {
-                vec[i] += arg[i];
-                //vec[i] = vec[i]+ arg[i];
-            }
+            vec.x += arg.x;
+            vec.y += arg.y;
+            vec.z += arg.z;
         }
-        public static float[] Plus(float[] vec, float[] arg)
+        public static void Plus(xyz_t arg1, xyz_t arg2, ref xyz_t res)
         {
-            float[] res = new float[vec.Length];
-            for (int i = 0; i < vec.Length; i++)
-            {
-                res[i] = vec[i] + arg[i];
-            }
-            return res;
+            res.x = arg1.x + arg2.x;
+            res.y = arg1.y + arg2.y;
+            res.z = arg1.z + arg2.z;
         }
     }
 }

@@ -152,5 +152,11 @@
       <Version>7.2.0.1367</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\mechLIB\mechLIB.csproj">
+      <Project>{CFFCE4E0-6054-4728-8BEC-3DA1E996B6B4}</Project>
+      <Name>mechLIB</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

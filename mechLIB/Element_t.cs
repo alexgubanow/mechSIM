@@ -1,4 +1,6 @@
-﻿namespace mechLIB
+﻿using System;
+
+namespace mechLIB
 {
     public unsafe class Element_t
     {
@@ -10,6 +12,16 @@
         public Node_t n2;
         public xyz_t[] F;
         public xyz_t radiusPoint;
+        public Element_t(ref Node_t _n1,ref Node_t _n2, xyz_t _radiusPoint, float _E, int Counts)
+        {
+            F = new xyz_t[Counts];
+            E = _E;
+            n1 = _n1;
+            n2 = _n2;
+            radiusPoint = _radiusPoint;
+            A = (float)Math.PI * (float)Math.Pow(_radiusPoint.z, 2) / 4;
+            I = maf.P3(A) / 12.0f;
+        }
         void GetForces(int t)
         {
             xyz_t gFn = new xyz_t();
