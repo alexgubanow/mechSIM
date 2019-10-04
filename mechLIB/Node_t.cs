@@ -4,39 +4,61 @@ namespace mechLIB
 {
     public unsafe class Node_t
     {
+        public float m;
         public NodeFreedom freedom;
         public NodeLoad LoadType;
         public deriv_t[] deriv;
-        public Element_t[] Elems;
+        public int[] Neigs;
         public int NodeID;
-        public int[] ElemItr;
+        public xyz_t radiusPoint;
 
-        public Node_t(int tCounts, xyz_t coords, NodeFreedom _freedom, NodeLoad _LoadType, int ID, ref Element_t[] _Elems, int[] _ElemItr)
+        public Node_t(int tCounts, xyz_t coords, xyz_t _radiusPoint, NodeFreedom _freedom, NodeLoad _LoadType, int ID, int[] _Neigs)
         {
             NodeID = ID;
             freedom = _freedom;
             LoadType = _LoadType;
-            Elems = _Elems;
-            ElemItr = _ElemItr;
+            Neigs = _Neigs;
             deriv = new deriv_t[tCounts];
             deriv[0].p = coords;
+            radiusPoint = _radiusPoint;
         }
-        public void GetForces(int t)
+        public void GetForces(ref Rope_t model, int t, ref xyz_t nodeForce)
         {
             if (freedom != NodeFreedom.locked && (LoadType == NodeLoad.f || LoadType == NodeLoad.none))
             {
                 /*getting element forces*/
-                foreach (var element in Elems)
+                foreach (var neigNode in Neigs)
                 {
+                    //getting position of link according base point
+                    xyz_t LinkPos = new xyz_t();
+                    vectr.Minus(model.GetNodeRef(NodeID).deriv[t].p, model.GetNodeRef(neigNode).deriv[t].p, ref LinkPos);
+                    //getting DCM for this link
+                    dcm_t dcm = new dcm_t();
+                    crds.GetDCM(ref dcm, LinkPos, radiusPoint);
                     //get Fn from link between this point and np
-                    xyz_t gFn = new xyz_t();
-                    element.GetFn(t - 1, ref gFn);
+                    xyz_t lFn = model.GetElemRef(NodeID, neigNode).F[t];
                     //dirty fix of dcm, just turn - to + and vs
-                    vectr.Invert(ref gFn);
+                    //vectr.Invert(ref gFn);
+                    xyz_t gFn = new xyz_t();
+                    //convert Fn to global coords and return
+                    crds.ToGlob(dcm, lFn, ref gFn);
                     //push it to this force pull
-                    vectr.Plus(ref deriv, gFn);
+                    vectr.Plus(ref nodeForce, gFn);
                 }
             }
+        }
+        public void CalcMass(ref Rope_t model, float ro)
+        {
+            foreach (var neigNode in Neigs)
+            {
+                m += model.GetElemRef(NodeID, neigNode).CalcMass(ref model, ro);
+            }
+        }
+        public void CalcAccel(int now, xyz_t Force)
+        {
+            deriv[now].a.x = Force.x / m;
+            deriv[now].a.y = Force.y / m;
+            deriv[now].a.z = Force.z / m;//has to be different
         }
         public void Integrate(int now, int before, float dt)
         {

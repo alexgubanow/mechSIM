@@ -1,4 +1,5 @@
 ﻿using HelixToolkit.Wpf;
+using mechLIB;
 using OxyPlot;
 using OxyPlot.Series;
 using Prism.Commands;
@@ -29,7 +30,7 @@ namespace spring.ViewModels
         public float[] time;
         private Rope_t model;
         public props Props { get; set; }
-        public float EndT { get => Props.Counts - 1; }
+        public float EndT { get => Props.store.Counts - 1; }
 
         private int _CurrT;
         public int CurrT { get => _CurrT; set { _CurrT = value; Draw3d(value, SelDeriv); } }
@@ -81,9 +82,9 @@ namespace spring.ViewModels
         private float[][][] getLoad(NodeLoad ltype, C axis, int nodes, int Counts)
         {
             //float maxUx = 0.01f * Props.L / nodes ;
-            float A = (float)Math.PI * (float)Math.Pow(Props.D, 2) / 4;
-            float maxLoad = ((Props.E * A) / Props.L / nodes) * Props.MaxU;
-            float period = Props.Counts * Props.dt;
+            float A = (float)Math.PI * (float)Math.Pow(Props.store.D, 2) / 4;
+            float maxLoad = ((Props.store.E * A) / Props.store.L / nodes) * Props.store.MaxU;
+            float period = Props.store.Counts * Props.store.dt;
             float freq = 1 / period;
 
 
@@ -140,8 +141,8 @@ namespace spring.ViewModels
         {
             model = null;
             //_ea.GetEvent<ClearPlotsEvent>().Publish();
-            time = getT(Props.dt, Props.Counts);
-            float[][][] load = getLoad(NodeLoad.f, C.x, Props.nodes, Props.Counts);
+            time = getT(Props.store.dt, Props.store.Counts);
+            float[][][] load = getLoad(NodeLoad.f, C.x, Props.store.nodes, Props.store.Counts);
 
             #region load file
 
@@ -178,7 +179,7 @@ namespace spring.ViewModels
 
             #endregion load file
 
-            model = new Rope_t(Props, load);
+            model = new Rope_t(Props.store, load);
             await Task.Run(Simulating);
         }
 
@@ -187,7 +188,21 @@ namespace spring.ViewModels
         {
             for (int t = 1; t < time.Length; t++)
             {
-                model.IterateOverNodes(t, Props.dt);
+                foreach (var elem in model.Elements)
+                {
+                    elem.CalcForce(ref model, t);
+                }
+                foreach (var node in model.Nodes)
+                {
+                    /*get loading*/
+                    //vectr.Plus(ref node.tm[t][(int)node.LoadType], load[node.NodeID][t]);
+                    /*calc force*/
+                    xyz_t nodeForce = new xyz_t();
+                    node.GetForces(ref model, t, ref nodeForce);
+                    node.CalcAccel(t, nodeForce);
+                    /*integrate*/
+                    node.Integrate(t, t - 1, Props.store.dt);
+                }
             }
             //_ea.GetEvent<GotResultsEvent>().Publish();
             ShowResults(SelDeriv);
