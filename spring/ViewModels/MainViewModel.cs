@@ -86,7 +86,6 @@ namespace spring.ViewModels
             float freq = 1 / (Props.store.Counts * Props.store.dt);
             for (int t = 0; t < Props.store.Counts; t++)
             {
-                float dscsd = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * Props.store.MaxU);
                 model.Nodes[0].deriv[t].u.x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * Props.store.MaxU);
                 model.Nodes[Props.store.nodes - 1].deriv[t].u.x = (float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * Props.store.MaxU;
             }
@@ -211,7 +210,7 @@ namespace spring.ViewModels
         private void DrawPoints(int Deriv)
         {
             ClearDataView();
-            if ((NodeLoad)SelDeriv == NodeLoad.f)
+            if ((NodeLoad)Deriv == NodeLoad.f)
             {
                 foreach (var elem in model.Elements)
                 {

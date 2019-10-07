@@ -19,10 +19,15 @@
     }
     public class deriv_t
     {
+        //coordinates
         public xyz_t p;
+        //displacement
         public xyz_t u;
+        //velocity
         public xyz_t v;
+        //acceleration
         public xyz_t a;
+        //jerk
         public xyz_t b;
         public deriv_t()
         {

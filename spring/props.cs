@@ -4,30 +4,6 @@ namespace spring
 {
     public class props
     {
-        //public props(string _E, string _L, string _D, string _ro, string _Counts, string _dt, string _nodes, string _initDrop)
-        //{
-        //    Estr = _E;
-        //    Lstr = _L;
-        //    Dstr = _D;
-        //    rostr = _ro;
-        //    Countstr = _Counts;
-        //    dtstr = _dt;
-        //    nodesstr = _nodes;
-        //    initDropstr = _initDrop;
-        //}
-
-        //public props(float _E, float _L, float _D, float _ro, int _Counts, float _dt, int _nodes, float _initDrop)
-        //{
-        //    E = _E;
-        //    L = _L;
-        //    D = _D;
-        //    ro = _ro;
-        //    Counts = _Counts;
-        //    dt = _dt;
-        //    nodes = _nodes;
-        //    initDrop = _initDrop;
-        //}
-
         public props()
         {
             store.E = 2E6f;

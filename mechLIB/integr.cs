@@ -19,12 +19,28 @@
                 now.v.x = before.v.x + before.a.x * dt;
                 now.u.x = before.u.x + before.v.x * dt;
                 now.p.x = before.p.x + before.u.x;
+
+                now.v.y = before.v.y + before.a.y * dt;
+                now.u.y = before.u.y + before.v.y * dt;
+                now.p.y = before.p.y + before.u.y;
+
+                now.v.z = before.v.z + before.a.z * dt;
+                now.u.z = before.u.z + before.v.z * dt;
+                now.p.z = before.p.z + before.u.z;
             }
             else
             {
-                now.u.x = (now.p.x - before.p.x) / dt;
+                now.u.x = now.p.x - before.p.x;
                 now.v.x = (now.u.x - before.u.x) / dt;
                 now.a.x = (now.v.x - before.v.x) / dt;
+
+                now.u.y = now.p.y - before.p.y;
+                now.v.y = (now.u.y - before.u.y) / dt;
+                now.a.y = (now.v.y - before.v.y) / dt;
+
+                now.u.z = now.p.z - before.p.z;
+                now.v.z = (now.u.z - before.u.z) / dt;
+                now.a.z = (now.v.z - before.v.z) / dt;
             }
         }
 
