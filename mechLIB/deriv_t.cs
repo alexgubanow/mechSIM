@@ -24,6 +24,14 @@
         public xyz_t v;
         public xyz_t a;
         public xyz_t b;
+        public deriv_t()
+        {
+            p = new xyz_t();
+            u = new xyz_t();
+            v = new xyz_t();
+            a = new xyz_t();
+            b = new xyz_t();
+        }
         public xyz_t GetByN(N_t N)
         {
             switch (N)
@@ -42,7 +50,7 @@
                     throw new System.Exception();
             }
         }
-        public void SetByC(N_t N, xyz_t val)
+        public void SetByN(N_t N, xyz_t val)
         {
             switch (N)
             {
