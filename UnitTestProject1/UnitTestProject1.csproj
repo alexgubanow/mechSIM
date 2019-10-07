@@ -59,6 +59,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\mechLIB\mechLIB.csproj">
+      <Project>{CFFCE4E0-6054-4728-8BEC-3DA1E996B6B4}</Project>
+      <Name>mechLIB</Name>
+    </ProjectReference>
     <ProjectReference Include="..\spring\spring.csproj">
       <Project>{64c6fc95-0c5d-4a0c-a636-cb89b588e579}</Project>
       <Name>spring</Name>

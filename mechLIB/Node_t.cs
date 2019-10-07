@@ -31,7 +31,7 @@ namespace mechLIB
                 {
                     //getting position of link according base point
                     xyz_t LinkPos = new xyz_t();
-                    vectr.Minus(model.GetNodeRef(NodeID).deriv[t].p, model.GetNodeRef(neigNode).deriv[t].p, ref LinkPos);
+                    xyz_t.Minus(model.GetNodeRef(NodeID).deriv[t].p, model.GetNodeRef(neigNode).deriv[t].p, ref LinkPos);
                     //getting DCM for this link
                     dcm_t dcm = new dcm_t();
                     crds.GetDCM(ref dcm, LinkPos, radiusPoint);
@@ -43,7 +43,7 @@ namespace mechLIB
                     //convert Fn to global coords and return
                     crds.ToGlob(dcm, lFn, ref gFn);
                     //push it to this force pull
-                    vectr.Plus(ref nodeForce, gFn);
+                    nodeForce.Plus(gFn);
                 }
             }
         }

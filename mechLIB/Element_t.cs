@@ -47,7 +47,7 @@ namespace mechLIB
             float oldL2 = crds.GetTotL(model.GetNodeRef(n1).deriv[t].p, model.GetNodeRef(n2).deriv[t].p);
             //getting position of link according base point
             xyz_t LinkPos = new xyz_t();
-            vectr.Minus(model.GetNodeRef(n1).deriv[t].p, model.GetNodeRef(n2).deriv[t].p, ref LinkPos);
+            xyz_t.Minus(model.GetNodeRef(n1).deriv[t].p, model.GetNodeRef(n2).deriv[t].p, ref LinkPos);
             //getting DCM for this link
             dcm_t dcm = new dcm_t();
             crds.GetDCM(ref dcm, LinkPos, radiusPoint);

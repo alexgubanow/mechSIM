@@ -79,14 +79,13 @@ namespace spring.ViewModels
             return tCounts;
         }
 
-        private float[][][] getLoad(NodeLoad ltype, C axis, int nodes, int Counts)
+        private float[][][] getLoad(NodeLoad ltype, C_t axis, int nodes, int Counts)
         {
             //float maxUx = 0.01f * Props.L / nodes ;
             float A = (float)Math.PI * (float)Math.Pow(Props.store.D, 2) / 4;
             float maxLoad = ((Props.store.E * A) / Props.store.L / nodes) * Props.store.MaxU;
             float period = Props.store.Counts * Props.store.dt;
             float freq = 1 / period;
-
 
             float[][][] tCounts = new float[nodes][][];
             for (int node = 0; node < nodes; node++)
@@ -98,7 +97,7 @@ namespace spring.ViewModels
                     tCounts[node][t] = new float[3];
                     if (node == 0)
                     {
-                        tCounts[node][t][(int)axis] = 0-((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
+                        tCounts[node][t][(int)axis] = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
                     }
                     else if (node == nodes - 1)
                     {
@@ -142,7 +141,7 @@ namespace spring.ViewModels
             model = null;
             //_ea.GetEvent<ClearPlotsEvent>().Publish();
             time = getT(Props.store.dt, Props.store.Counts);
-            float[][][] load = getLoad(NodeLoad.f, C.x, Props.store.nodes, Props.store.Counts);
+            float[][][] load = getLoad(NodeLoad.f, C_t.x, Props.store.nodes, Props.store.Counts);
 
             #region load file
 
@@ -182,7 +181,6 @@ namespace spring.ViewModels
             model = new Rope_t(Props.store, load);
             await Task.Run(Simulating);
         }
-
 
         private void Simulating()
         {
@@ -254,49 +252,47 @@ namespace spring.ViewModels
             //}
             foreach (var node in model.Nodes)
             {
-                float[][] tmp = ExtractArray(node.tm, (N)SelDeriv);
-                plotData("node #" + node.NodeID, tmp);
-                tmp = null;
+                plotData("node #" + node.NodeID, ExtractArray(node.deriv, (N_t)SelDeriv));
             }
         }
 
-        public List<DataPoint> getDataPointList(float[] X, float[][] Y, C axis)
+        public List<DataPoint> getDataPointList(float[] X, xyz_t[] Y, C_t axis)
         {
             List<DataPoint> tmp = new List<DataPoint>();
             for (int t = 0; t < X.Length; t++)
             {
-                tmp.Add(new DataPoint(X[t], Y[t][(int)axis]));
+                tmp.Add(new DataPoint(X[t], Y[t].GetByC(axis)));
             }
             return tmp;
         }
 
-        private void plotData(string title, float[][] Y)
+        private xyz_t[] ExtractArray(deriv_t[] derivs, N_t deriv)
         {
-            List<DataPoint> data = getDataPointList(time, Y, C.x);
+            xyz_t[] tmp = new xyz_t[time.Length];
+            for (int t = 0; t < time.Length; t++)
+            {
+                tmp[t] = derivs[t].GetByN(deriv);
+            }
+            return tmp;
+        }
+
+        private void plotData(string title, xyz_t[] Y)
+        {
+            List<DataPoint> data = getDataPointList(time, Y, C_t.x);
             LineSeries aweLineSeries = new LineSeries { Title = title };
             aweLineSeries.Points.AddRange(data);
             awePlotModelX.Series.Add(aweLineSeries);
             awePlotModelX.InvalidatePlot(true);
-            data = getDataPointList(time, Y, C.y);
+            data = getDataPointList(time, Y, C_t.y);
             aweLineSeries = new LineSeries { Title = title };
             aweLineSeries.Points.AddRange(data);
             awePlotModelY.Series.Add(aweLineSeries);
             awePlotModelY.InvalidatePlot(true);
-            data = getDataPointList(time, Y, C.z);
+            data = getDataPointList(time, Y, C_t.z);
             aweLineSeries = new LineSeries { Title = title };
             aweLineSeries.Points.AddRange(data);
             awePlotModelZ.Series.Add(aweLineSeries);
             awePlotModelZ.InvalidatePlot(true);
-        }
-
-        private float[][] ExtractArray(float[][][] tm, N deriv)
-        {
-            float[][] tmp = new float[time.Length][];
-            for (int t = 0; t < time.Length; t++)
-            {
-                tmp[t] = tm[t][(int)deriv];
-            }
-            return tmp;
         }
 
         private void Draw3d(int t, int Deriv)
@@ -307,13 +303,17 @@ namespace spring.ViewModels
                 Load3d();
                 Objs3d.Add(new CubeVisual3D
                 {
-                    Center = new Point3D(model.Nodes[0].tm[t][(int)N.p][(int)C.x] * 10E2, model.Nodes[0].tm[t][(int)N.p][(int)C.z] * 10E2, model.Nodes[0].tm[t][(int)N.p][(int)C.y] * 10E2),
+                    Center = new Point3D(model.Nodes[0].deriv[t].GetByN(N_t.p).GetByC(C_t.x) * 10E2,
+                                         model.Nodes[0].deriv[t].GetByN(N_t.p).GetByC(C_t.z) * 10E2,
+                                         model.Nodes[0].deriv[t].GetByN(N_t.p).GetByC(C_t.y) * 10E2),
                     SideLength = .8,
                     Fill = Brushes.Gray
                 });
                 Objs3d.Add(new CubeVisual3D
                 {
-                    Center = new Point3D(model.Nodes[model.Nodes.Length - 1].tm[t][(int)N.p][(int)C.x] * 10E2, model.Nodes[model.Nodes.Length - 1].tm[t][(int)N.p][(int)C.z] * 10E2, model.Nodes[model.Nodes.Length - 1].tm[t][(int)N.p][(int)C.y] * 10E2),
+                    Center = new Point3D(model.Nodes[model.Nodes.Length - 1].deriv[t].GetByN(N_t.p).GetByC(C_t.x) * 10E2,
+                                         model.Nodes[model.Nodes.Length - 1].deriv[t].GetByN(N_t.p).GetByC(C_t.z) * 10E2,
+                                         model.Nodes[model.Nodes.Length - 1].deriv[t].GetByN(N_t.p).GetByC(C_t.y) * 10E2),
                     SideLength = .8,
                     Fill = Brushes.Gray
                 });
@@ -321,14 +321,20 @@ namespace spring.ViewModels
                 {
                     Objs3d.Add(new LinesVisual3D
                     {
-                        Points = { new Point3D(model.Nodes[node].tm[t][(int)N.p][(int)C.x] * 10E2, model.Nodes[node].tm[t][(int)N.p][(int)C.z] * 10E2, model.Nodes[node].tm[t][(int)N.p][(int)C.y] * 10E2),
-                            new Point3D(model.Nodes[node + 1].tm[t][(int)N.p][(int)C.x] * 10E2, model.Nodes[node + 1].tm[t][(int)N.p][(int)C.z] * 10E2, model.Nodes[node + 1].tm[t][(int)N.p][(int)C.y] * 10E2) },
+                        Points = { new Point3D(model.Nodes[node].deriv[t].GetByN(N_t.p).GetByC(C_t.x) * 10E2,
+                                                model.Nodes[node].deriv[t].GetByN(N_t.p).GetByC(C_t.z) * 10E2,
+                                                model.Nodes[node].deriv[t].GetByN(N_t.p).GetByC(C_t.y) * 10E2),
+                            new Point3D(model.Nodes[node + 1].deriv[t].GetByN(N_t.p).GetByC(C_t.x) * 10E2,
+                                        model.Nodes[node + 1].deriv[t].GetByN(N_t.p).GetByC(C_t.z) * 10E2,
+                                        model.Nodes[node + 1].deriv[t].GetByN(N_t.p).GetByC(C_t.y) * 10E2) },
                         Thickness = 2,
                         Color = Brushes.Blue.Color
                     });
                     Objs3d.Add(new SphereVisual3D
                     {
-                        Center = new Point3D(model.Nodes[node].tm[t][(int)N.p][(int)C.x] * 10E2, model.Nodes[node].tm[t][(int)N.p][(int)C.z] * 10E2, model.Nodes[node].tm[t][(int)N.p][(int)C.y] * 10E2),
+                        Center = new Point3D(model.Nodes[node].deriv[t].GetByN(N_t.p).GetByC(C_t.x) * 10E2,
+                                            model.Nodes[node].deriv[t].GetByN(N_t.p).GetByC(C_t.z) * 10E2,
+                                            model.Nodes[node].deriv[t].GetByN(N_t.p).GetByC(C_t.y) * 10E2),
                         Radius = .3,
                         Fill = Brushes.Black
                     });

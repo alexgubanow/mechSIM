@@ -1,68 +1,64 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using spring;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace spring.Tests
+namespace mechLIB.Tests
 {
     [TestClass()]
     public class vectrTests
     {
-        [TestMethod()]
-        public void InvertTest()
-        {
-            float[] vec = new float[1] { 1 };
-            vectr.Invert(ref vec);
-            CollectionAssert.AreEqual(new float[1] { -1 }, vec);
-        }
-        [TestMethod()]
-        public void PlusNumTest()
-        {
-            float[] vec = new float[1] { 1 };
-            vectr.Plus(ref vec, 1);
-            CollectionAssert.AreEqual(new float[1] { 2 }, vec);
-        }
-        [TestMethod()]
-        public void PlusVecTest()
-        {
-            float[] vec = new float[1] { 1 };
-            float[] arg = new float[1] { 1 };
-            vectr.Plus(ref vec, arg);
-            CollectionAssert.AreEqual(new float[1] { 2 }, vec);
-        }
-        [TestMethod()]
-        public void PlusVecTwoTest()
-        {
-            float[] vec = new float[1] { 1 };
-            float[] arg = new float[1] { 1 };
-            float[] res = vectr.Plus(vec, arg);
-            CollectionAssert.AreEqual(new float[1] { 2 }, res);
-        }
-        [TestMethod()]
-        public void MinusNumTest()
-        {
-            float[] vec = new float[1] { 2 };
-            vectr.Minus(ref vec, 1);
-            CollectionAssert.AreEqual(new float[1] { 1 }, vec);
-        }
-        [TestMethod()]
-        public void MinusVecTest()
-        {
-            float[] vec = new float[1] { 2 };
-            float[] arg = new float[1] { 1 };
-            vectr.Minus(ref vec, arg);
-            CollectionAssert.AreEqual(new float[1] { 1 }, vec);
-        }
-        [TestMethod()]
-        public void MinusVecTwoTest()
-        {
-            float[] vec = new float[1] { 2 };
-            float[] arg = new float[1] { 1 };
-            float[] res = vectr.Minus(vec, arg);
-            CollectionAssert.AreEqual(new float[1] { 1 }, res);
-        }
+        //[TestMethod()]
+        //public void InvertTest()
+        //{
+        //    xyz_t vec = new xyz_t() { x =1, y = 1 , z = 1 };
+        //    vectr.Invert(ref vec);
+        //    Assert.AreEqual(new xyz_t() { x = -1, y = -1, z = -1 }, vec);
+        //}
+        //[TestMethod()]
+        //public void PlusNumTest()
+        //{
+        //    xyz_t vec = new xyz_t() { x = 1, y = 1, z = 1 };
+        //    vectr.Plus(ref vec, 1);
+        //    Assert.AreEqual(new xyz_t() { x = 2, y = 2, z = 2 }, vec);
+        //}
+        //[TestMethod()]
+        //public void PlusVecTest()
+        //{
+        //    xyz_t vec = new xyz_t() { x = 1, y = 1, z = 1 };
+        //    xyz_t arg = new xyz_t() { x = 1, y = 1, z = 1 };
+        //    vectr.Plus(ref vec, arg);
+        //    Assert.AreEqual(new xyz_t() { x = 2, y = 2, z = 2 }, vec);
+        //}
+        //[TestMethod()]
+        //public void PlusVecTwoTest()
+        //{
+        //    xyz_t vec = new xyz_t() { x = 1, y = 1, z = 1 };
+        //    xyz_t arg = new xyz_t() { x = 1, y = 1, z = 1 };
+        //    xyz_t res = new xyz_t();
+        //    vectr.Plus(vec, arg, ref res);
+        //    Assert.AreEqual(new xyz_t() { x = 2, y = 2, z = 2 }, res);
+        //}
+        //[TestMethod()]
+        //public void MinusNumTest()
+        //{
+        //    xyz_t vec = new xyz_t() { x = 2, y = 2, z = 2 };
+        //    vectr.Minus(ref vec, 1);
+        //    Assert.AreEqual(new xyz_t() { x = 1, y = 1, z = 1 }, vec);
+        //}
+        //[TestMethod()]
+        //public void MinusVecTest()
+        //{
+        //    xyz_t vec = new xyz_t() { x = 2, y = 2, z = 2 };
+        //    xyz_t arg = new xyz_t() { x = 1, y = 1, z = 1 };
+        //    vectr.Minus(ref vec, arg);
+        //    Assert.AreEqual(new xyz_t() { x = 1, y = 1, z = 1 }, vec);
+        //}
+        //[TestMethod()]
+        //public void MinusVecTwoTest()
+        //{
+        //    xyz_t vec = new xyz_t() { x = 2, y = 2, z = 2 };
+        //    xyz_t arg = new xyz_t() { x = 1, y = 1, z = 1 };
+        //    xyz_t res = new xyz_t();
+        //    vectr.Minus(vec, arg, ref res);
+        //    Assert.AreEqual(new xyz_t() { x = 1, y = 1, z = 1 }, res);
+        //}
     }
 }
