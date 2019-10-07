@@ -10,11 +10,17 @@ namespace mechLIB
         public float I;
         public int n1;
         public int n2;
+        public int ID;
         public xyz_t[] F;
         public xyz_t radiusPoint;
-        public Element_t(int _n1, int _n2, xyz_t _radiusPoint, float _E, int Counts)
+        public Element_t(int _n1, int _n2, xyz_t _radiusPoint, float _E, int Counts, int _ID)
         {
+            ID = _ID;
             F = new xyz_t[Counts];
+            for (int i = 0; i < F.Length; i++)
+            {
+                F[i] = new xyz_t();
+            }
             E = _E;
             n1 = _n1;
             n2 = _n2;
@@ -25,24 +31,23 @@ namespace mechLIB
         public bool IsMyNode(int id) => (n1 == id || n2 == id) ? true : false;
         public void CalcForce(ref Rope_t model, int t)
         {
-            xyz_t gFn = new xyz_t();
-            GetFn(ref model, t, ref gFn);
+            //xyz_t Fn = new xyz_t();
+            GetFn(ref model, t, ref F[t]);
             //dirty fix of dcm, just turn - to + and vs
             //vectr.Invert(ref gFn);
-            F[t] = gFn;
+            //F[t] = Fn;
         }
-        public float CalcMass(ref Rope_t model, float ro)
+        public void CalcMass(ref Rope_t model, float ro)
         {
             float L = crds.GetTotL(model.GetNodeRef(n1).deriv[0].p, model.GetNodeRef(n2).deriv[0].p);
             if (L == 0)
             {
-                throw new Exception();
+                throw new Exception("Calculated length of element can't be eaqul to zero");
             }
-            return ro * A * L / 2;
+            m = ro * A * L;
         }
-        public void GetFn(ref Rope_t model, int t, ref xyz_t gFn)
+        public void GetFn(ref Rope_t model, int t, ref xyz_t Fn)
         {
-            xyz_t Fn = new xyz_t();
             //getting length of link by measure between coords
             float oldL2 = crds.GetTotL(model.GetNodeRef(n1).deriv[t].p, model.GetNodeRef(n2).deriv[t].p);
             //getting position of link according base point

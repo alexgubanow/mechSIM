@@ -79,69 +79,24 @@ namespace spring.ViewModels
             return tCounts;
         }
 
-        private float[][][] getLoad(NodeLoad ltype, C_t axis, int nodes, int Counts)
+        private void getLoad(C_t axis, ref Rope_t model)
         {
-            //float maxUx = 0.01f * Props.L / nodes ;
-            float A = (float)Math.PI * (float)Math.Pow(Props.store.D, 2) / 4;
-            float maxLoad = ((Props.store.E * A) / Props.store.L / nodes) * Props.store.MaxU;
-            float period = Props.store.Counts * Props.store.dt;
-            float freq = 1 / period;
-
-            float[][][] tCounts = new float[nodes][][];
-            for (int node = 0; node < nodes; node++)
+            //float A = (float)Math.PI * (float)Math.Pow(Props.store.D, 2) / 4;
+            //float maxLoad = ((Props.store.E * A) / Props.store.L / Props.store.nodes) * Props.store.MaxU;
+            float freq = 1 / (Props.store.Counts * Props.store.dt);
+            for (int t = 0; t < Props.store.Counts; t++)
             {
-                tCounts[node] = new float[Counts][];
-                tCounts[node][0] = new float[3];
-                for (int t = 1; t < Counts; t++)
-                {
-                    tCounts[node][t] = new float[3];
-                    if (node == 0)
-                    {
-                        tCounts[node][t][(int)axis] = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
-                    }
-                    else if (node == nodes - 1)
-                    {
-                        tCounts[node][t][(int)axis] = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
-                    }
-                    //switch (ltype)
-                    //{
-                    //    case NodeLoad.u:
-                    //        float ut = (float)Math.Sin(2 * Math.PI * 0.5 * time[t]) * Props.MaxU;
-                    //        //float ut = (maxUx / (0 - t)) + maxUx;
-                    //        tCounts[node][t][(int)axis] = ut;
-                    //        //tCounts[node][t][0] = ((E * A) / L / nodeCount) * ut;
-                    //        break;
-
-                    //    case NodeLoad.a:
-                    //        break;
-
-                    //    case NodeLoad.f:
-                    //        //(maxUx / (0 - t)) + maxUx
-                    //        tCounts[node][t][(int)axis] = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
-                    //        //tCounts[node][t][(int)axis] = (tCounts[node][t - 1][(int)axis] + (maxLoad / (0 - t)) + maxLoad);
-                    //        //tCounts[node][t][0] = tCounts[node][t - 1][0] + maxLoad / Counts;
-                    //        break;
-
-                    //    case NodeLoad.p:
-                    //        break;
-
-                    //    case NodeLoad.none:
-                    //        break;
-
-                    //    default:
-                    //        break;
-                    //}
-                }
+                float dscsd = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * Props.store.MaxU);
+                model.Nodes[0].deriv[t].u.x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * Props.store.MaxU);
+                model.Nodes[Props.store.nodes - 1].deriv[t].u.x = (float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * Props.store.MaxU;
             }
-            return tCounts;
         }
 
         private async void Compute_Click()
         {
-            model = null;
+            //model = null;
             //_ea.GetEvent<ClearPlotsEvent>().Publish();
             time = getT(Props.store.dt, Props.store.Counts);
-            float[][][] load = getLoad(NodeLoad.f, C_t.x, Props.store.nodes, Props.store.Counts);
 
             #region load file
 
@@ -178,7 +133,16 @@ namespace spring.ViewModels
 
             #endregion load file
 
-            model = new Rope_t(Props.store, load);
+            model = new Rope_t(Props.store);
+            foreach (var elem in model.Elements)
+            {
+                elem.CalcMass(ref model, Props.store.ro);
+            }
+            foreach (var node in model.Nodes)
+            {
+                node.CalcMass(ref model);
+            }
+            getLoad(C_t.x, ref model);
             await Task.Run(Simulating);
         }
 
@@ -192,12 +156,13 @@ namespace spring.ViewModels
                 }
                 foreach (var node in model.Nodes)
                 {
-                    /*get loading*/
-                    //vectr.Plus(ref node.tm[t][(int)node.LoadType], load[node.NodeID][t]);
-                    /*calc force*/
-                    xyz_t nodeForce = new xyz_t();
-                    node.GetForces(ref model, t, ref nodeForce);
-                    node.CalcAccel(t, nodeForce);
+                    if (node.LoadType == NodeLoad.none)
+                    {
+                        /*calc force*/
+                        xyz_t nodeForce = new xyz_t();
+                        node.GetForces(ref model, t - 1, ref nodeForce);
+                        node.CalcAccel(t - 1, nodeForce);
+                    }
                     /*integrate*/
                     node.Integrate(t, t - 1, Props.store.dt);
                 }
@@ -246,13 +211,19 @@ namespace spring.ViewModels
         private void DrawPoints(int Deriv)
         {
             ClearDataView();
-            //if ((N)SelDeriv == N.f)
-            //{
-            //    plotData("Fext", model.load[model.Nodes.Length / 2]);
-            //}
-            foreach (var node in model.Nodes)
+            if ((NodeLoad)SelDeriv == NodeLoad.f)
             {
-                plotData("node #" + node.NodeID, ExtractArray(node.deriv, (N_t)SelDeriv));
+                foreach (var elem in model.Elements)
+                {
+                    plotData("node #" + elem.ID, elem.F);
+                }
+            }
+            else
+            {
+                foreach (var node in model.Nodes)
+                {
+                    plotData("node #" + node.ID, ExtractArray(node.deriv, (N_t)SelDeriv));
+                }
             }
         }
 
@@ -303,17 +274,17 @@ namespace spring.ViewModels
                 Load3d();
                 Objs3d.Add(new CubeVisual3D
                 {
-                    Center = new Point3D(model.Nodes[0].deriv[t].GetByN(N_t.p).GetByC(C_t.x) * 10E2,
-                                         model.Nodes[0].deriv[t].GetByN(N_t.p).GetByC(C_t.z) * 10E2,
-                                         model.Nodes[0].deriv[t].GetByN(N_t.p).GetByC(C_t.y) * 10E2),
+                    Center = new Point3D(model.Nodes[0].deriv[t].p.x * 10E2,
+                                         model.Nodes[0].deriv[t].p.z * 10E2,
+                                         model.Nodes[0].deriv[t].p.y * 10E2),
                     SideLength = .8,
                     Fill = Brushes.Gray
                 });
                 Objs3d.Add(new CubeVisual3D
                 {
-                    Center = new Point3D(model.Nodes[model.Nodes.Length - 1].deriv[t].GetByN(N_t.p).GetByC(C_t.x) * 10E2,
-                                         model.Nodes[model.Nodes.Length - 1].deriv[t].GetByN(N_t.p).GetByC(C_t.z) * 10E2,
-                                         model.Nodes[model.Nodes.Length - 1].deriv[t].GetByN(N_t.p).GetByC(C_t.y) * 10E2),
+                    Center = new Point3D(model.Nodes[model.Nodes.Length - 1].deriv[t].p.x * 10E2,
+                                         model.Nodes[model.Nodes.Length - 1].deriv[t].p.z * 10E2,
+                                         model.Nodes[model.Nodes.Length - 1].deriv[t].p.y * 10E2),
                     SideLength = .8,
                     Fill = Brushes.Gray
                 });
@@ -321,20 +292,20 @@ namespace spring.ViewModels
                 {
                     Objs3d.Add(new LinesVisual3D
                     {
-                        Points = { new Point3D(model.Nodes[node].deriv[t].GetByN(N_t.p).GetByC(C_t.x) * 10E2,
-                                                model.Nodes[node].deriv[t].GetByN(N_t.p).GetByC(C_t.z) * 10E2,
-                                                model.Nodes[node].deriv[t].GetByN(N_t.p).GetByC(C_t.y) * 10E2),
-                            new Point3D(model.Nodes[node + 1].deriv[t].GetByN(N_t.p).GetByC(C_t.x) * 10E2,
-                                        model.Nodes[node + 1].deriv[t].GetByN(N_t.p).GetByC(C_t.z) * 10E2,
-                                        model.Nodes[node + 1].deriv[t].GetByN(N_t.p).GetByC(C_t.y) * 10E2) },
+                        Points = { new Point3D(model.Nodes[node].deriv[t].p.x * 10E2,
+                                                model.Nodes[node].deriv[t].p.z * 10E2,
+                                                model.Nodes[node].deriv[t].p.y * 10E2),
+                            new Point3D(model.Nodes[node + 1].deriv[t].p.x * 10E2,
+                                        model.Nodes[node + 1].deriv[t].p.z * 10E2,
+                                        model.Nodes[node + 1].deriv[t].p.y * 10E2) },
                         Thickness = 2,
                         Color = Brushes.Blue.Color
                     });
                     Objs3d.Add(new SphereVisual3D
                     {
-                        Center = new Point3D(model.Nodes[node].deriv[t].GetByN(N_t.p).GetByC(C_t.x) * 10E2,
-                                            model.Nodes[node].deriv[t].GetByN(N_t.p).GetByC(C_t.z) * 10E2,
-                                            model.Nodes[node].deriv[t].GetByN(N_t.p).GetByC(C_t.y) * 10E2),
+                        Center = new Point3D(model.Nodes[node].deriv[t].p.x * 10E2,
+                                            model.Nodes[node].deriv[t].p.z * 10E2,
+                                            model.Nodes[node].deriv[t].p.y * 10E2),
                         Radius = .3,
                         Fill = Brushes.Black
                     });
