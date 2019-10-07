@@ -2,6 +2,22 @@
 {
     public enum NodeLoad
     {
-        u, a, f, p, none
+        //coordinates
+        p,
+
+        //displacement
+        u,
+
+        //velocity
+        v,
+
+        //acceleration
+        a,
+
+        //jerk
+        b,
+
+        f,
+        none
     }
 }
