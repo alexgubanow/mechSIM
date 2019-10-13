@@ -19,13 +19,18 @@ namespace mechLIB
             LoadType = _LoadType;
             Neigs = _Neigs;
             deriv = new deriv_t[tCounts];
+            //for (int i = 0; i < deriv.Length; i++)
+            //{
+            //    deriv[i] = new deriv_t
+            //    {
+            //        p = coords
+            //    };
+            //}
             for (int i = 0; i < deriv.Length; i++)
             {
-                deriv[i] = new deriv_t
-                {
-                    p = coords
-                };
+                deriv[i] = new deriv_t();
             }
+            deriv[0].p = coords;
             radiusPoint = _radiusPoint;
         }
         public void GetForces(ref Rope_t model, int t, ref xyz_t nodeForce)
@@ -37,19 +42,18 @@ namespace mechLIB
                 {
                     //getting position of link according base point
                     xyz_t LinkPos = new xyz_t();
-                    xyz_t.Minus(deriv[t].p, model.GetNodeRef(neigNode).deriv[t].p, ref LinkPos);
+                    LinkPos.Minus(deriv[t].p, model.GetNodeRef(neigNode).deriv[t].p);
                     //getting DCM for this link
-                    dcm_t dcm = new dcm_t();
-                    crds.GetDCM(ref dcm, LinkPos, radiusPoint);
+                    dcm_t dcm = new dcm_t(LinkPos, radiusPoint);
                     //get Fn from link between this point and np
                     xyz_t lFn = model.GetElemRef(ID, neigNode).F[t];
-                    //dirty fix of dcm, just turn - to + and vs
-                    //vectr.Invert(ref gFn);
                     xyz_t gFn = new xyz_t();
                     //convert Fn to global coords and return
-                    crds.ToGlob(dcm, lFn, ref gFn);
+                    dcm.ToGlob(lFn, ref gFn);
+                    //dirty fix of dcm, just turn - to + and vs
+                    gFn.Invert();
                     //push it to this force pull
-                    nodeForce.Plus(gFn);
+                    nodeForce.PlusHalf(gFn);
                 }
             }
         }
@@ -58,6 +62,10 @@ namespace mechLIB
             foreach (var neigNode in Neigs)
             {
                 m += model.GetElemRef(ID, neigNode).m / 2;
+            }
+            if (m == 0)
+            {
+                throw new Exception("Mass has to be more than zero");
             }
         }
         public void CalcAccel(int now, xyz_t Force)

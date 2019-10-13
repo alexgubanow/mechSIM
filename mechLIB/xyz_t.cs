@@ -37,11 +37,11 @@
             y -= arg.y;
             z -= arg.z;
         }
-        public static void Minus(xyz_t arg1, xyz_t arg2, ref xyz_t res)
+        public void Minus(xyz_t arg1, xyz_t arg2)
         {
-            res.x = arg1.x - arg2.x;
-            res.y = arg1.y - arg2.y;
-            res.z = arg1.z - arg2.z;
+            x = arg1.x - arg2.x;
+            y = arg1.y - arg2.y;
+            z = arg1.z - arg2.z;
         }
 
         public void Plus(float arg)
@@ -57,11 +57,17 @@
             y += arg.y;
             z += arg.z;
         }
-        public static void Plus(xyz_t arg1, xyz_t arg2, ref xyz_t res)
+        public void PlusHalf(xyz_t arg)
         {
-            res.x = arg1.x + arg2.x;
-            res.y = arg1.y + arg2.y;
-            res.z = arg1.z + arg2.z;
+            x += arg.x / 2;
+            y += arg.y / 2;
+            z += arg.z / 2;
+        }
+        public void Plus(xyz_t arg1, xyz_t arg2)
+        {
+            x = arg1.x + arg2.x;
+            y = arg1.y + arg2.y;
+            z = arg1.z + arg2.z;
         }
         public float GetByC(C_t C)
         {

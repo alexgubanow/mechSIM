@@ -84,10 +84,12 @@ namespace spring.ViewModels
             //float A = (float)Math.PI * (float)Math.Pow(Props.store.D, 2) / 4;
             //float maxLoad = ((Props.store.E * A) / Props.store.L / Props.store.nodes) * Props.store.MaxU;
             float freq = 1 / (Props.store.Counts * Props.store.dt);
-            for (int t = 0; t < Props.store.Counts; t++)
+            for (int t = 1; t < Props.store.Counts; t++)
             {
-                model.Nodes[0].deriv[t].u.x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * Props.store.MaxU);
-                model.Nodes[Props.store.nodes - 1].deriv[t].u.x = (float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * Props.store.MaxU;
+                float st = (float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * Props.store.MaxU;
+                float stPrev = (float)Math.Sin(2 * Math.PI * 0.5 * time[t - 1] * freq) * Props.store.MaxU;
+                model.Nodes[0].deriv[t].p.x = (0 - st);
+                model.Nodes[Props.store.nodes - 1].deriv[t].p.x = model.Nodes[Props.store.nodes - 1].deriv[0].p.x;
             }
         }
 
@@ -151,7 +153,7 @@ namespace spring.ViewModels
             {
                 foreach (var elem in model.Elements)
                 {
-                    elem.CalcForce(ref model, t);
+                    elem.CalcForce(ref model, t - 1);
                 }
                 foreach (var node in model.Nodes)
                 {

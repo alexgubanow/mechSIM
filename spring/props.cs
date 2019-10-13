@@ -10,10 +10,10 @@ namespace spring
             store.L = 25E-3f;
             store.D = 1E-3f;
             store.ro = 1040;
-            store.Counts = 3000;
+            store.Counts = 30;
             store.dt = 1E-7f;
-            store.nodes = 7;
-            store.initDrop = 1E-1f;
+            store.nodes = 9;
+            store.initDrop = 0.01f;
             store.MaxU = 2E-3f;
         }
         public props_t store;
