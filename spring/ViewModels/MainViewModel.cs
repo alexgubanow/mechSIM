@@ -81,13 +81,13 @@ namespace spring.ViewModels
 
         private void getLoad(C_t axis, ref Rope_t model)
         {
-            //float A = (float)Math.PI * (float)Math.Pow(Props.store.D, 2) / 4;
-            //float maxLoad = ((Props.store.E * A) / Props.store.L / Props.store.nodes) * Props.store.MaxU;
+            float A = (float)Math.PI * (float)Math.Pow(Props.store.D, 2) / 4;
+            float maxLoad = ((Props.store.E * A) / Props.store.L / Props.store.nodes) * Props.store.MaxU;
             float freq = 1 / (Props.store.Counts * Props.store.dt);
             for (int t = 0; t < Props.store.Counts; t++)
             {
-                model.Nodes[0].deriv[t].u.x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * Props.store.MaxU);
-                model.Nodes[Props.store.nodes - 1].deriv[t].u.x = (float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * Props.store.MaxU;
+                model.Nodes[0].F[t].x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
+                //model.Nodes[Props.store.nodes - 1].deriv[t].u.x = (float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * Props.store.MaxU;
             }
         }
 
@@ -151,17 +151,12 @@ namespace spring.ViewModels
             {
                 foreach (var elem in model.Elements)
                 {
-                    elem.CalcForce(ref model, t);
+                    elem.CalcForce(ref model, t - 1);
                 }
                 foreach (var node in model.Nodes)
                 {
-                    if (node.LoadType == NodeLoad.none)
-                    {
-                        /*calc force*/
-                        xyz_t nodeForce = new xyz_t();
-                        node.GetForces(ref model, t - 1, ref nodeForce);
-                        node.CalcAccel(t - 1, nodeForce);
-                    }
+                    //node.GetForces(ref model, t - 1, ref nodeForce);
+                    node.CalcAccel(ref model, t - 1);
                     /*integrate*/
                     node.Integrate(t, t - 1, Props.store.dt);
                 }
@@ -214,7 +209,11 @@ namespace spring.ViewModels
             {
                 foreach (var elem in model.Elements)
                 {
-                    plotData("node #" + elem.ID, elem.F);
+                    plotData("elem #" + elem.ID, elem.F);
+                }
+                foreach (var node in model.Nodes)
+                {
+                    plotData("node #" + node.ID, node.F);
                 }
             }
             else
