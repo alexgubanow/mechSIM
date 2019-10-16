@@ -18,15 +18,15 @@
             {
                 now.v.x = before.v.x + before.a.x * dt;
                 now.u.x = before.u.x + before.v.x * dt;
-                now.p.x = before.p.x + now.u.x;
+                now.p.x = before.p.x + before.u.x;
 
                 now.v.y = before.v.y + before.a.y * dt;
                 now.u.y = before.u.y + before.v.y * dt;
-                now.p.y = before.p.y + now.u.y;
+                now.p.y = before.p.y + before.u.y;
 
                 now.v.z = before.v.z + before.a.z * dt;
                 now.u.z = before.u.z + before.v.z * dt;
-                now.p.z = before.p.z + now.u.z;
+                now.p.z = before.p.z + before.u.z;
             }
             else
             {

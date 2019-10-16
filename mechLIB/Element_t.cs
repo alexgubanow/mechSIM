@@ -62,7 +62,7 @@ namespace mechLIB
             xyz_t lNpUx = new xyz_t();
             dcm.ToLoc(model.GetNodeRef(n2).deriv[before].u, ref lNpUx);
             //calc Fn of link
-            Fn.x = E * A / oldL * (lBpUx.x - lNpUx.x);
+            Fn.x = 0 - (E * A / oldL * (lBpUx.x - lNpUx.x));
             //Fn[(int)C.y] = 12f * E * I / maf.P3(oldL2) * oldUy2;
         }
     }

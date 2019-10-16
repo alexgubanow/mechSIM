@@ -86,8 +86,10 @@ namespace spring.ViewModels
             float freq = 1 / (Props.store.Counts * Props.store.dt);
             for (int t = 1; t < Props.store.Counts; t++)
             {
-                model.Nodes[0].F[t].x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
-                //model.Nodes[Props.store.nodes - 1].deriv[t].u.x = (float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * Props.store.MaxU;
+                //model.Nodes[0].F[t].x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
+                model.Nodes[0].deriv[t].p.x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad) + model.Nodes[0].deriv[0].p.x;
+                //model.Nodes[0].F[t].x = 0 - (time[t] * Props.store.MaxU);
+                model.Nodes[Props.store.nodes - 1].deriv[t].p = model.Nodes[Props.store.nodes - 1].deriv[0].p;
             }
         }
 
@@ -156,7 +158,7 @@ namespace spring.ViewModels
                 foreach (var node in model.Nodes)
                 {
                     //node.GetForces(ref model, t - 1, ref nodeForce);
-                    node.CalcAccel(ref model, t - 1);
+                    node.CalcAccel(ref model, t - 1); 
                     /*integrate*/
                     node.Integrate(t, t - 1, Props.store.dt);
                 }
@@ -211,10 +213,10 @@ namespace spring.ViewModels
                 {
                     plotData("elem #" + elem.ID, elem.F);
                 }
-                foreach (var node in model.Nodes)
-                {
-                    plotData("node #" + node.ID, node.F);
-                }
+                //foreach (var node in model.Nodes)
+                //{
+                //    plotData("node #" + node.ID, node.F);
+                //}
             }
             else
             {

@@ -34,34 +34,33 @@ namespace mechLIB
         }
         public void CalcAccel(ref Rope_t model, int t)
         {
-            if (LoadType == NodeLoad.none)
+            if (LoadType == NodeLoad.none && LoadType == NodeLoad.f)
             {
-                GetForces(ref model, t, ref F[t]);
-            }
+                GetForces(ref model, t);
             deriv[t].a.x = F[t].x / m;
             deriv[t].a.y = F[t].y / m;
             deriv[t].a.z = F[t].z / m;//has to be different
+            }
         }
-        public void GetForces(ref Rope_t model, int t, ref xyz_t nodeForce)
+        public void GetForces(ref Rope_t model, int t)
         {
             /*getting element forces*/
             foreach (var neigNode in Neigs)
             {
                 //getting position of link according base point
                 xyz_t LinkPos = new xyz_t();
-                xyz_t.Minus(deriv[t].p, model.GetNodeRef(neigNode).deriv[t].p, ref LinkPos);
+                LinkPos.Minus(deriv[t].p, model.GetNodeRef(neigNode).deriv[t].p);
                 //getting DCM for this link
-                dcm_t dcm = new dcm_t();
-                crds.GetDCM(ref dcm, LinkPos, radiusPoint);
+                dcm_t dcm = new dcm_t(LinkPos, radiusPoint);
                 //get Fn from link between this point and np
                 xyz_t lFn = model.GetElemRef(ID, neigNode).F[t];
                 xyz_t gFn = new xyz_t();
                 //convert Fn to global coords and return
-                crds.ToGlob(dcm, lFn, ref gFn);
+                dcm.ToGlob(lFn, ref gFn);
                 //push it to this force pull
-                nodeForce.Plus(gFn);
+                F[t].Plus(gFn);
                 //dirty fix of dcm, just turn - to + and vs
-                gFn.Invert();
+                //gFn.Invert();
             }
         }
         public void CalcMass(ref Rope_t model)
@@ -75,7 +74,7 @@ namespace mechLIB
         {
             switch (LoadType)
             {
-                case NodeLoad.u:
+                case NodeLoad.p:
                     Integr.EulerExpl(Integr.Direction.Backward, ref deriv[now], deriv[before], dt);
                     break;
                 case NodeLoad.none:
