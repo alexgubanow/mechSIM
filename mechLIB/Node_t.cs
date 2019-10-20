@@ -24,22 +24,23 @@ namespace mechLIB
             for (int i = 0; i < deriv.Length; i++)
             {
                 F[i] = new xyz_t();
-                deriv[i] = new deriv_t
-                {
-                    p = coords
-                };
+                deriv[i] = new deriv_t();
+                //deriv[i] = new deriv_t
+                //{
+                //    p = coords
+                //};
             }
             deriv[0].p = coords;
             radiusPoint = _radiusPoint;
         }
         public void CalcAccel(ref Rope_t model, int t)
         {
-            if (LoadType == NodeLoad.none && LoadType == NodeLoad.f)
+            if (LoadType == NodeLoad.none || LoadType == NodeLoad.f)
             {
                 GetForces(ref model, t);
-            deriv[t].a.x = F[t].x / m;
-            deriv[t].a.y = F[t].y / m;
-            deriv[t].a.z = F[t].z / m;//has to be different
+                deriv[t].a.x = F[t].x / m;
+                deriv[t].a.y = F[t].y / m;
+                deriv[t].a.z = F[t].z / m;//has to be different
             }
         }
         public void GetForces(ref Rope_t model, int t)
@@ -49,18 +50,14 @@ namespace mechLIB
             {
                 //getting position of link according base point
                 xyz_t LinkPos = new xyz_t();
-                LinkPos.Minus(deriv[t].p, model.GetNodeRef(neigNode).deriv[t].p);
+                LinkPos.Minus(deriv[t - 1].p, model.GetNodeRef(neigNode).deriv[t - 1].p);
                 //getting DCM for this link
                 dcm_t dcm = new dcm_t(LinkPos, radiusPoint);
-                //get Fn from link between this point and np
-                xyz_t lFn = model.GetElemRef(ID, neigNode).F[t];
                 xyz_t gFn = new xyz_t();
                 //convert Fn to global coords and return
-                dcm.ToGlob(lFn, ref gFn);
+                dcm.ToGlob(model.GetElemRef(ID, neigNode).F[t], ref gFn);
                 //push it to this force pull
                 F[t].Plus(gFn);
-                //dirty fix of dcm, just turn - to + and vs
-                //gFn.Invert();
             }
         }
         public void CalcMass(ref Rope_t model)
@@ -68,6 +65,10 @@ namespace mechLIB
             foreach (var neigNode in Neigs)
             {
                 m += model.GetElemRef(ID, neigNode).m / 2;
+            }
+            if (m <= 0)
+            {
+                throw new Exception("Calculated mass of node can't be eaqul to zero");
             }
         }
         public void Integrate(int now, int before, float dt)

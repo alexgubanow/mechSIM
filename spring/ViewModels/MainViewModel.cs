@@ -153,12 +153,11 @@ namespace spring.ViewModels
             {
                 foreach (var elem in model.Elements)
                 {
-                    elem.CalcForce(ref model, t - 1);
+                    elem.CalcForce(ref model, t);
                 }
                 foreach (var node in model.Nodes)
                 {
-                    //node.GetForces(ref model, t - 1, ref nodeForce);
-                    node.CalcAccel(ref model, t - 1); 
+                    node.CalcAccel(ref model, t);
                     /*integrate*/
                     node.Integrate(t, t - 1, Props.store.dt);
                 }
@@ -209,20 +208,20 @@ namespace spring.ViewModels
             ClearDataView();
             if ((NodeLoad)Deriv == NodeLoad.f)
             {
-                foreach (var elem in model.Elements)
-                {
-                    plotData("elem #" + elem.ID, elem.F);
-                }
-                //foreach (var node in model.Nodes)
+                //foreach (var elem in model.Elements)
                 //{
-                //    plotData("node #" + node.ID, node.F);
+                //    plotData("elem #" + elem.ID, elem.F);
                 //}
+                foreach (var node in model.Nodes)
+                {
+                    plotData("node #" + node.ID, node.F);
+                }
             }
             else
             {
                 foreach (var node in model.Nodes)
                 {
-                    plotData("node #" + node.ID, ExtractArray(node.deriv, (N_t)SelDeriv));
+                    plotData("node #" + node.ID, ExtractArray(node.deriv, (N_t)Deriv));
                 }
             }
         }
