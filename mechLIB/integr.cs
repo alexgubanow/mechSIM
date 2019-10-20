@@ -53,19 +53,27 @@
 
         public static void Verlet(Direction dir, ref deriv_t now, deriv_t before, float dt)
         {
-            throw new System.NotImplementedException();
-            //if (dir == Direction.Forward)
-            //{
-            //    now.v.x = before.v.x + (maf.hlf * before.a.x + now.a.x) * dt;
-            //    now.u.x = before.u.x + now.v.x * dt + (maf.hlf * before.a.x * maf.P2(dt));
-            //    now.p.x = before.p.x + now.u.x;
-            //}
-            //else
-            //{
-            //    now.u.x = before.u.x + now.v.x * dt + (maf.hlf * before.a.x * maf.P2(dt));
-            //    now.v.x = before.v.x + (maf.hlf * before.a.x + now.a.x) * dt;
-            //    now.p.x = before.p.x + now.u.x;
-            //}
+            if (dir == Direction.Forward)
+            {
+                now.v.x = before.v.x + (maf.hlf * before.a.x + now.a.x) * dt;
+                now.u.x = before.u.x + now.v.x * dt + (maf.hlf * before.a.x * maf.P2(dt));
+                now.p.x = before.p.x + now.u.x;
+
+                now.v.y = before.v.y + (maf.hlf * before.a.y + now.a.y) * dt;
+                now.u.y = before.u.y + now.v.y * dt + (maf.hlf * before.a.y * maf.P2(dt));
+                now.p.y = before.p.y + now.u.y;
+
+                now.v.z = before.v.z + (maf.hlf * before.a.z + now.a.z) * dt;
+                now.u.z = before.u.z + now.v.z * dt + (maf.hlf * before.a.z * maf.P2(dt));
+                now.p.z = before.p.z + now.u.z;
+            }
+            else
+            {
+                throw new System.NotImplementedException();
+                //now.u.x = before.u.x + now.v.x * dt + (maf.hlf * before.a.x * maf.P2(dt));
+                //now.v.x = before.v.x + (maf.hlf * before.a.x + now.a.x) * dt;
+                //now.p.x = before.p.x + now.u.x;
+            }
         }
 
         //private static void GearP(ref float[][] now, float[][] before, float dt, float m)

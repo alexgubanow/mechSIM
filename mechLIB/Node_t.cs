@@ -79,10 +79,10 @@ namespace mechLIB
                     Integr.EulerExpl(Integr.Direction.Backward, ref deriv[now], deriv[before], dt);
                     break;
                 case NodeLoad.none:
-                    Integr.EulerExpl(Integr.Direction.Forward, ref deriv[now], deriv[before], dt);
+                    Integr.Verlet(Integr.Direction.Forward, ref deriv[now], deriv[before], dt);
                     break;
                 case NodeLoad.f:
-                    Integr.EulerExpl(Integr.Direction.Forward, ref deriv[now], deriv[before], dt);
+                    Integr.Verlet(Integr.Direction.Forward, ref deriv[now], deriv[before], dt);
                     break;
                 default:
                     throw new Exception();

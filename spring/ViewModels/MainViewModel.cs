@@ -87,6 +87,8 @@ namespace spring.ViewModels
             for (int t = 1; t < Props.store.Counts; t++)
             {
                 //model.Nodes[0].F[t].x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
+                model.Nodes[0].deriv[t].p.z = model.Nodes[0].deriv[0].p.z;
+                model.Nodes[0].deriv[t].p.y = model.Nodes[0].deriv[0].p.y;
                 model.Nodes[0].deriv[t].p.x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad) + model.Nodes[0].deriv[0].p.x;
                 //model.Nodes[0].F[t].x = 0 - (time[t] * Props.store.MaxU);
                 model.Nodes[Props.store.nodes - 1].deriv[t].p = model.Nodes[Props.store.nodes - 1].deriv[0].p;
