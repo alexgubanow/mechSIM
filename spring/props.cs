@@ -10,14 +10,20 @@ namespace spring
             store.L = 25E-3f;
             store.D = 1E-3f;
             store.ro = 1040;
-            store.Counts = 30;
-            store.dt = 1E-7f;
+            store.Counts = 60000;
+            EndT = store.Counts - 1;
+            store.dt = 2E-8f;
             store.nodes = 9;
-            store.initDrop = 0.01f;
+            store.initDrop = 1f;
             store.MaxU = 2E-3f;
         }
         public props_t store;
-
+        private int _EndT;
+        public int EndT
+        {
+            get => _EndT; 
+            set => _EndT = value;
+        }
         public string MaxUstr
         {
             get => store.MaxU.ToString(); set
@@ -85,6 +91,7 @@ namespace spring
                 if (int.TryParse(value, out int tmp))
                 {
                     store.Counts = tmp;
+                    EndT = tmp - 1;
                 }
             }
         }
@@ -109,5 +116,6 @@ namespace spring
                 }
             }
         }
+
     }
 }

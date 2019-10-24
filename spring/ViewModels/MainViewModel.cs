@@ -30,7 +30,8 @@ namespace spring.ViewModels
         public float[] time;
         private Rope_t model;
         public props Props { get; set; }
-        public float EndT { get => Props.store.Counts - 1; }
+        private int _EndT;
+        public int EndT { get => _EndT; set { _EndT = value; } }
 
         private int _CurrT;
         public int CurrT { get => _CurrT; set { _CurrT = value; Draw3d(value, SelDeriv); } }
@@ -49,6 +50,7 @@ namespace spring.ViewModels
         {
             _ea = ea;
             Props = new props();
+            EndT = Props.store.Counts - 1;
             selDeriv = 0;
             _CurrT = 0;
             Objs3d = new ObservableCollection<Visual3D>();
@@ -89,9 +91,13 @@ namespace spring.ViewModels
                 //model.Nodes[0].F[t].x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
                 model.Nodes[0].deriv[t].p.z = model.Nodes[0].deriv[0].p.z;
                 model.Nodes[0].deriv[t].p.y = model.Nodes[0].deriv[0].p.y;
-                model.Nodes[0].deriv[t].p.x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad) + model.Nodes[0].deriv[0].p.x;
-                //model.Nodes[0].F[t].x = 0 - (time[t] * Props.store.MaxU);
-                model.Nodes[Props.store.nodes - 1].deriv[t].p = model.Nodes[Props.store.nodes - 1].deriv[0].p;
+                //model.Nodes[0].deriv[t].p.x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad) + model.Nodes[0].deriv[0].p.x;
+                model.Nodes[0].deriv[t].p.x = 0 - (time[t] * Props.store.MaxU);
+                int lastN = Props.store.nodes - 1;
+                model.Nodes[lastN].deriv[t].p.z = model.Nodes[lastN].deriv[0].p.z;
+                model.Nodes[lastN].deriv[t].p.y = model.Nodes[lastN].deriv[0].p.y;
+                model.Nodes[lastN].deriv[t].p.x = model.Nodes[lastN].deriv[0].p.x;
+                //model.Nodes[lastN].deriv[t].p.x =  ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad) + model.Nodes[lastN].deriv[0].p.x;
             }
         }
 
@@ -101,6 +107,7 @@ namespace spring.ViewModels
             //_ea.GetEvent<ClearPlotsEvent>().Publish();
             time = getT(Props.store.dt, Props.store.Counts);
 
+            CurrT = 100;
             #region load file
 
             //OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -210,14 +217,14 @@ namespace spring.ViewModels
             ClearDataView();
             if ((NodeLoad)Deriv == NodeLoad.f)
             {
-                //foreach (var elem in model.Elements)
-                //{
-                //    plotData("elem #" + elem.ID, elem.F);
-                //}
-                foreach (var node in model.Nodes)
+                foreach (var elem in model.Elements)
                 {
-                    plotData("node #" + node.ID, node.F);
+                    plotData("elem #" + elem.ID, elem.F);
                 }
+                //foreach (var node in model.Nodes)
+                //{
+                //    plotData("node #" + node.ID, node.F);
+                //}
             }
             else
             {
@@ -231,7 +238,7 @@ namespace spring.ViewModels
         public List<DataPoint> getDataPointList(float[] X, xyz_t[] Y, C_t axis)
         {
             List<DataPoint> tmp = new List<DataPoint>();
-            for (int t = 0; t < X.Length; t++)
+            for (int t = 0; t < X.Length; t ++)
             {
                 tmp.Add(new DataPoint(X[t], Y[t].GetByC(axis)));
             }
@@ -269,6 +276,10 @@ namespace spring.ViewModels
 
         private void Draw3d(int t, int Deriv)
         {
+            if (model == null)
+            {
+                return;
+            }
             Application.Current.Dispatcher.Invoke(delegate
             {
                 Objs3d.Clear();
