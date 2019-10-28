@@ -86,17 +86,18 @@ namespace spring.ViewModels
             float A = (float)Math.PI * (float)Math.Pow(Props.store.D, 2) / 4;
             float maxLoad = ((Props.store.E * A) / Props.store.L / Props.store.nodes) * Props.store.MaxU;
             float freq = 1 / (Props.store.Counts * Props.store.dt);
-            for (int t = 1; t < Props.store.Counts; t++)
+            for (int t = 0; t < Props.store.Counts; t++)
             {
-                //model.Nodes[0].F[t].x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
-                model.Nodes[0].deriv[t].p.z = model.Nodes[0].deriv[0].p.z;
-                model.Nodes[0].deriv[t].p.y = model.Nodes[0].deriv[0].p.y;
-                //model.Nodes[0].deriv[t].p.x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad) + model.Nodes[0].deriv[0].p.x;
-                model.Nodes[0].deriv[t].p.x = 0 - (time[t] * Props.store.MaxU);
+                model.Nodes[0].F[t].x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
+                //model.Nodes[0].deriv[t].p.z = model.Nodes[0].deriv[0].p.z;
+                //model.Nodes[0].deriv[t].p.y = model.Nodes[0].deriv[0].p.y;
+                //model.Nodes[0].deriv[t].p.x = 0 - ((time[t] + time[1]) * Props.store.MaxU);
+                //model.Nodes[0].deriv[t].v.x = (model.Nodes[0].deriv[t].p.x - (0 - (time[t] * Props.store.MaxU))) / time[1];
                 int lastN = Props.store.nodes - 1;
-                model.Nodes[lastN].deriv[t].p.z = model.Nodes[lastN].deriv[0].p.z;
-                model.Nodes[lastN].deriv[t].p.y = model.Nodes[lastN].deriv[0].p.y;
-                model.Nodes[lastN].deriv[t].p.x = model.Nodes[lastN].deriv[0].p.x;
+                //model.Nodes[lastN].deriv[t].p.z = model.Nodes[lastN].deriv[0].p.z;
+                //model.Nodes[lastN].deriv[t].p.y = model.Nodes[lastN].deriv[0].p.y;
+                //model.Nodes[lastN].deriv[t].p.x = model.Nodes[lastN].deriv[0].p.x;
+                model.Nodes[lastN].F[t].x =  ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
                 //model.Nodes[lastN].deriv[t].p.x =  ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad) + model.Nodes[lastN].deriv[0].p.x;
             }
         }
@@ -166,6 +167,7 @@ namespace spring.ViewModels
                 }
                 foreach (var node in model.Nodes)
                 {
+                    node.GetForces(ref model, t);
                     node.CalcAccel(ref model, t);
                     /*integrate*/
                     node.Integrate(t, t - 1, Props.store.dt);
@@ -221,10 +223,10 @@ namespace spring.ViewModels
                 {
                     plotData("elem #" + elem.ID, elem.F);
                 }
-                //foreach (var node in model.Nodes)
-                //{
-                //    plotData("node #" + node.ID, node.F);
-                //}
+                foreach (var node in model.Nodes)
+                {
+                    plotData("node #" + node.ID, node.F);
+                }
             }
             else
             {
@@ -238,7 +240,7 @@ namespace spring.ViewModels
         public List<DataPoint> getDataPointList(float[] X, xyz_t[] Y, C_t axis)
         {
             List<DataPoint> tmp = new List<DataPoint>();
-            for (int t = 0; t < X.Length; t ++)
+            for (int t = 0; t < X.Length; t++)
             {
                 tmp.Add(new DataPoint(X[t], Y[t].GetByC(axis)));
             }

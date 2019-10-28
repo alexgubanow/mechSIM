@@ -4,6 +4,7 @@ namespace mechLIB
 {
     public class Element_t
     {
+        public float c;
         public float m;
         public float E;
         public float A;
@@ -31,7 +32,9 @@ namespace mechLIB
         public bool IsMyNode(int id) => (n1 == id || n2 == id) ? true : false;
         public void CalcForce(ref Rope_t model, int t)
         {
-            GetFn(ref model, t, ref F[t]);
+            xyz_t Fn = new xyz_t();
+            GetFn(ref model, t, ref Fn);
+            F[t].Plus(Fn);
         }
         public void CalcMass(ref Rope_t model, float ro)
         {
@@ -44,6 +47,11 @@ namespace mechLIB
             if (m <= 0)
             {
                 throw new Exception("Calculated mass of element can't be eaqul to zero");
+            }
+            c = 0.8f * 2f * (float)Math.Sqrt(m*((E * A) / L));
+            if (c <= 0)
+            {
+                throw new Exception("Calculated damping ratio of element can't be eaqul to zero");
             }
         }
         public void GetFn(ref Rope_t model, int t, ref xyz_t Fn)

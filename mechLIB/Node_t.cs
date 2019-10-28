@@ -4,6 +4,7 @@ namespace mechLIB
 {
     public unsafe class Node_t
     {
+        public float c;
         public float m;
         public NodeFreedom freedom;
         public NodeLoad LoadType;
@@ -37,8 +38,6 @@ namespace mechLIB
         {
             if (LoadType == NodeLoad.none || LoadType == NodeLoad.f)
             {
-                GetForces(ref model, t);
-                //F[t].x = 0.1f * (deriv[t - 1].u.x);
                 deriv[t].a.x = F[t].x / m;
                 deriv[t].a.y = F[t].y / m;
                 deriv[t].a.z = F[t].z / m;//has to be different
@@ -46,6 +45,11 @@ namespace mechLIB
         }
         public void GetForces(ref Rope_t model, int t)
         {
+            xyz_t Fd = new xyz_t();
+            Fd.x = 0 - (c * deriv[t - 1].v.x);
+            Fd.y = 0 - (c * deriv[t - 1].v.y);
+            Fd.z = 0 - (c * deriv[t - 1].v.z);
+            F[t].Plus(Fd);
             /*getting element forces*/
             foreach (var neigNode in Neigs)
             {
@@ -66,10 +70,16 @@ namespace mechLIB
             foreach (var neigNode in Neigs)
             {
                 m += model.GetElemRef(ID, neigNode).m / 2;
+                c += model.GetElemRef(ID, neigNode).c;
             }
+            c /= Neigs.Length;
             if (m <= 0)
             {
                 throw new Exception("Calculated mass of node can't be eaqul to zero");
+            }
+            if (c <= 0)
+            {
+                throw new Exception("Calculated damping ratio of node can't be eaqul to zero");
             }
         }
         public void Integrate(int now, int before, float dt)
