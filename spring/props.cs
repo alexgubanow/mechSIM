@@ -10,7 +10,7 @@ namespace spring
             store.L = 25E-3f;
             store.D = 1E-3f;
             store.ro = 1040;
-            store.Counts = 3000;
+            store.Counts = 20000;
             EndT = store.Counts - 1;
             store.dt = 1E-6f;
             store.nodes = 9;

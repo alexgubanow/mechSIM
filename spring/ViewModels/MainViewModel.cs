@@ -240,7 +240,7 @@ namespace spring.ViewModels
         public List<DataPoint> getDataPointList(float[] X, xyz_t[] Y, C_t axis)
         {
             List<DataPoint> tmp = new List<DataPoint>();
-            for (int t = 0; t < X.Length; t++)
+            for (int t = 0; t < X.Length; t+=100)
             {
                 tmp.Add(new DataPoint(X[t], Y[t].GetByC(axis)));
             }
