@@ -38,6 +38,7 @@ namespace mechLIB
             if (LoadType == NodeLoad.none || LoadType == NodeLoad.f)
             {
                 GetForces(ref model, t);
+                //F[t].x = 0.1f * (deriv[t - 1].u.x);
                 deriv[t].a.x = F[t].x / m;
                 deriv[t].a.y = F[t].y / m;
                 deriv[t].a.z = F[t].z / m;//has to be different
