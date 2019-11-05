@@ -4,6 +4,8 @@ namespace mechLIB
 {
     public class Element_t
     {
+        public float k0;
+        public float DampRatio;
         public float c;
         public float m;
         public float E;
@@ -14,8 +16,9 @@ namespace mechLIB
         public int ID;
         public xyz_t[] F;
         public xyz_t radiusPoint;
-        public Element_t(int _n1, int _n2, xyz_t _radiusPoint, float _E, int Counts, int _ID)
+        public Element_t(int _n1, int _n2, xyz_t _radiusPoint, float _E, int Counts, int _ID, float _DampRatio)
         {
+            DampRatio = _DampRatio;
             ID = _ID;
             F = new xyz_t[Counts];
             for (int i = 0; i < F.Length; i++)
@@ -48,7 +51,8 @@ namespace mechLIB
             {
                 throw new Exception("Calculated mass of element can't be eaqul to zero");
             }
-            c = 0.8f * 2f * (float)Math.Sqrt(m*((E * A) / L));
+            k0 = (E * A) / L;
+            c = DampRatio * 2f * (float)Math.Sqrt(m * k0);
             if (c <= 0)
             {
                 throw new Exception("Calculated damping ratio of element can't be eaqul to zero");

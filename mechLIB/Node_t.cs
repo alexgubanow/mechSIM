@@ -4,6 +4,8 @@ namespace mechLIB
 {
     public unsafe class Node_t
     {
+        public float k0;
+        public float DampRatio;
         public float c;
         public float m;
         public NodeFreedom freedom;
@@ -71,8 +73,12 @@ namespace mechLIB
             {
                 m += model.GetElemRef(ID, neigNode).m / 2;
                 c += model.GetElemRef(ID, neigNode).c;
+                k0 += model.GetElemRef(ID, neigNode).k0;
+                DampRatio += model.GetElemRef(ID, neigNode).DampRatio;
             }
             c /= Neigs.Length;
+            DampRatio /= Neigs.Length;
+            k0 /= Neigs.Length;
             if (m <= 0)
             {
                 throw new Exception("Calculated mass of node can't be eaqul to zero");
