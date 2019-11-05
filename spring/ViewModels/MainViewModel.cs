@@ -97,7 +97,7 @@ namespace spring.ViewModels
                 //model.Nodes[lastN].deriv[t].p.z = model.Nodes[lastN].deriv[0].p.z;
                 //model.Nodes[lastN].deriv[t].p.y = model.Nodes[lastN].deriv[0].p.y;
                 //model.Nodes[lastN].deriv[t].p.x = model.Nodes[lastN].deriv[0].p.x;
-                model.Nodes[lastN].F[t].x =  ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
+                model.Nodes[lastN].F[t].x = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
                 //model.Nodes[lastN].deriv[t].p.x =  ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad) + model.Nodes[lastN].deriv[0].p.x;
             }
         }
@@ -159,6 +159,10 @@ namespace spring.ViewModels
 
         private void Simulating()
         {
+            float A = (float)Math.PI * (float)Math.Pow(Props.store.D, 2) / 4;
+            float maxLoad = ((Props.store.E * A) / Props.store.L / Props.store.nodes) * Props.store.MaxU;
+            float w = 1000;
+            float n = 1;
             for (int t = 1; t < time.Length; t++)
             {
                 foreach (var elem in model.Elements)
@@ -167,6 +171,13 @@ namespace spring.ViewModels
                 }
                 foreach (var node in model.Nodes)
                 {
+                    float w0 = maf.sqrt(node.k0 / node.m);
+                    float Zm = maf.sqrt(maf.P2(2 * w0 * node.DampRatio) + (1 / maf.P2(w)) * maf.P2(maf.P2(w0) - maf.P2(w)));
+                    float phi = maf.atan((2 * w * w0 * node.DampRatio) / (maf.P2(w) - maf.P2(w0))) + (n * maf.pi);
+                    float xt = (maxLoad / (node.m * Zm * w)) * maf.sin(w * time[t] + phi);
+                    float vt = (maxLoad / (node.m * Zm * w)) * maf.cos(w * time[t] + phi) * w;
+                    float at = (maxLoad / (node.m * Zm * w)) * (0 - maf.sin(w * time[t] + phi)) * w;
+                    float Ft = (1 / node.m) * maxLoad * maf.sin(w * time[t]);
                     node.GetForces(ref model, t);
                     node.CalcAccel(ref model, t);
                     /*integrate*/
@@ -240,7 +251,7 @@ namespace spring.ViewModels
         public List<DataPoint> getDataPointList(float[] X, xyz_t[] Y, C_t axis)
         {
             List<DataPoint> tmp = new List<DataPoint>();
-            for (int t = 0; t < X.Length; t+=100)
+            for (int t = 0; t < X.Length; t += 100)
             {
                 tmp.Add(new DataPoint(X[t], Y[t].GetByC(axis)));
             }
