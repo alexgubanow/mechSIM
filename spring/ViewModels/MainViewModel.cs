@@ -175,8 +175,10 @@ namespace spring.ViewModels
                     float Zm = maf.sqrt(maf.P2(2 * w0 * node.DampRatio) + (1 / maf.P2(w)) * maf.P2(maf.P2(w0) - maf.P2(w)));
                     float phi = maf.atan((2 * w * w0 * node.DampRatio) / (maf.P2(w) - maf.P2(w0))) + (n * maf.pi);
                     float xt = (maxLoad / (node.m * Zm * w)) * maf.sin(w * time[t] + phi);
-                    float vt = (maxLoad / (node.m * Zm * w)) * maf.cos(w * time[t] + phi) * w;
-                    float at = (maxLoad / (node.m * Zm * w)) * (0 - maf.sin(w * time[t] + phi)) * w;
+                    //https://www.wolframalpha.com/input/?i=d%2Fdt+%28F0%2F%28w*k%29%29*sin%28wt%2Bphi%29
+                    float vt = (maxLoad / (node.m * Zm)) * maf.cos(w * time[t] + phi);
+                    //https://www.wolframalpha.com/input/?i=d%5E2%2Fdt%5E2+%28F0%2F%28w*k%29%29*sin%28wt%2Bphi%29
+                    float at = (maxLoad / (node.m * Zm)) * (0 - maf.sin(w * time[t] + phi)) * w;
                     float Ft = (1 / node.m) * maxLoad * maf.sin(w * time[t]);
                     node.GetForces(ref model, t);
                     node.CalcAccel(ref model, t);
