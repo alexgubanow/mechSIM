@@ -10,6 +10,7 @@ namespace mechLIB
     {
         public const float hlf = 1f / 2f;
         public const float sxt = 1f / 6f;
+        public const float pi = (float)Math.PI;
 
         public static float P2(float value)
         {
@@ -24,6 +25,22 @@ namespace mechLIB
         public static float P4(float value)
         {
             return (float)Math.Pow(value, 4);
+        }
+        public static float sqrt(float value)
+        {
+            return (float)Math.Sqrt(value);
+        }
+        public static float sin(float value)
+        {
+            return (float)Math.Sin(value);
+        }
+        public static float cos(float value)
+        {
+            return (float)Math.Cos(value);
+        }
+        public static float atan(float value)
+        {
+            return (float)Math.Atan(value);
         }
     }
 }
