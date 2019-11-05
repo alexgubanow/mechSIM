@@ -37,7 +37,7 @@ namespace mechLIB
             for (int i = 0; i < Elements.Length; i++)
             {
                 xyz_t tmpRadPoint = new xyz_t { z = props.D };
-                Elements[i] = new Element_t(i, i + 1, tmpRadPoint, props.E, props.Counts, i);
+                Elements[i] = new Element_t(i, i + 1, tmpRadPoint, props.E, props.Counts, i, props.DampRatio);
             }
         }
 

@@ -30,6 +30,8 @@
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
             <lcl:lblTxTbox LabelTxt="Max U" BoxTxt="{Binding Path=Props.MaxUstr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
+            <lcl:lblTxTbox LabelTxt="DampRatio" BoxTxt="{Binding Path=Props.DampRatiostr,
+                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
             <ComboBox DockPanel.Dock="Top" SelectedIndex="{Binding Path=SelDeriv, Mode=TwoWay}" Margin="5,0,0,0">
                 <ComboBoxItem Content="Coordinates" />
                 <ComboBoxItem Content="Displacement" />

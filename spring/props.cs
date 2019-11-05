@@ -16,6 +16,7 @@ namespace spring
             store.nodes = 9;
             store.initDrop = 1f;
             store.MaxU = 2E-3f;
+            store.DampRatio = 0.8f;
         }
         public props_t store;
         private int _EndT;
@@ -23,6 +24,16 @@ namespace spring
         {
             get => _EndT; 
             set => _EndT = value;
+        }
+        public string DampRatiostr
+        {
+            get => store.DampRatio.ToString(); set
+            {
+                if (float.TryParse(value, out float tmp))
+                {
+                    store.DampRatio = tmp;
+                }
+            }
         }
         public string MaxUstr
         {

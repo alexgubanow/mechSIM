@@ -2,6 +2,7 @@
 {
     public struct props_t
     {
+        public float DampRatio;
         public float MaxU;
         public float initDrop;
         public int nodes;
