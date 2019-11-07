@@ -16,7 +16,7 @@ namespace spring
             store.nodes = 9;
             store.initDrop = 1f;
             store.MaxU = 2E-3f;
-            store.DampRatio = 0.8f;
+            store.DampRatio = 0.01f;
         }
         public props_t store;
         private int _EndT;

@@ -240,10 +240,10 @@ namespace spring.ViewModels
             }
         }
 
-        public List<DataPoint> getDataPointList(float[] X, xyz_t[] Y, C_t axis)
+        public List<DataPoint> getDataPointList(float[] X, xyz_t[] Y, C_t axis, int step)
         {
             List<DataPoint> tmp = new List<DataPoint>();
-            for (int t = 0; t < X.Length; t += 100)
+            for (int t = 0; t < X.Length; t += step)
             {
                 tmp.Add(new DataPoint(X[t], Y[t].GetByC(axis)));
             }
@@ -262,17 +262,25 @@ namespace spring.ViewModels
 
         private void plotData(string title, xyz_t[] Y)
         {
-            List<DataPoint> data = getDataPointList(time, Y, C_t.x);
+            int step = 1;
+            int maxPlotPx = (int)SystemParameters.PrimaryScreenWidth / 2;
+
+            if (Y.Length > maxPlotPx)
+            {
+                step = Y.Length / maxPlotPx;
+            }
+
+            List<DataPoint> data = getDataPointList(time, Y, C_t.x, step);
             LineSeries aweLineSeries = new LineSeries { Title = title };
             aweLineSeries.Points.AddRange(data);
             awePlotModelX.Series.Add(aweLineSeries);
             awePlotModelX.InvalidatePlot(true);
-            data = getDataPointList(time, Y, C_t.y);
+            data = getDataPointList(time, Y, C_t.y, step);
             aweLineSeries = new LineSeries { Title = title };
             aweLineSeries.Points.AddRange(data);
             awePlotModelY.Series.Add(aweLineSeries);
             awePlotModelY.InvalidatePlot(true);
-            data = getDataPointList(time, Y, C_t.z);
+            data = getDataPointList(time, Y, C_t.z, step);
             aweLineSeries = new LineSeries { Title = title };
             aweLineSeries.Points.AddRange(data);
             awePlotModelZ.Series.Add(aweLineSeries);
