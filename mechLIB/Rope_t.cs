@@ -30,7 +30,7 @@ namespace mechLIB
             }
             Nodes[lastNode] = new Node_t(props.Counts,
                 new xyz_t { x = lastNode * dl, y = props.initDrop * (float)Math.Pow((lastNode * dl) - (props.L - dl) / 2, 2) + 1E-3f },
-                tmpRadPoint, NodeFreedom.xyz, NodeLoad.f, lastNode, new int[1] { lastNode - 1 });
+                tmpRadPoint, NodeFreedom.xyz, NodeLoad.p, lastNode, new int[1] { lastNode - 1 });
         }
         private void EvalElements(props_t props)
         {

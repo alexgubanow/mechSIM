@@ -94,10 +94,10 @@ namespace spring.ViewModels
                 //model.Nodes[0].deriv[t].p.x = 0 - ((time[t] + time[1]) * Props.store.MaxU);
                 //model.Nodes[0].deriv[t].v.x = (model.Nodes[0].deriv[t].p.x - (0 - (time[t] * Props.store.MaxU))) / time[1];
                 int lastN = Props.store.nodes - 1;
-                //model.Nodes[lastN].deriv[t].p.z = model.Nodes[lastN].deriv[0].p.z;
-                //model.Nodes[lastN].deriv[t].p.y = model.Nodes[lastN].deriv[0].p.y;
-                //model.Nodes[lastN].deriv[t].p.x = model.Nodes[lastN].deriv[0].p.x;
-                model.Nodes[lastN].F[t].x = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
+                model.Nodes[lastN].deriv[t].p.z = model.Nodes[lastN].deriv[0].p.z;
+                model.Nodes[lastN].deriv[t].p.y = model.Nodes[lastN].deriv[0].p.y;
+                model.Nodes[lastN].deriv[t].p.x = model.Nodes[lastN].deriv[0].p.x;
+                //model.Nodes[lastN].F[t].x = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
                 //model.Nodes[lastN].deriv[t].p.x =  ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad) + model.Nodes[lastN].deriv[0].p.x;
             }
         }
@@ -153,7 +153,7 @@ namespace spring.ViewModels
             {
                 node.CalcMass(ref model);
             }
-            getLoad(C_t.x, ref model);
+            //getLoad(C_t.x, ref model);
             await Task.Run(Simulating);
         }
 
@@ -161,8 +161,6 @@ namespace spring.ViewModels
         {
             float A = (float)Math.PI * (float)Math.Pow(Props.store.D, 2) / 4;
             float maxLoad = ((Props.store.E * A) / Props.store.L / Props.store.nodes) * Props.store.MaxU;
-            float w = 1000;
-            float n = 1;
             for (int t = 1; t < time.Length; t++)
             {
                 foreach (var elem in model.Elements)
@@ -171,17 +169,8 @@ namespace spring.ViewModels
                 }
                 foreach (var node in model.Nodes)
                 {
-                    float w0 = maf.sqrt(node.k0 / node.m);
-                    float Zm = maf.sqrt(maf.P2(2 * w0 * node.DampRatio) + (1 / maf.P2(w)) * maf.P2(maf.P2(w0) - maf.P2(w)));
-                    float phi = maf.atan((2 * w * w0 * node.DampRatio) / (maf.P2(w) - maf.P2(w0))) + (n * maf.pi);
-                    float xt = (maxLoad / (node.m * Zm * w)) * maf.sin(w * time[t] + phi);
-                    //https://www.wolframalpha.com/input/?i=d%2Fdt+%28F0%2F%28w*k%29%29*sin%28wt%2Bphi%29
-                    float vt = (maxLoad / (node.m * Zm)) * maf.cos(w * time[t] + phi);
-                    //https://www.wolframalpha.com/input/?i=d%5E2%2Fdt%5E2+%28F0%2F%28w*k%29%29*sin%28wt%2Bphi%29
-                    float at = (maxLoad / (node.m * Zm)) * (0 - maf.sin(w * time[t] + phi)) * w;
-                    float Ft = (1 / node.m) * maxLoad * maf.sin(w * time[t]);
-                    node.GetForces(ref model, t);
-                    node.CalcAccel(ref model, t);
+                    node.GetForces(ref model, t, maxLoad, time[t]);
+                    node.CalcAccel(ref model, t, maxLoad, time[t]);
                     /*integrate*/
                     node.Integrate(t, t - 1, Props.store.dt);
                 }
@@ -246,6 +235,7 @@ namespace spring.ViewModels
                 foreach (var node in model.Nodes)
                 {
                     plotData("node #" + node.ID, ExtractArray(node.deriv, (N_t)Deriv));
+                    plotData("An node #" + node.ID, ExtractArray(node.derivAn, (N_t)Deriv));
                 }
             }
         }
