@@ -28,6 +28,7 @@ namespace spring.ViewModels
         private readonly IEventAggregator _ea;
         public float[] Re;
         public float[] bloodV;
+        public float[] bloodP;
         public float[] time;
         private Rope_t model;
         public props Props { get; set; }
@@ -166,7 +167,7 @@ namespace spring.ViewModels
             {
                 foreach (var elem in model.Elements)
                 {
-                    elem.CalcForce(ref model, t, Re[t], bloodV[t]);
+                    elem.CalcForce(ref model, t, Re[t], bloodV[t], bloodP[t]);
                 }
                 foreach (var node in model.Nodes)
                 {
