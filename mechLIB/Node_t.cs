@@ -74,10 +74,8 @@ namespace mechLIB
                 F[t].Plus(gFn);
             }
         }
-        public void GetPhysicParam(ref Rope_t model, int t, ref float m, ref float c)
+        public void GetPhysicParam(ref Rope_t model, int t, float Re, ref float m, ref float c)
         {
-            //calc Re
-            float Re = 0;
             foreach (var neigNode in Neigs)
             {
                 float mElem = 0;

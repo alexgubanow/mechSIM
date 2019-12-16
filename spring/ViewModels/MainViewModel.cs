@@ -26,7 +26,8 @@ namespace spring.ViewModels
     public class MainViewModel : BindableBase
     {
         private readonly IEventAggregator _ea;
-
+        public float[] Re;
+        public float[] bloodV;
         public float[] time;
         private Rope_t model;
         public props Props { get; set; }
@@ -165,13 +166,13 @@ namespace spring.ViewModels
             {
                 foreach (var elem in model.Elements)
                 {
-                    elem.CalcForce(ref model, t);
+                    elem.CalcForce(ref model, t, Re[t], bloodV[t]);
                 }
                 foreach (var node in model.Nodes)
                 {
                     float m = 0;
                     float c = 0;
-                    node.GetPhysicParam(ref model, t, ref m, ref c);
+                    node.GetPhysicParam(ref model, t, Re[t], ref m, ref c);
                     node.GetForces(ref model, t, m, c);
                     node.CalcAccel(t, m);
                     /*integrate*/
