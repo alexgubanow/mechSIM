@@ -35,11 +35,17 @@ namespace mechLIB
             I = maf.P3(A) / 12.0f;
         }
         public bool IsMyNode(int id) => (n1 == id || n2 == id) ? true : false;
-        public void CalcForce(ref Rope_t model, int t, float Re, float bloodV)
+        public void CalcForce(ref Rope_t model, int t, float Re, float bloodV, float bloodP)
         {
-            GetFn(ref model, t);
-            GetPressureForce(ref model, t);
-            GetDragForce(ref model, t, Re, bloodV);
+            //getting length of link by measure between coords
+            float L = crds.GetTotL(model.GetNodeRef(n1).deriv[t - 1].p, model.GetNodeRef(n2).deriv[t - 1].p);
+            if (L == 0)
+            {
+                throw new Exception("Calculated length of element can't be eaqul to zero");
+            }
+            GetFn(ref model, t, L);
+            GetPressureForce(ref model, t, bloodP, L);
+            GetDragForce(ref model, t, Re, bloodV, L);
         }
         public void GetPhysicParam(ref Rope_t model, int t, float Re, ref float m, ref float c)
         {
@@ -59,15 +65,10 @@ namespace mechLIB
                 throw new Exception("Calculated damping ratio of element can't be eaqul to zero");
             }
         }
-        private void GetFn(ref Rope_t model, int t)
+        private void GetFn(ref Rope_t model, int t, float L)
         {
             xyz_t Fn = new xyz_t();
-            //getting length of link by measure between coords
-            float oldL = crds.GetTotL(model.GetNodeRef(n1).deriv[t - 1].p, model.GetNodeRef(n2).deriv[t - 1].p);
-            if (oldL == 0)
-            {
-                throw new Exception("Calculated length of element can't be eaqul to zero");
-            }
+           
             //getting position of link according base point
             xyz_t LinkPos = new xyz_t();
             LinkPos.Minus(model.GetNodeRef(n1).deriv[t - 1].p, model.GetNodeRef(n2).deriv[t - 1].p);
@@ -80,18 +81,17 @@ namespace mechLIB
             xyz_t lNpUx = new xyz_t();
             dcm.ToLoc(model.GetNodeRef(n2).deriv[t - 1].u, ref lNpUx);
             //calc Fn of link
-            Fn.x = 0 - (E * A / oldL * (lBpUx.x - lNpUx.x));
+            Fn.x = 0 - (E * A / L * (lBpUx.x - lNpUx.x));
             //Fn[(int)C.y] = 12f * E * I / maf.P3(oldL2) * oldUy2;
             F[t].Plus(Fn);
         }
-        private void GetPressureForce(ref Rope_t model, int t)
+        private void GetPressureForce(ref Rope_t model, int t, float bloodP, float L)
         {
-            xyz_t Fpress = new xyz_t();
+            float Fpress = 0 - bloodP * A * 2 * L;
             F[t].Plus(Fpress);
         }
-        private void GetDragForce(ref Rope_t model, int t, float Re, float v)
+        private void GetDragForce(ref Rope_t model, int t, float Re, float v, float L)
         {
-            float L = crds.GetTotL(model.GetNodeRef(n1).deriv[t - 1].p, model.GetNodeRef(n2).deriv[t - 1].p);
             float Awet = 2 * (float)Math.PI * radiusPoint.z * L;
             float bloodViscosity = 3E-3f;
             float Be = 0.9f;
