@@ -4,32 +4,34 @@ namespace mechLIB
 {
     public class Element_t
     {
-        public float k0;
-        public float DampRatio;
-        public float c;
-        public float m;
-        public float E;
-        public float A;
-        public float I;
+        //private float k0;
+        private readonly float DampRatio;
+        //private float c;
+        //private float m;
+        private readonly float ro;
+        private readonly float E;
+        private readonly float A;
+        private readonly float I;
         public int n1;
         public int n2;
         public int ID;
         public xyz_t[] F;
         public xyz_t radiusPoint;
-        public Element_t(int _n1, int _n2, xyz_t _radiusPoint, float _E, int Counts, int _ID, float _DampRatio)
+        public Element_t(int _n1, int _n2, xyz_t _radiusPoint, int Counts, int _ID, props_t props)
         {
-            DampRatio = _DampRatio;
+            ro = props.ro;
+            DampRatio = props.DampRatio;
             ID = _ID;
             F = new xyz_t[Counts];
             for (int i = 0; i < F.Length; i++)
             {
                 F[i] = new xyz_t();
             }
-            E = _E;
+            E = props.E;
             n1 = _n1;
             n2 = _n2;
             radiusPoint = _radiusPoint;
-            A = (float)Math.PI * (float)Math.Pow(_radiusPoint.z, 2) / 4;
+            A = (float)Math.PI * maf.P2(_radiusPoint.z) / 4;
             I = maf.P3(A) / 12.0f;
         }
         public bool IsMyNode(int id) => (n1 == id || n2 == id) ? true : false;
@@ -38,20 +40,19 @@ namespace mechLIB
             GetFn(ref model, t);
             GetPressureForce(ref model, t);
         }
-        public void CalcMass(ref Rope_t model, float ro)
+        public void GetPhysicParam(ref Rope_t model, int t, float Re, ref float m, ref float c)
         {
-            float L = crds.GetTotL(model.GetNodeRef(n1).deriv[0].p, model.GetNodeRef(n2).deriv[0].p);
-            if (L <= 0)
+            float L = crds.GetTotL(model.GetNodeRef(n1).deriv[t].p, model.GetNodeRef(n2).deriv[t].p);
+            m += ro * A * L;
+            if (Re > 0)
             {
-                throw new Exception("Calculated length of element can't be eaqul to zero");
+                //calc h of fluid on rod
+                float thFluid = (radiusPoint.z * 2) / maf.sqrt(Re);
+                //calc mass of fluid on rod
+                m += (float)Math.PI * L * (maf.P2(radiusPoint.z + thFluid) - maf.P2(radiusPoint.z)) * 1060;
+                //add mass of this fluid to mass of rod
             }
-            m = ro * A * L;
-            if (m <= 0)
-            {
-                throw new Exception("Calculated mass of element can't be eaqul to zero");
-            }
-            k0 = (E * A) / L;
-            c = DampRatio * 2f * (float)Math.Sqrt(m * k0);
+            c = DampRatio * 2f * (float)Math.Sqrt(m *((E * A) / L));
             if (c <= 0)
             {
                 throw new Exception("Calculated damping ratio of element can't be eaqul to zero");

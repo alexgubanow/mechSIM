@@ -145,14 +145,14 @@ namespace spring.ViewModels
             #endregion load file
 
             model = new Rope_t(Props.store);
-            foreach (var elem in model.Elements)
-            {
-                elem.CalcMass(ref model, Props.store.ro);
-            }
-            foreach (var node in model.Nodes)
-            {
-                node.CalcMass(ref model);
-            }
+            //foreach (var elem in model.Elements)
+            //{
+            //    elem.CalcPhysicParam(ref model, Props.store.ro);
+            //}
+            //foreach (var node in model.Nodes)
+            //{
+            //    node.CalcMass(ref model);
+            //}
             //getLoad(C_t.x, ref model);
             await Task.Run(Simulating);
         }
@@ -169,8 +169,11 @@ namespace spring.ViewModels
                 }
                 foreach (var node in model.Nodes)
                 {
-                    node.GetForces(ref model, t, maxLoad, time[t]);
-                    node.CalcAccel(ref model, t, maxLoad, time[t]);
+                    float m = 0;
+                    float c = 0;
+                    node.GetPhysicParam(ref model, t, ref m, ref c);
+                    node.GetForces(ref model, t, m, c);
+                    node.CalcAccel(t, m);
                     /*integrate*/
                     node.Integrate(t, t - 1, Props.store.dt);
                 }
