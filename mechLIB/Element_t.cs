@@ -68,7 +68,7 @@ namespace mechLIB
         private void GetFn(ref Rope_t model, int t, float L)
         {
             xyz_t Fn = new xyz_t();
-           
+
             //getting position of link according base point
             xyz_t LinkPos = new xyz_t();
             LinkPos.Minus(model.GetNodeRef(n1).deriv[t - 1].p, model.GetNodeRef(n2).deriv[t - 1].p);
@@ -85,6 +85,21 @@ namespace mechLIB
             //Fn[(int)C.y] = 12f * E * I / maf.P3(oldL2) * oldUy2;
             F[t].Plus(Fn);
         }
+        private void GetFnMR(ref Rope_t model, int t, float L)
+        {
+            xyz_t lamda = new xyz_t();
+            lamda.x = (currxi[i] - lastxi[i]) / L + 1;
+
+
+
+            for (int i = 0; i < currxi->Length; i++)
+            {
+                lamda1[i] = (currxi[i] - lastxi[i]) / l + 1;
+                double sigma = 2 * C10 * (lamda1[i] - (1 / (lamda1[i] * lamda1[i]))) + 2 * C01 * (1 - (1 / (lamda1[i] * lamda1[i] * lamda1[i])));
+                F[i] = F[i] + A * sigma;
+            }
+            return 0;
+        };
         private void GetPressureForce(ref Rope_t model, int t, float bloodP, float L)
         {
             float Fpress = 0 - bloodP * A * 2 * L;
