@@ -6,7 +6,7 @@ namespace mechLIB
     {
         public float k0;
         public float DampRatio;
-        public float c;
+        //public float c;
         public float m;
         public float E;
         public float A;
@@ -52,11 +52,11 @@ namespace mechLIB
                 throw new Exception("Calculated mass of element can't be eaqul to zero");
             }
             k0 = (E * A) / L;
-            c = DampRatio * 2f * (float)Math.Sqrt(m * k0);
-            if (c <= 0)
-            {
-                throw new Exception("Calculated damping ratio of element can't be eaqul to zero");
-            }
+            //c = DampRatio * 2f * (float)Math.Sqrt(m * k0);
+            //if (c <= 0)
+            //{
+            //    throw new Exception("Calculated damping ratio of element can't be eaqul to zero");
+            //}
         }
         public void GetFn(ref Rope_t model, int t, ref xyz_t Fn)
         {

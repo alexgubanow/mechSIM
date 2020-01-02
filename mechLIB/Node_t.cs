@@ -6,7 +6,7 @@ namespace mechLIB
     {
         public float k0;
         public float DampRatio;
-        public float c;
+        //public float c;
         public float m;
         public NodeFreedom freedom;
         public NodeLoad LoadType;
@@ -75,9 +75,9 @@ namespace mechLIB
             else
             {
                 xyz_t Fd = new xyz_t();
-                Fd.x = 0 - (c * deriv[t - 1].v.x);
-                Fd.y = 0 - (c * deriv[t - 1].v.y);
-                Fd.z = 0 - (c * deriv[t - 1].v.z);
+                Fd.x = 0 - (2 * DampRatio * maf.sqrt(k0 / m) * deriv[t - 1].v.x);
+                Fd.y = 0 - (2 * DampRatio * maf.sqrt(k0 / m) * deriv[t - 1].v.y);
+                Fd.z = 0 - (2 * DampRatio * maf.sqrt(k0 / m) * deriv[t - 1].v.z);
                 F[t].Plus(Fd);
                 /*getting element forces*/
                 foreach (var neigNode in Neigs)
@@ -95,27 +95,36 @@ namespace mechLIB
                 }
             }
         }
-        public void CalcMass(ref Rope_t model)
+        public void CalcMass(ref Rope_t model, float maxLoad)
         {
             foreach (var neigNode in Neigs)
             {
                 m += model.GetElemRef(ID, neigNode).m / 2;
-                c += model.GetElemRef(ID, neigNode).c;
+                //c += model.GetElemRef(ID, neigNode).c;
                 k0 += model.GetElemRef(ID, neigNode).k0;
                 DampRatio += model.GetElemRef(ID, neigNode).DampRatio;
             }
-            c /= Neigs.Length;
+            //c /= Neigs.Length;
+            //if (c <= 0)
+            //{
+            //    throw new Exception("Calculated damping ratio of node can't be eaqul to zero");
+            //}
             DampRatio /= Neigs.Length;
             k0 /= Neigs.Length;
             if (m <= 0)
             {
                 throw new Exception("Calculated mass of node can't be eaqul to zero");
             }
-            if (c <= 0)
-            {
-                throw new Exception("Calculated damping ratio of node can't be eaqul to zero");
-            }
             m = 1;
+            float w0 = maf.sqrt(k0 / m);
+            float Zm = maf.sqrt(maf.P2(2 * w0 * DampRatio) + (1 / maf.P2(w)) * maf.P2(maf.P2(w0) - maf.P2(w)));
+            float phi = maf.atan((2 * w * w0 * DampRatio) / (maf.P2(w) - maf.P2(w0))) + (n * maf.pi);
+
+            if (LoadType == NodeLoad.f)
+            {
+                float v0 = (maxLoad / (m * Zm)) * maf.cos(phi);
+                deriv[0].v.x = (maxLoad / (m * Zm)) * maf.cos(phi);
+            }
         }
         public void Integrate(int now, int before, float dt)
         {

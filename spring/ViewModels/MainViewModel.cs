@@ -145,13 +145,15 @@ namespace spring.ViewModels
             #endregion load file
 
             model = new Rope_t(Props.store);
+            float A = (float)Math.PI * (float)Math.Pow(Props.store.D, 2) / 4;
+            float maxLoad = ((Props.store.E * A) / Props.store.L / Props.store.nodes) * Props.store.MaxU;
             foreach (var elem in model.Elements)
             {
                 elem.CalcMass(ref model, Props.store.ro);
             }
             foreach (var node in model.Nodes)
             {
-                node.CalcMass(ref model);
+                node.CalcMass(ref model, maxLoad);
             }
             //getLoad(C_t.x, ref model);
             await Task.Run(Simulating);
