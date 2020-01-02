@@ -35,9 +35,8 @@ namespace mechLIB
         public bool IsMyNode(int id) => (n1 == id || n2 == id) ? true : false;
         public void CalcForce(ref Rope_t model, int t)
         {
-            xyz_t Fn = new xyz_t();
-            GetFn(ref model, t, ref Fn);
-            F[t].Plus(Fn);
+            GetFn(ref model, t);
+            GetPressureForce(ref model, t);
         }
         public void CalcMass(ref Rope_t model, float ro)
         {
@@ -58,8 +57,9 @@ namespace mechLIB
             //    throw new Exception("Calculated damping ratio of element can't be eaqul to zero");
             //}
         }
-        public void GetFn(ref Rope_t model, int t, ref xyz_t Fn)
+        private void GetFn(ref Rope_t model, int t)
         {
+            xyz_t Fn = new xyz_t();
             //getting length of link by measure between coords
             float oldL = crds.GetTotL(model.GetNodeRef(n1).deriv[t - 1].p, model.GetNodeRef(n2).deriv[t - 1].p);
             if (oldL == 0)
@@ -80,6 +80,12 @@ namespace mechLIB
             //calc Fn of link
             Fn.x = 0 - (E * A / oldL * (lBpUx.x - lNpUx.x));
             //Fn[(int)C.y] = 12f * E * I / maf.P3(oldL2) * oldUy2;
+            F[t].Plus(Fn);
+        }
+        private void GetPressureForce(ref Rope_t model, int t)
+        {
+            xyz_t Fpress = new xyz_t();
+            F[t].Plus(Fpress);
         }
     }
 }
