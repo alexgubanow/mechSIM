@@ -4,20 +4,16 @@ namespace mechLIB
 {
     public unsafe class Node_t
     {
-        //public float k0;
-        //public float DampRatio;
-        //public float c;
-        //public float m;
         public NodeFreedom freedom;
         public NodeLoad LoadType;
         public deriv_t[] deriv;
-        public deriv_t[] derivAn;
+        //public deriv_t[] derivAn;
         public xyz_t[] F;
         public int[] Neigs;
         public int ID;
         public xyz_t radiusPoint;
-        float w = 300;
-        float n = 1f;
+        //float w = 300;
+        //float n = 1f;
 
         public Node_t(int tCounts, xyz_t coords, xyz_t _radiusPoint, NodeFreedom _freedom, NodeLoad _LoadType, int _ID, int[] _Neigs)
         {
@@ -27,19 +23,19 @@ namespace mechLIB
             Neigs = _Neigs;
             F = new xyz_t[tCounts];
             deriv = new deriv_t[tCounts];
-            derivAn = new deriv_t[tCounts];
+            //derivAn = new deriv_t[tCounts];
             for (int i = 0; i < deriv.Length; i++)
             {
                 F[i] = new xyz_t();
                 deriv[i] = new deriv_t();
-                derivAn[i] = new deriv_t();
+                //derivAn[i] = new deriv_t();
                 //deriv[i] = new deriv_t
                 //{
                 //    p = coords
                 //};
             }
             deriv[0].p = coords;
-            derivAn[0].p = coords;
+            //derivAn[0].p = coords;
             radiusPoint = _radiusPoint;
         }
         public void CalcAccel(int t, float m)
@@ -74,13 +70,13 @@ namespace mechLIB
                 F[t].Plus(gFn);
             }
         }
-        public void GetPhysicParam(ref Rope_t model, int t, float Re, ref float m, ref float c)
+        public void GetPhysicParam(ref Rope_t rope, int t, float Re, ref float m, ref float c)
         {
             foreach (var neigNode in Neigs)
             {
                 float mElem = 0;
                 float cElem = 0;
-                model.GetElemRef(ID, neigNode).GetPhysicParam(ref model, t, Re, ref mElem, ref cElem);
+                rope.GetElemRef(ID, neigNode).GetPhysicParam(ref rope, t, Re, ref mElem, ref cElem);
                 c += cElem;
                 m += mElem;
             }

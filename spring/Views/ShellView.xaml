@@ -4,10 +4,19 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
+    xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         Loaded="ShellView_OnLoaded"
-        Title="{Binding Title}" Height="600" Width="600">
+        Title="{Binding Title}" Height="600" Width="1024"
+    Effect="{Binding Path=win_Effect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
     <DockPanel LastChildFill="True">
-        <ContentControl prism:RegionManager.RegionName="MainViewRegion"/>
+        <Button DockPanel.Dock="Bottom" Content="{Binding Path=RunBtnTxt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding Compute}" Margin="5" />
+        <Grid>
+            <ContentControl prism:RegionManager.RegionName="MainViewRegion"/>
+            <Rectangle Panel.ZIndex="1000" x:Name="overlayrect" Fill="DarkGray" Opacity=".5"
+                       Visibility="{Binding Path=overlayrect_Visibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Controls:ProgressRing IsActive="True" Panel.ZIndex="1000" x:Name="overlayring" Foreground="White"
+                                   Visibility="{Binding Path=overlayring_Visibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </Grid>
     </DockPanel>
     <!--<DockPanel LastChildFill="True">
         <StatusBar DockPanel.Dock="Bottom">

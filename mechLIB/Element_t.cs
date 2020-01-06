@@ -35,50 +35,46 @@ namespace mechLIB
             I = maf.P3(A) / 12.0f;
         }
         public bool IsMyNode(int id) => (n1 == id || n2 == id) ? true : false;
-        public void CalcForce(ref Rope_t model, int t, float Re, float bloodV, float bloodP)
+        public void CalcForce(ref Rope_t rope, int t, float Re, float bloodV, float bloodP)
         {
             //getting length of link by measure between coords
             float L = 0;
             switch (phMod)
             {
                 case PhModels.hook:
-                    L = crds.GetTotL(model.GetNodeRef(n1).deriv[0].p, model.GetNodeRef(n2).deriv[0].p);
+                    L = GetOwnLength(ref rope, 0);
                     break;
                 case PhModels.hookGeomNon:
-                    L = crds.GetTotL(model.GetNodeRef(n1).deriv[t - 1].p, model.GetNodeRef(n2).deriv[t - 1].p);
+                    L = GetOwnLength(ref rope, t - 1);
                     break;
                 case PhModels.mooneyRiv:
-                    L = crds.GetTotL(model.GetNodeRef(n1).deriv[t - 1].p, model.GetNodeRef(n2).deriv[t - 1].p);
+                    L = GetOwnLength(ref rope, t - 1);
                     break;
                 default:
                     throw new Exception("unexpected behavior");
             }
-            if (L == 0)
-            {
-                throw new Exception("Calculated length of element can't be eaqul to zero");
-            }
             //getting position of link according base point
             xyz_t LinkPos = new xyz_t();
-            LinkPos.Minus(model.GetNodeRef(n1).deriv[t - 1].p, model.GetNodeRef(n2).deriv[t - 1].p);
+            LinkPos.Minus(rope.GetNodeRef(n1).deriv[t - 1].p, rope.GetNodeRef(n2).deriv[t - 1].p);
             //getting DCM for this link
             dcm_t dcm = new dcm_t(LinkPos, radiusPoint);
             //convert base point Ux to local coords
             xyz_t lBpUx = new xyz_t();
-            dcm.ToLoc(model.GetNodeRef(n1).deriv[t - 1].u, ref lBpUx);
+            dcm.ToLoc(rope.GetNodeRef(n1).deriv[t - 1].u, ref lBpUx);
             //convert n point Ux to local coords
             xyz_t lNpUx = new xyz_t();
-            dcm.ToLoc(model.GetNodeRef(n2).deriv[t - 1].u, ref lNpUx);
+            dcm.ToLoc(rope.GetNodeRef(n2).deriv[t - 1].u, ref lNpUx);
             //store delta of expansion
             xyz_t deltaL = new xyz_t();
             //lBpUx.x - lNpUx.x
             deltaL.Minus(lBpUx, lNpUx);
             GetFn(t, L, deltaL);
-            GetPressureForce(t, bloodP, L);
-            GetDragForce(t, Re, bloodV, L);
+            //GetPressureForce(t, bloodP, L);
+            //GetDragForce(t, Re, bloodV, L);
         }
-        public void GetPhysicParam(ref Rope_t model, int t, float Re, ref float m, ref float c)
+        public void GetPhysicParam(ref Rope_t rope, int t, float Re, ref float m, ref float c)
         {
-            float L = crds.GetTotL(model.GetNodeRef(n1).deriv[t].p, model.GetNodeRef(n2).deriv[t].p);
+            float L = GetOwnLength(ref rope, t);
             m += ro * A * L;
             if (Re > 0)
             {
@@ -94,6 +90,18 @@ namespace mechLIB
                 throw new Exception("Calculated damping ratio of element can't be eaqul to zero");
             }
         }
+
+        private float GetOwnLength(ref Rope_t rope, int t)
+        {
+            float L = crds.GetTotL(rope.GetNodeRef(n1).deriv[t].p, rope.GetNodeRef(n2).deriv[t].p);
+            if (L == 0)
+            {
+                throw new Exception("Calculated length of element can't be eaqul to zero");
+            }
+
+            return L;
+        }
+
         private void GetFn(int t, float L, xyz_t deltaL)
         {
             //calc Fn of link

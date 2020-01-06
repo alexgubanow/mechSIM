@@ -51,6 +51,7 @@
     <Compile Include="deriv_t.cs" />
     <Compile Include="EnumBindingSourceExtension.cs" />
     <Compile Include="EnumDescriptionTypeConverter.cs" />
+    <Compile Include="enviro.cs" />
     <Compile Include="PhModels.cs" />
     <Compile Include="props.cs" />
     <Compile Include="xyz_t.cs" />

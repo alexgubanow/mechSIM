@@ -55,7 +55,6 @@
                 <ComboBoxItem Content="Force" />
             </ComboBox>
         </StackPanel>
-        <Button DockPanel.Dock="Bottom" Content="Compute" Command="{Binding Compute}" Margin="5" />
         <Slider DockPanel.Dock="Bottom" Height="22" Margin="5" Value="{Binding CurrT, Mode=TwoWay}"
                 Maximum="{Binding EndT}" 
                 Minimum="0" AutoToolTipPlacement="TopLeft" LargeChange="10" SmallChange="1"/>
