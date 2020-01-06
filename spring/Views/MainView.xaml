@@ -7,11 +7,25 @@
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:oxy="http://oxyplot.org/wpf"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:lcl="clr-namespace:spring"
+             xmlns:mLib="clr-namespace:mechLIB;assembly=mechLIB"
              xmlns:h="http://helix-toolkit.org/wpf"
              mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues"
+                        ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="mLib:PhModels"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
     <DockPanel LastChildFill="True">
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5">
+            <ComboBox MinWidth="150" Margin="0,0,5,0" 
+                      ItemsSource="{Binding Source={mLib:EnumBindingSource {x:Type mLib:PhModels}}}"
+                      SelectedValue="{Binding Path=Props.PhMod,
+                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             <lcl:lblTxTbox LabelTxt="E:" BoxTxt="{Binding Path=Props.Estr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
             <lcl:lblTxTbox LabelTxt="ro:" BoxTxt="{Binding Path=Props.rostr,

@@ -12,5 +12,6 @@
         public int Counts;
         public float dt;
         public float ro;
+        public PhModels phMod;
     }
 }

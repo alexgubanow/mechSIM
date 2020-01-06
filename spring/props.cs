@@ -19,6 +19,7 @@ namespace spring
             store.DampRatio = 0.01f;
         }
         public props_t store;
+        public PhModels PhMod { get => store.phMod; set => store.phMod = value; }
         private int _EndT;
         public int EndT
         {

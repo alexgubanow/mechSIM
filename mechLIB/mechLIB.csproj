@@ -38,6 +38,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -48,6 +49,9 @@
   <ItemGroup>
     <Compile Include="dcm_t.cs" />
     <Compile Include="deriv_t.cs" />
+    <Compile Include="EnumBindingSourceExtension.cs" />
+    <Compile Include="EnumDescriptionTypeConverter.cs" />
+    <Compile Include="PhModels.cs" />
     <Compile Include="props.cs" />
     <Compile Include="xyz_t.cs" />
     <Compile Include="coords.cs" />
