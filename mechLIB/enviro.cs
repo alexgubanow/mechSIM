@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,49 +11,40 @@ namespace mechLIB
     {
         public Enviro()
         { }
-        public void PrepRun(props_t propStore)
+        public void PrepRun(props_t propStore, string loadFile)
         {
             phProps = propStore;
             allocateTime(phProps.dt, phProps.Counts);
-
-            #region load file
-
-            //OpenFileDialog openFileDialog = new OpenFileDialog();
-            //if (openFileDialog.ShowDialog() == true)
-            //{
-            //    string fileName = openFileDialog.FileName;
-            //    // deserialize JSON directly from a file
-            //    using (StreamReader file = File.OpenText(fileName))
-            //    {
-            //        JsonSerializer serializer = new JsonSerializer();
-            //        Load ld = (Load)serializer.Deserialize(file, typeof(Load));
-            //        load = new float[nodeCount][][];
-            //        load[nodeCount - 1] = new float[Counts][];
-            //        for (int i = 0; i < Counts; i++)
-            //        {
-            //            load[nodeCount - 1][i] = new float[3];
-            //            load[nodeCount - 1][i][0] = ld.x[i];
-            //            load[nodeCount - 1][i][1] = ld.y[i];
-            //        }
-            //    }
-            //    ////txtOutput.Text = txtOutput.Text + "Attempting to read the file '" + fileName + "'...";
-            //    //try
-            //    //{
-            //    //}
-            //    //catch (Exception)
-            //    //{
-            //    //    throw new Exception();
-            //    //    //txtOutput.Text = txtOutput.Text + "Invalid MAT-file!\n";
-            //    //    //MessageBox.Show("Invalid binary MAT-file! Please select a valid binary MAT-file.",
-            //    //    //    "Invalid MAT-file", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            //    //}
-            //}
-
-            #endregion load file
-
             rope = new Rope_t(phProps);
-            GenerateLoad(C_t.x, ref rope);
+            if (loadFile.Length > 0)
+            {
+                ReadLoadFile(loadFile);
+            }
+            else
+            {
+                GenerateLoad(C_t.x);
+            }
         }
+
+        private void ReadLoadFile(string loadFile)
+        {
+            using (StreamReader sr = File.OpenText(loadFile))
+            {
+                string line = string.Empty;
+                //read load back
+                List<string> loadStrs
+                while ((line = sr.ReadLine()) != null)
+                {
+                    //t	PMx	PMy	PLx	PLy
+                    Console.WriteLine(line);
+                }
+            }
+            //fill load to rope
+            //choose load nodes
+            rope.Nodes[0].LoadType = NodeLoad.p;
+            rope.Nodes[phProps.nodes - 1].LoadType = NodeLoad.p;
+        }
+
         public props_t phProps;
         public float[] Re;
         public float[] bloodV;
@@ -67,7 +59,7 @@ namespace mechLIB
                 time[i] = time[i - 1] + dt;
             }
         }
-        private void GenerateLoad(C_t axis, ref Rope_t model)
+        private void GenerateLoad(C_t axis)
         {
             Re = new float[phProps.Counts];
             bloodV = new float[phProps.Counts];
@@ -75,20 +67,22 @@ namespace mechLIB
             float A = (float)Math.PI * (float)Math.Pow(phProps.D, 2) / 4;
             float maxLoad = ((phProps.E * A) / phProps.L / phProps.nodes) * phProps.MaxU;
             float freq = 1 / (phProps.Counts * phProps.dt);
+            rope.Nodes[0].LoadType = NodeLoad.f;
+            rope.Nodes[phProps.nodes - 1].LoadType = NodeLoad.p;
             for (int t = 0; t < phProps.Counts; t++)
             {
                 Re[t] = 0;
                 bloodV[t] = 0;
                 bloodP[t] = 0;
-                model.Nodes[0].F[t].x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
+                rope.Nodes[0].F[t].x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
                 //model.Nodes[0].deriv[t].p.z = model.Nodes[0].deriv[0].p.z;
                 //model.Nodes[0].deriv[t].p.y = model.Nodes[0].deriv[0].p.y;
                 //model.Nodes[0].deriv[t].p.x = 0 - ((time[t] + time[1]) * phProps.MaxU);
                 //model.Nodes[0].deriv[t].v.x = (model.Nodes[0].deriv[t].p.x - (0 - (time[t] * phProps.MaxU))) / time[1];
                 int lastN = phProps.nodes - 1;
-                model.Nodes[lastN].deriv[t].p.z = model.Nodes[lastN].deriv[0].p.z;
-                model.Nodes[lastN].deriv[t].p.y = model.Nodes[lastN].deriv[0].p.y;
-                model.Nodes[lastN].deriv[t].p.x = model.Nodes[lastN].deriv[0].p.x;
+                rope.Nodes[lastN].deriv[t].p.z = rope.Nodes[lastN].deriv[0].p.z;
+                rope.Nodes[lastN].deriv[t].p.y = rope.Nodes[lastN].deriv[0].p.y;
+                rope.Nodes[lastN].deriv[t].p.x = rope.Nodes[lastN].deriv[0].p.x;
                 //model.Nodes[lastN].F[t].x = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
                 //model.Nodes[lastN].deriv[t].p.x =  ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad) + model.Nodes[lastN].deriv[0].p.x;
             }

@@ -1,5 +1,6 @@
 ﻿using HelixToolkit.Wpf;
 using mechLIB;
+using Microsoft.Win32;
 using OxyPlot;
 using OxyPlot.Series;
 using Prism.Commands;
@@ -88,7 +89,10 @@ namespace spring.ViewModels
 
         private void Simulate()
         {
-            world.PrepRun(Props.store);
+            string fileName = "";
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true) { fileName = openFileDialog.FileName; }
+            world.PrepRun(Props.store, fileName);
             world.Run();
             //ShowResults(SelDeriv);
             _ea.GetEvent<GotResultsEvent>().Publish();
