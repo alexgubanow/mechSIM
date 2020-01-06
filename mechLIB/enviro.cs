@@ -80,10 +80,10 @@ namespace mechLIB
                 Re[t] = 0;
                 bloodV[t] = 0;
                 bloodP[t] = 0;
-                //model.Nodes[0].F[t].x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
+                model.Nodes[0].F[t].x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
                 //model.Nodes[0].deriv[t].p.z = model.Nodes[0].deriv[0].p.z;
                 //model.Nodes[0].deriv[t].p.y = model.Nodes[0].deriv[0].p.y;
-                model.Nodes[0].deriv[t].p.x = 0 - ((time[t] + time[1]) * phProps.MaxU);
+                //model.Nodes[0].deriv[t].p.x = 0 - ((time[t] + time[1]) * phProps.MaxU);
                 //model.Nodes[0].deriv[t].v.x = (model.Nodes[0].deriv[t].p.x - (0 - (time[t] * phProps.MaxU))) / time[1];
                 int lastN = phProps.nodes - 1;
                 model.Nodes[lastN].deriv[t].p.z = model.Nodes[lastN].deriv[0].p.z;

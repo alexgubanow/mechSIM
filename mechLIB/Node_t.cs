@@ -48,7 +48,7 @@ namespace mechLIB
             }
 
         }
-        public void GetForces(ref Rope_t model, int t, float c, float m)
+        public void GetForces(ref Rope_t model, int t, float m, float c)
         {
             xyz_t Fd = new xyz_t();
             Fd.x = 0 - (c * deriv[t - 1].v.x);

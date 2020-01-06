@@ -21,7 +21,7 @@ namespace mechLIB
             xyz_t tmpRadPoint = new xyz_t { z = props.D };
             Nodes[0] = new Node_t(props.Counts, 
                 new xyz_t { y = props.initDrop * (float)Math.Pow((0 * dl) - (props.L - dl) / 2, 2) + 1E-3f },
-                tmpRadPoint, NodeFreedom.xyz, NodeLoad.p, 0, new int[1] { 1 });
+                tmpRadPoint, NodeFreedom.xyz, NodeLoad.f, 0, new int[1] { 1 });
             for (int i = 1; i < lastNode; i++)
             {
                 Nodes[i] = new Node_t(props.Counts,
