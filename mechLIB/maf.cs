@@ -42,5 +42,17 @@ namespace mechLIB
         {
             return (float)Math.Atan(value);
         }
+        public static void Linip(float[] y, int ratio, ref float[] yd)
+        {
+            for (int i = 0; i < y.Length -1; i++)
+            {
+                int start = i * ratio;
+                yd[start] = y[i];
+                for (int j = 1; j < ratio; j++)
+                {
+                    yd[start + j] = yd[start + j - 1] + (y[i + 1] - y[i]) / ratio;
+                }
+            }
+        }
     }
 }
