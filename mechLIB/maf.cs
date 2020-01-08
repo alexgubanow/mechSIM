@@ -8,6 +8,7 @@ namespace mechLIB
 {
     public class maf
     {
+        public const float _g = -9.80666f;
         public const float hlf = 1f / 2f;
         public const float sxt = 1f / 6f;
         public const float pi = (float)Math.PI;

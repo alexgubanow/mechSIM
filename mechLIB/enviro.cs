@@ -112,23 +112,23 @@ namespace mechLIB
             float freq = 1 / (phProps.Counts * phProps.dt);
             rope.Nodes[0].LoadType = NodeLoad.f;
             rope.Nodes[phProps.nodes - 1].LoadType = NodeLoad.p;
-            for (int t = 0; t < phProps.Counts; t++)
-            {
-                Re[t] = 0;
-                bloodV[t] = 0;
-                bloodP[t] = 0;
-                rope.Nodes[0].F[t].x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
-                //model.Nodes[0].deriv[t].p.z = model.Nodes[0].deriv[0].p.z;
-                //model.Nodes[0].deriv[t].p.y = model.Nodes[0].deriv[0].p.y;
-                //model.Nodes[0].deriv[t].p.x = 0 - ((time[t] + time[1]) * phProps.MaxU);
-                //model.Nodes[0].deriv[t].v.x = (model.Nodes[0].deriv[t].p.x - (0 - (time[t] * phProps.MaxU))) / time[1];
-                int lastN = phProps.nodes - 1;
-                rope.Nodes[lastN].deriv[t].p.z = rope.Nodes[lastN].deriv[0].p.z;
-                rope.Nodes[lastN].deriv[t].p.y = rope.Nodes[lastN].deriv[0].p.y;
-                rope.Nodes[lastN].deriv[t].p.x = rope.Nodes[lastN].deriv[0].p.x;
-                //model.Nodes[lastN].F[t].x = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
-                //model.Nodes[lastN].deriv[t].p.x =  ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad) + model.Nodes[lastN].deriv[0].p.x;
-            }
+            //for (int t = 0; t < phProps.Counts; t++)
+            //{
+            //    Re[t] = 0;
+            //    bloodV[t] = 0;
+            //    bloodP[t] = 0;
+            //    rope.Nodes[0].F[t].x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
+            //    //model.Nodes[0].deriv[t].p.z = model.Nodes[0].deriv[0].p.z;
+            //    //model.Nodes[0].deriv[t].p.y = model.Nodes[0].deriv[0].p.y;
+            //    //model.Nodes[0].deriv[t].p.x = 0 - ((time[t] + time[1]) * phProps.MaxU);
+            //    //model.Nodes[0].deriv[t].v.x = (model.Nodes[0].deriv[t].p.x - (0 - (time[t] * phProps.MaxU))) / time[1];
+            //    int lastN = phProps.nodes - 1;
+            //    rope.Nodes[lastN].deriv[t].p.z = rope.Nodes[lastN].deriv[0].p.z;
+            //    rope.Nodes[lastN].deriv[t].p.y = rope.Nodes[lastN].deriv[0].p.y;
+            //    rope.Nodes[lastN].deriv[t].p.x = rope.Nodes[lastN].deriv[0].p.x;
+            //    //model.Nodes[lastN].F[t].x = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
+            //    //model.Nodes[lastN].deriv[t].p.x =  ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad) + model.Nodes[lastN].deriv[0].p.x;
+            //}
         }
         public void Run()
         {
