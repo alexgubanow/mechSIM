@@ -1,8 +1,9 @@
 ﻿using mechLIB;
+using Prism.Mvvm;
 
 namespace spring
 {
-    public class props
+    public class props : BindableBase
     {
         public props()
         {
@@ -24,7 +25,7 @@ namespace spring
         public int EndT
         {
             get => _EndT; 
-            set => _EndT = value;
+            set => SetProperty(ref _EndT, value);
         }
         public string DampRatiostr
         {

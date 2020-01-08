@@ -30,8 +30,6 @@ namespace spring.ViewModels
         private readonly IEventAggregator _ea;
         public props Props { get; set; }
         private Enviro world;
-        private int _EndT;
-        public int EndT { get => _EndT; set { _EndT = value; } }
 
         private int _CurrT;
         public int CurrT { get => _CurrT; set { _CurrT = value; Draw3d(value, SelDeriv); } }
@@ -51,7 +49,6 @@ namespace spring.ViewModels
         {
             _ea = ea;
             Props = new props();
-            EndT = Props.store.Counts - 1;
             selDeriv = 0;
             _CurrT = 0;
             Objs3d = new ObservableCollection<Visual3D>();
