@@ -5,11 +5,13 @@ namespace mechLIB
     
     public class Element_t
     {
+
         private readonly float DampRatio;
         private readonly float ro;
         private readonly float E;
         private readonly float A;
         private readonly float I;
+
         public int n1;
         public int n2;
         public int ID;
@@ -84,11 +86,13 @@ namespace mechLIB
                 m += (float)Math.PI * L * (maf.P2(radiusPoint.z + thFluid) - maf.P2(radiusPoint.z)) * 1060;
                 //add mass of this fluid to mass of rod
             }
+
             c = DampRatio * 2f * (float)Math.Sqrt(m * ((E * A) / L));
             if (c <= 0)
             {
                 throw new Exception("Calculated damping ratio of element can't be eaqul to zero");
             }
+
         }
 
         private float GetOwnLength(ref Rope_t rope, int t)

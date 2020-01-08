@@ -85,9 +85,15 @@ namespace mechLIB
             {
                 throw new Exception("Calculated mass of node can't be eaqul to zero");
             }
-            if (c <= 0)
+            m = 1;
+            float w0 = maf.sqrt(k0 / m);
+            float Zm = maf.sqrt(maf.P2(2 * w0 * DampRatio) + (1 / maf.P2(w)) * maf.P2(maf.P2(w0) - maf.P2(w)));
+            float phi = maf.atan((2 * w * w0 * DampRatio) / (maf.P2(w) - maf.P2(w0))) + (n * maf.pi);
+
+            if (LoadType == NodeLoad.f)
             {
-                throw new Exception("Calculated damping ratio of node can't be eaqul to zero");
+                float v0 = (maxLoad / (m * Zm)) * maf.cos(phi);
+                deriv[0].v.x = (maxLoad / (m * Zm)) * maf.cos(phi);
             }
         }
         public void Integrate(int now, int before, float dt)

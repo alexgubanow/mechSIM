@@ -76,11 +76,13 @@ namespace spring.ViewModels
                 { Simulate(); });
                 thrsim.Start();
             }
+
             else
             {
                 thrsim.Abort();
                 thrsim = null;
                 world = null;
+
             }
         }
 
