@@ -7,28 +7,42 @@
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:oxy="http://oxyplot.org/wpf"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:lcl="clr-namespace:spring"
+             xmlns:mLib="clr-namespace:mechLIB;assembly=mechLIB"
              xmlns:h="http://helix-toolkit.org/wpf"
              mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues"
+                        ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="mLib:PhModels"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
     <DockPanel LastChildFill="True">
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5">
-            <lcl:lblTxTbox LabelTxt="E:" BoxTxt="{Binding Path=Props.Estr,
+            <ComboBox MinWidth="150" Margin="0,0,5,0" 
+                      ItemsSource="{Binding Source={mLib:EnumBindingSource {x:Type mLib:PhModels}}}"
+                      SelectedValue="{Binding Path=Props.PhMod,
+                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <lcl:lblTxTbox LabelTxt="E, Pa:" BoxTxt="{Binding Path=Props.Estr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-            <lcl:lblTxTbox LabelTxt="ro:" BoxTxt="{Binding Path=Props.rostr,
+            <lcl:lblTxTbox LabelTxt="ro, kg/m3:" BoxTxt="{Binding Path=Props.rostr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-            <lcl:lblTxTbox LabelTxt="L:" BoxTxt="{Binding Path=Props.Lstr,
+            <lcl:lblTxTbox LabelTxt="L, m:" BoxTxt="{Binding Path=Props.Lstr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
             <lcl:lblTxTbox LabelTxt="nodes:" BoxTxt="{Binding Path=Props.nodesstr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-            <lcl:lblTxTbox LabelTxt="D:" BoxTxt="{Binding Path=Props.Dstr,
+            <lcl:lblTxTbox LabelTxt="D, m:" BoxTxt="{Binding Path=Props.Dstr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
             <lcl:lblTxTbox LabelTxt="Count:" BoxTxt="{Binding Path=Props.Countstr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-            <lcl:lblTxTbox LabelTxt="dt:" BoxTxt="{Binding Path=Props.dtstr,
+            <lcl:lblTxTbox LabelTxt="dt, s:" BoxTxt="{Binding Path=Props.dtstr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-            <lcl:lblTxTbox LabelTxt="Initial drop" BoxTxt="{Binding Path=Props.initDropstr,
+            <lcl:lblTxTbox LabelTxt="Initial drop, m" BoxTxt="{Binding Path=Props.initDropstr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-            <lcl:lblTxTbox LabelTxt="Max U" BoxTxt="{Binding Path=Props.MaxUstr,
+            <lcl:lblTxTbox LabelTxt="Max U, m" BoxTxt="{Binding Path=Props.MaxUstr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
             <lcl:lblTxTbox LabelTxt="DampRatio" BoxTxt="{Binding Path=Props.DampRatiostr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
@@ -41,9 +55,8 @@
                 <ComboBoxItem Content="Force" />
             </ComboBox>
         </StackPanel>
-        <Button DockPanel.Dock="Bottom" Content="Compute" Command="{Binding Compute}" Margin="5" />
         <Slider DockPanel.Dock="Bottom" Height="22" Margin="5" Value="{Binding CurrT, Mode=TwoWay}"
-                Maximum="{Binding EndT}" 
+                Maximum="{Binding Path=Props.EndT}" 
                 Minimum="0" AutoToolTipPlacement="TopLeft" LargeChange="10" SmallChange="1"/>
         <Grid Margin="5">
             <Grid.ColumnDefinitions>

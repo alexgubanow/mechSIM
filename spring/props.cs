@@ -1,8 +1,9 @@
 ﻿using mechLIB;
+using Prism.Mvvm;
 
 namespace spring
 {
-    public class props
+    public class props : BindableBase
     {
         public props()
         {
@@ -12,18 +13,19 @@ namespace spring
             store.ro = 1040;
             store.Counts = 20000;
             EndT = store.Counts - 1;
-            store.dt = 1E-6f;
+            store.dt = 5E-6f;
             store.nodes = 9;
-            store.initDrop = 1f;
+            store.initDrop = 1E-08f;
             store.MaxU = 2E-3f;
-            store.DampRatio = 0.01f;
+            store.DampRatio = 0.4f;
         }
         public props_t store;
+        public PhModels PhMod { get => store.phMod; set => store.phMod = value; }
         private int _EndT;
         public int EndT
         {
             get => _EndT; 
-            set => _EndT = value;
+            set => SetProperty(ref _EndT, value);
         }
         public string DampRatiostr
         {

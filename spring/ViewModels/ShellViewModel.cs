@@ -1,19 +1,40 @@
 ﻿using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using System.Windows;
 
 namespace spring.ViewModels
 {
     public class ShellViewModel : BindableBase
     {
+        readonly System.Windows.Media.Effects.BlurEffect objBlur = new System.Windows.Media.Effects.BlurEffect
+        {
+            Radius = 4
+        };
+
+        private Visibility _overlayrect_Visibility;
+        public Visibility overlayrect_Visibility { get => _overlayrect_Visibility; set => SetProperty(ref _overlayrect_Visibility, value); }
+        private Visibility _overlayring_Visibility;
+        public Visibility overlayring_Visibility { get => _overlayring_Visibility; set => SetProperty(ref _overlayring_Visibility, value); }
+        private System.Windows.Media.Effects.BlurEffect _win_Effect;
+        public System.Windows.Media.Effects.BlurEffect win_Effect { get => _win_Effect; set => SetProperty(ref _win_Effect, value); }
+
         private IEventAggregator _ea;
         public ShellViewModel(IEventAggregator ea)
         {
             _ea = ea;
-            Title = "Spring sim";
+            Title = "Rope sim";
             //MeasuringStartedEvent
-            //StartStopButtonText = "Start";
-            //_ea.GetEvent<MeasuringStartedEvent>().Subscribe((status) => StartStopButtonText = status ? "Stop" : "Start");
+            IsRuninng = false;
+            RunBtnTxt = "Run";
+            win_Effect = null;
+            overlayrect_Visibility = Visibility.Collapsed;
+            overlayring_Visibility = Visibility.Collapsed;
+            _ea.GetEvent<ComputeEvent>().Subscribe((var) => RunBtnTxt = var ? "Stop" : "Run");
+            _ea.GetEvent<ComputeEvent>().Subscribe((var) => ApplyEffect(var));
+            _ea.GetEvent<GotResultsEvent>().Subscribe(() => ApplyEffect(false));
+            _ea.GetEvent<GotResultsEvent>().Subscribe(() => IsRuninng = false);
+            _ea.GetEvent<GotResultsEvent>().Subscribe(() => RunBtnTxt = "Run");
             //_ea.GetEvent<BissConnectionEvent>().Subscribe((status) => ConStatText = status ? "Connected" : "Disconnected");
             //_ea.GetEvent<AdapterChangedEvent>().Subscribe((val) => AdapterT= val);
             //_ea.GetEvent<StatusChangedEvent>().Subscribe((val) => StatusT= val);
@@ -27,10 +48,35 @@ namespace spring.ViewModels
             //Usb = new BissFunc(ea);
             //_ea.GetEvent<BissConnReqEvent>().Publish(false);
         }
+        private bool _isRunning;
 
+        public bool IsRuninng
+        {
+            get => _isRunning;
+            set => SetProperty(ref _isRunning, value);
+        }
+        private DelegateCommand _Compute;
+        public DelegateCommand Compute => _Compute ?? (_Compute = new DelegateCommand(() => { IsRuninng = !IsRuninng; _ea.GetEvent<ComputeEvent>().Publish(IsRuninng); }));
+        //RunBtnTxt
+        private string _RunBtnTxt;
+        public string RunBtnTxt { get => _RunBtnTxt; set => SetProperty(ref _RunBtnTxt, value); }
         private string _title;
         public string Title { get => _title; set => SetProperty(ref _title, value); }
-
+        private void ApplyEffect(bool IsRuninng)
+        {
+            if (IsRuninng)
+            {
+                overlayrect_Visibility = Visibility.Visible;
+                overlayring_Visibility = Visibility.Visible;
+                win_Effect = objBlur;
+            }
+            else
+            {
+                win_Effect = null;
+                overlayrect_Visibility = Visibility.Collapsed;
+                overlayring_Visibility = Visibility.Collapsed;
+            }
+        }
         //private string _adapterT;
         //public string AdapterT{ get => _adapterT; set => SetProperty(ref _adapterT, value); }
 

@@ -8,6 +8,7 @@ namespace mechLIB
 {
     public class maf
     {
+        public const float _g = -9.80666f;
         public const float hlf = 1f / 2f;
         public const float sxt = 1f / 6f;
         public const float pi = (float)Math.PI;
@@ -41,6 +42,18 @@ namespace mechLIB
         public static float atan(float value)
         {
             return (float)Math.Atan(value);
+        }
+        public static void Linip(float[] y, int ratio, ref float[] yd)
+        {
+            for (int i = 0; i < y.Length -1; i++)
+            {
+                int start = i * ratio;
+                yd[start] = y[i];
+                for (int j = 1; j < ratio; j++)
+                {
+                    yd[start + j] = yd[start + j - 1] + (y[i + 1] - y[i]) / ratio;
+                }
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using HelixToolkit.Wpf;
 using mechLIB;
+using Microsoft.Win32;
 using OxyPlot;
 using OxyPlot.Series;
 using Prism.Commands;
@@ -8,6 +9,7 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -26,18 +28,14 @@ namespace spring.ViewModels
     public class MainViewModel : BindableBase
     {
         private readonly IEventAggregator _ea;
-
-        public float[] time;
-        private Rope_t model;
         public props Props { get; set; }
-        private int _EndT;
-        public int EndT { get => _EndT; set { _EndT = value; } }
+        private Enviro world;
 
         private int _CurrT;
         public int CurrT { get => _CurrT; set { _CurrT = value; Draw3d(value, SelDeriv); } }
 
         private int selDeriv;
-        public int SelDeriv { get => selDeriv; set { selDeriv = value; if (model != null) { DrawPoints(value); } } }
+        public int SelDeriv { get => selDeriv; set { selDeriv = value; if (world != null) { DrawPoints(value); } } }
 
         public Point3DCollection RopeCoords { get; set; }
         public ObservableCollection<Visual3D> Objs3d { get; set; }
@@ -46,11 +44,11 @@ namespace spring.ViewModels
         public PlotModel awePlotModelY { get; set; }
         public PlotModel awePlotModelZ { get; set; }
 
+        Thread thrsim;
         public MainViewModel(IEventAggregator ea)
         {
             _ea = ea;
             Props = new props();
-            EndT = Props.store.Counts - 1;
             selDeriv = 0;
             _CurrT = 0;
             Objs3d = new ObservableCollection<Visual3D>();
@@ -60,128 +58,44 @@ namespace spring.ViewModels
             awePlotModelX.InvalidatePlot(true);
             awePlotModelY.InvalidatePlot(true);
             awePlotModelZ.InvalidatePlot(true);
-            //_ea.GetEvent<GotResultsEvent>().Subscribe(() => ShowResults());
-            //_ea.GetEvent<ClearPlotsEvent>().Subscribe(() => ClearPlot());
-            _ea.GetEvent<ComputeEvent>().Subscribe(() => Compute_Click());
+            _ea.GetEvent<GotResultsEvent>().Subscribe(() => thrsim = null);
+            _ea.GetEvent<GotResultsEvent>().Subscribe(() => ShowResults(SelDeriv));
+            _ea.GetEvent<ComputeEvent>().Subscribe((var) => Compute_Click(var));
+            _ea.GetEvent<ClearPlotsEvent>().Subscribe(() => ClearDataView());
             //Load3dEvent
             //_ea.GetEvent<Load3dEvent>().Subscribe(() => Load3d());
         }
 
-        private DelegateCommand _Compute;
-
-        public DelegateCommand Compute => _Compute ?? (_Compute = new DelegateCommand(() => _ea.GetEvent<ComputeEvent>().Publish()));
-
-        private float[] getT(float dt, int Counts)
+        private void Compute_Click(bool IsRunning)
         {
-            float[] tCounts = new float[Counts];
-            for (int i = 1; i < Counts; i++)
+            if (IsRunning && thrsim == null)
             {
-                tCounts[i] = tCounts[i - 1] + dt;
+                _ea.GetEvent<ClearPlotsEvent>().Publish();
+                world = new Enviro();
+                thrsim = new Thread(delegate ()
+                { Simulate(); });
+                thrsim.Start();
             }
-            return tCounts;
-        }
 
-        private void getLoad(C_t axis, ref Rope_t model)
-        {
-            float A = (float)Math.PI * (float)Math.Pow(Props.store.D, 2) / 4;
-            float maxLoad = ((Props.store.E * A) / Props.store.L / Props.store.nodes) * Props.store.MaxU;
-            float freq = 1 / (Props.store.Counts * Props.store.dt);
-            for (int t = 0; t < Props.store.Counts; t++)
+            else
             {
-                model.Nodes[0].F[t].x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
-                //model.Nodes[0].deriv[t].p.z = model.Nodes[0].deriv[0].p.z;
-                //model.Nodes[0].deriv[t].p.y = model.Nodes[0].deriv[0].p.y;
-                //model.Nodes[0].deriv[t].p.x = 0 - ((time[t] + time[1]) * Props.store.MaxU);
-                //model.Nodes[0].deriv[t].v.x = (model.Nodes[0].deriv[t].p.x - (0 - (time[t] * Props.store.MaxU))) / time[1];
-                int lastN = Props.store.nodes - 1;
-                model.Nodes[lastN].deriv[t].p.z = model.Nodes[lastN].deriv[0].p.z;
-                model.Nodes[lastN].deriv[t].p.y = model.Nodes[lastN].deriv[0].p.y;
-                model.Nodes[lastN].deriv[t].p.x = model.Nodes[lastN].deriv[0].p.x;
-                //model.Nodes[lastN].F[t].x = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
-                //model.Nodes[lastN].deriv[t].p.x =  ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad) + model.Nodes[lastN].deriv[0].p.x;
+                thrsim.Abort();
+                thrsim = null;
+                world = null;
+
             }
         }
 
-        private async void Compute_Click()
+        private void Simulate()
         {
-            //model = null;
-            //_ea.GetEvent<ClearPlotsEvent>().Publish();
-            time = getT(Props.store.dt, Props.store.Counts);
-
-            CurrT = 100;
-            #region load file
-
-            //OpenFileDialog openFileDialog = new OpenFileDialog();
-            //if (openFileDialog.ShowDialog() == true)
-            //{
-            //    string fileName = openFileDialog.FileName;
-            //    // deserialize JSON directly from a file
-            //    using (StreamReader file = File.OpenText(fileName))
-            //    {
-            //        JsonSerializer serializer = new JsonSerializer();
-            //        Load ld = (Load)serializer.Deserialize(file, typeof(Load));
-            //        load = new float[nodeCount][][];
-            //        load[nodeCount - 1] = new float[Counts][];
-            //        for (int i = 0; i < Counts; i++)
-            //        {
-            //            load[nodeCount - 1][i] = new float[3];
-            //            load[nodeCount - 1][i][0] = ld.x[i];
-            //            load[nodeCount - 1][i][1] = ld.y[i];
-            //        }
-            //    }
-            //    ////txtOutput.Text = txtOutput.Text + "Attempting to read the file '" + fileName + "'...";
-            //    //try
-            //    //{
-            //    //}
-            //    //catch (Exception)
-            //    //{
-            //    //    throw new Exception();
-            //    //    //txtOutput.Text = txtOutput.Text + "Invalid MAT-file!\n";
-            //    //    //MessageBox.Show("Invalid binary MAT-file! Please select a valid binary MAT-file.",
-            //    //    //    "Invalid MAT-file", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            //    //}
-            //}
-
-            #endregion load file
-
-            model = new Rope_t(Props.store);
-            float A = (float)Math.PI * (float)Math.Pow(Props.store.D, 2) / 4;
-            float maxLoad = ((Props.store.E * A) / Props.store.L / Props.store.nodes) * Props.store.MaxU;
-            foreach (var elem in model.Elements)
-            {
-                elem.CalcMass(ref model, Props.store.ro);
-            }
-            foreach (var node in model.Nodes)
-            {
-                node.CalcMass(ref model, maxLoad);
-            }
-            //getLoad(C_t.x, ref model);
-            await Task.Run(Simulating);
+            string fileName = "";
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true) { fileName = openFileDialog.FileName; }
+            world.PrepRun(Props.store, fileName);
+            world.Run();
+            //ShowResults(SelDeriv);
+            _ea.GetEvent<GotResultsEvent>().Publish();
         }
-
-        private void Simulating()
-        {
-            float A = (float)Math.PI * (float)Math.Pow(Props.store.D, 2) / 4;
-            float maxLoad = ((Props.store.E * A) / Props.store.L / Props.store.nodes) * Props.store.MaxU;
-            for (int t = 1; t < time.Length; t++)
-            {
-                foreach (var elem in model.Elements)
-                {
-                    elem.CalcForce(ref model, t);
-                }
-                foreach (var node in model.Nodes)
-                {
-                    node.GetForces(ref model, t, maxLoad, time[t]);
-                    node.CalcAccel(ref model, t, maxLoad, time[t]);
-                    /*integrate*/
-                    node.Integrate(t, t - 1, Props.store.dt);
-                }
-            }
-            //_ea.GetEvent<GotResultsEvent>().Publish();
-            ShowResults(SelDeriv);
-            GC.Collect();
-        }
-
         private void ClearDataView()
         {
             CurrT = 0;
@@ -211,7 +125,7 @@ namespace spring.ViewModels
 
         private void ShowResults(int Deriv)
         {
-            if (model.Nodes != null)
+            if (world.rope.Nodes != null)
             {
                 DrawPoints(Deriv);
                 Draw3d(CurrT, Deriv);
@@ -223,21 +137,21 @@ namespace spring.ViewModels
             ClearDataView();
             if ((NodeLoad)Deriv == NodeLoad.f)
             {
-                foreach (var elem in model.Elements)
+                foreach (var elem in world.rope.Elements)
                 {
                     plotData("elem #" + elem.ID, elem.F);
                 }
-                foreach (var node in model.Nodes)
+                foreach (var node in world.rope.Nodes)
                 {
                     plotData("node #" + node.ID, node.F);
                 }
             }
             else
             {
-                foreach (var node in model.Nodes)
+                foreach (var node in world.rope.Nodes)
                 {
                     plotData("node #" + node.ID, ExtractArray(node.deriv, (N_t)Deriv));
-                    plotData("An node #" + node.ID, ExtractArray(node.derivAn, (N_t)Deriv));
+                    //plotData("An node #" + node.ID, ExtractArray(node.derivAn, (N_t)Deriv));
                 }
             }
         }
@@ -254,8 +168,8 @@ namespace spring.ViewModels
 
         private xyz_t[] ExtractArray(deriv_t[] derivs, N_t deriv)
         {
-            xyz_t[] tmp = new xyz_t[time.Length];
-            for (int t = 0; t < time.Length; t++)
+            xyz_t[] tmp = new xyz_t[world.time.Length];
+            for (int t = 0; t < world.time.Length; t++)
             {
                 tmp[t] = derivs[t].GetByN(deriv);
             }
@@ -272,17 +186,17 @@ namespace spring.ViewModels
                 step = Y.Length / maxPlotPx;
             }
 
-            List<DataPoint> data = getDataPointList(time, Y, C_t.x, step);
+            List<DataPoint> data = getDataPointList(world.time, Y, C_t.x, step);
             LineSeries aweLineSeries = new LineSeries { Title = title };
             aweLineSeries.Points.AddRange(data);
             awePlotModelX.Series.Add(aweLineSeries);
             awePlotModelX.InvalidatePlot(true);
-            data = getDataPointList(time, Y, C_t.y, step);
+            data = getDataPointList(world.time, Y, C_t.y, step);
             aweLineSeries = new LineSeries { Title = title };
             aweLineSeries.Points.AddRange(data);
             awePlotModelY.Series.Add(aweLineSeries);
             awePlotModelY.InvalidatePlot(true);
-            data = getDataPointList(time, Y, C_t.z, step);
+            data = getDataPointList(world.time, Y, C_t.z, step);
             aweLineSeries = new LineSeries { Title = title };
             aweLineSeries.Points.AddRange(data);
             awePlotModelZ.Series.Add(aweLineSeries);
@@ -291,7 +205,7 @@ namespace spring.ViewModels
 
         private void Draw3d(int t, int Deriv)
         {
-            if (model == null)
+            if (world == null)
             {
                 return;
             }
@@ -301,38 +215,38 @@ namespace spring.ViewModels
                 Load3d();
                 Objs3d.Add(new CubeVisual3D
                 {
-                    Center = new Point3D(model.Nodes[0].deriv[t].p.x * 10E2,
-                                         model.Nodes[0].deriv[t].p.z * 10E2,
-                                         model.Nodes[0].deriv[t].p.y * 10E2),
+                    Center = new Point3D(world.rope.Nodes[0].deriv[t].p.x * 10E2,
+                                         world.rope.Nodes[0].deriv[t].p.z * 10E2,
+                                         world.rope.Nodes[0].deriv[t].p.y * 10E2),
                     SideLength = .8,
                     Fill = Brushes.Gray
                 });
                 Objs3d.Add(new CubeVisual3D
                 {
-                    Center = new Point3D(model.Nodes[model.Nodes.Length - 1].deriv[t].p.x * 10E2,
-                                         model.Nodes[model.Nodes.Length - 1].deriv[t].p.z * 10E2,
-                                         model.Nodes[model.Nodes.Length - 1].deriv[t].p.y * 10E2),
+                    Center = new Point3D(world.rope.Nodes[world.rope.Nodes.Length - 1].deriv[t].p.x * 10E2,
+                                         world.rope.Nodes[world.rope.Nodes.Length - 1].deriv[t].p.z * 10E2,
+                                         world.rope.Nodes[world.rope.Nodes.Length - 1].deriv[t].p.y * 10E2),
                     SideLength = .8,
                     Fill = Brushes.Gray
                 });
-                for (int node = 0; node < model.Nodes.Length - 1; node++)
+                for (int node = 0; node < world.rope.Nodes.Length - 1; node++)
                 {
                     Objs3d.Add(new LinesVisual3D
                     {
-                        Points = { new Point3D(model.Nodes[node].deriv[t].p.x * 10E2,
-                                                model.Nodes[node].deriv[t].p.z * 10E2,
-                                                model.Nodes[node].deriv[t].p.y * 10E2),
-                            new Point3D(model.Nodes[node + 1].deriv[t].p.x * 10E2,
-                                        model.Nodes[node + 1].deriv[t].p.z * 10E2,
-                                        model.Nodes[node + 1].deriv[t].p.y * 10E2) },
+                        Points = { new Point3D(world.rope.Nodes[node].deriv[t].p.x * 10E2,
+                                                world.rope.Nodes[node].deriv[t].p.z * 10E2,
+                                                world.rope.Nodes[node].deriv[t].p.y * 10E2),
+                            new Point3D(world.rope.Nodes[node + 1].deriv[t].p.x * 10E2,
+                                        world.rope.Nodes[node + 1].deriv[t].p.z * 10E2,
+                                        world.rope.Nodes[node + 1].deriv[t].p.y * 10E2) },
                         Thickness = 2,
                         Color = Brushes.Blue.Color
                     });
                     Objs3d.Add(new SphereVisual3D
                     {
-                        Center = new Point3D(model.Nodes[node].deriv[t].p.x * 10E2,
-                                            model.Nodes[node].deriv[t].p.z * 10E2,
-                                            model.Nodes[node].deriv[t].p.y * 10E2),
+                        Center = new Point3D(world.rope.Nodes[node].deriv[t].p.x * 10E2,
+                                            world.rope.Nodes[node].deriv[t].p.z * 10E2,
+                                            world.rope.Nodes[node].deriv[t].p.y * 10E2),
                         Radius = .3,
                         Fill = Brushes.Black
                     });
