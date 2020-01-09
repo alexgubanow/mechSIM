@@ -45,8 +45,10 @@ namespace mechLIB
             float[] plx = (mfr.Content["plxq"] as MLSingle).GetArray()[0];
             float[] pmy = (mfr.Content["pmyq"] as MLSingle).GetArray()[0];
             float[] ply = (mfr.Content["plyq"] as MLSingle).GetArray()[0];
-
-            rope = new Rope_t(phProps);
+            xyz_t startCoord = new xyz_t() { x= pmx[0], y = pmy[0] };
+            xyz_t endCoord = new xyz_t() { x = plx[0], y = ply[0] };
+            phProps.L = crds.GetTotL(startCoord, endCoord);
+            rope = new Rope_t(phProps, startCoord, endCoord);
             //fill load to rope
             Re = new float[phProps.Counts];
             bloodV = new float[phProps.Counts];
@@ -56,12 +58,12 @@ namespace mechLIB
                 Re[t] = 0;
                 bloodV[t] = 0;
                 bloodP[t] = 0;
-                rope.Nodes[0].deriv[t].p.x = rope.Nodes[0].deriv[0].p.x + pmx[t];
-                rope.Nodes[0].deriv[t].p.y = rope.Nodes[0].deriv[0].p.y + pmy[t];
+                rope.Nodes[0].deriv[t].p.x = pmx[t];
+                rope.Nodes[0].deriv[t].p.y = pmy[t];
 
                 int lastN = phProps.nodes - 1;
-                rope.Nodes[lastN].deriv[t].p.x = rope.Nodes[lastN].deriv[0].p.x + plx[t];
-                rope.Nodes[lastN].deriv[t].p.y = rope.Nodes[lastN].deriv[0].p.y + ply[t];
+                rope.Nodes[lastN].deriv[t].p.x = plx[t];
+                rope.Nodes[lastN].deriv[t].p.y = ply[t];
             }
             //choose load nodes
             rope.Nodes[0].LoadType = NodeLoad.p;

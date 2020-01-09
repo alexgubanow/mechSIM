@@ -135,7 +135,7 @@ namespace mechLIB
         {
             xyz_t lamda = new xyz_t
             {
-                x = deltaL.x / (oldL + 1)
+                x = (deltaL.x / oldL) + 1
             };
             const float C10 = 22956961.3f;
             const float C01 = -23512872.8f;
