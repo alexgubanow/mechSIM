@@ -50,14 +50,11 @@ namespace mechLIB
             phProps.L = crds.GetTotL(startCoord, endCoord);
             rope = new Rope_t(phProps, startCoord, endCoord);
             //fill load to rope
-            Re = new float[phProps.Counts];
-            bloodV = new float[phProps.Counts];
+            Re = (mfr.Content["req"] as MLSingle).GetArray()[0];
+            bloodV = (mfr.Content["bloodVq"] as MLSingle).GetArray()[0];
             bloodP = new float[phProps.Counts];
             for (int t = 0; t < phProps.Counts; t++)
             {
-                Re[t] = 0;
-                bloodV[t] = 0;
-                bloodP[t] = 0;
                 rope.Nodes[0].deriv[t].p.x = pmx[t];
                 rope.Nodes[0].deriv[t].p.y = pmy[t];
 
