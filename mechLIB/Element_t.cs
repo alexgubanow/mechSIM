@@ -144,8 +144,8 @@ namespace mechLIB
         }
         private void GetPressureForce(int t, float bloodP, float L)
         {
-            float Fpress = 0 - bloodP * A * 2 * L;
-            F[t].Plus(Fpress);
+            //float Fpress = bloodP * radiusPoint.z * 2 * L;
+            F[t].y = -1E-05f;
         }
         private void GetDragForce(int t, float Re, float v, float L)
         {
