@@ -8,11 +8,32 @@ t_re = [0	0.036956914	0.073553272	0.110329908	0.147286822	0.184424013	0.22102037
 re = [0	-1808.466913	-2959.309494	-3863.542951	-4655.980271	-5652.281134	-6191.533087	-5211.672832	-3827.373613	-2226.058364	-752.9798603	-82.20304151	-509.6588574	-2449.650637	-4248.253185	0	4116.728319	7145.088368	7352.240033	6819.564324	6083.025072	5073.571722	4455.40485	3321.002877	0	0	0	0];
 bloodV = [0	-0.184956843	-0.30620633	-0.399095767	-0.480065762	-0.583641595	-0.642416769	-0.537607891	-0.397451706	-0.230168516	-0.071927661	-0.006165228	-0.047266749	-0.246609125	-0.450061652	0	0.468557337	0.819975339	0.844636252	0.78298397	0.696670777	0.581586519	0.509658857	0.384299219	0	0	0	0];
 dt = 5E-06;
-tq = single(0:dt:t(end));
-pmxq = single(makima(t,pmx,tq));
-pmyq = single(makima(t,pmy,tq));
-plxq = single(makima(t,plx,tq));
-plyq = single(makima(t,ply,tq));
-req = single(makima(t_re,re,tq));
-bloodVq = single(makima(t_re,bloodV,tq));
-save('interpLoadOriginal','tq','pmxq','pmyq','plxq','plyq','req','bloodVq');
+ti = single(0:dt:t(end));
+pmxi = single(makima(t,pmx,ti));
+pmyi = single(makima(t,pmy,ti));
+plxi = single(makima(t,plx,ti));
+plyi = single(makima(t,ply,ti));
+rei = single(makima(t_re,re,ti));
+bloodVi = single(makima(t_re,bloodV,ti));
+
+[signal, Fs, tm] = rdsamp('mghdb/mgh064');
+abp1 = signal(310000:311000,4);
+abp = abp1(257:732);
+t_abp1 = tm(310000:311000);
+t_abp = t_abp1(257:732);
+t_abp = t_abp-t_abp(1);
+abp = abp * 133.322;
+abpi = single(makima(t_abp,abp,ti));
+plot(ti, abpq);
+yyaxis right
+plot(ti,bloodVi);
+
+tq = single(0:dt:t(end)*2);
+pmxq = [pmxi pmxi];
+pmyq = [pmyi pmyi];
+plxq = [plxi plxi];
+plyq = [plyi plyi];
+req = [rei rei];
+bloodVq = [bloodVi bloodVi];
+abpq = [abpi abpi];
+save('interpLoadOriginal2','tq','pmxq','pmyq','plxq','plyq','req','bloodVq','abpq');

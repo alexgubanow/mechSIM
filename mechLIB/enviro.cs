@@ -52,7 +52,7 @@ namespace mechLIB
             //fill load to rope
             Re = (mfr.Content["req"] as MLSingle).GetArray()[0];
             bloodV = (mfr.Content["bloodVq"] as MLSingle).GetArray()[0];
-            bloodP = new float[phProps.Counts];
+            bloodP = (mfr.Content["abpq"] as MLSingle).GetArray()[0];
             for (int t = 0; t < phProps.Counts; t++)
             {
                 rope.Nodes[0].deriv[t].p.x = pmx[t];
