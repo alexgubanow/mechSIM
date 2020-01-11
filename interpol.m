@@ -1,4 +1,4 @@
-clear all;
+clear all; close all;
 t = [0 0.07	0.14	0.21	0.28	0.35	0.42	0.49	0.56	0.63	0.7	0.77	0.84	0.91	0.98];
 pmx = [0	0.000185	0.003601	0.004685	0.005782	0.006534	0.007581	0.007585	0.00758	0.006119333	0.002035333	-0.000129333	-0.001618	-0.001792	0];
 pmy =[0	0.002124	0.005641	0.006194	0.002261	0.001819	-0.002615	-0.004486	-0.005878	-0.008712667	-0.008942667	-0.008068	-0.007747333	-0.005382	0];
@@ -13,6 +13,26 @@ pmxi = single(makima(t,pmx,ti));
 pmyi = single(makima(t,pmy,ti));
 plxi = single(makima(t,plx,ti));
 plyi = single(makima(t,ply,ti));
+L = zeros(length(ti), 1);
+for i = 1:length(ti)
+    L(i) = sqrt((pmxi(i) - plxi(i))^2 + (pmyi(i) - plyi(i))^2);
+end
+minLidx = 1;
+for i = 2:length(ti)
+    if L(minLidx) > L(i)
+        minLidx = i;
+    end
+end
+hold on
+%plot(ti, L);
+%Lsh = circshift(L,length(ti) - minLidx);
+%plot(ti, Lsh);
+
+pmxi = circshift(pmxi,length(ti) - minLidx);
+pmyi = circshift(pmyi,length(ti) - minLidx);
+plxi = circshift(plxi,length(ti) - minLidx);
+plyi = circshift(plyi,length(ti) - minLidx);
+
 rei = single(makima(t_re,re,ti));
 bloodVi = single(makima(t_re,bloodV,ti));
 
@@ -24,9 +44,9 @@ t_abp = t_abp1(257:732);
 t_abp = t_abp-t_abp(1);
 abp = abp * 133.322;
 abpi = single(makima(t_abp,abp,ti));
-plot(ti, abpq);
-yyaxis right
-plot(ti,bloodVi);
+%plot(ti, abpi);
+%yyaxis right
+%plot(ti,bloodVi);
 
 tq = single(0:dt:t(end)*2);
 pmxq = [pmxi pmxi];
