@@ -28,10 +28,10 @@ hold on
 %Lsh = circshift(L,length(ti) - minLidx);
 %plot(ti, Lsh);
 
-pmxi = circshift(pmxi,length(ti) - minLidx);
-pmyi = circshift(pmyi,length(ti) - minLidx);
-plxi = circshift(plxi,length(ti) - minLidx);
-plyi = circshift(plyi,length(ti) - minLidx);
+% pmxi = circshift(pmxi,length(ti) - minLidx);
+% pmyi = circshift(pmyi,length(ti) - minLidx);
+% plxi = circshift(plxi,length(ti) - minLidx);
+% plyi = circshift(plyi,length(ti) - minLidx);
 
 rei = single(makima(t_re,re,ti));
 bloodVi = single(makima(t_re,bloodV,ti));
@@ -48,12 +48,36 @@ abpi = single(makima(t_abp,abp,ti));
 %yyaxis right
 %plot(ti,bloodVi);
 
-tq = single(0:dt:t(end)*2);
-pmxq = [pmxi pmxi];
-pmyq = [pmyi pmyi];
-plxq = [plxi plxi];
-plyq = [plyi plyi];
-req = [rei rei];
-bloodVq = [bloodVi bloodVi];
-abpq = [abpi abpi];
-save('interpLoadOriginal2','tq','pmxq','pmyq','plxq','plyq','req','bloodVq','abpq');
+% tq = single(zeros(3, 1));
+% tq(1) = single(0);
+% for i = 2:3
+% tq(i) = single(tq(i - 1) + dt);
+% end
+% pmxq = pmxi(1:3);
+% pmyq = pmyi(1:3);
+% plxq = plxi(1:3);
+% plyq = plyi(1:3);
+% req = rei(1:3);
+% bloodVq = bloodVi(1:3);
+% abpq = abpi(1:3);
+% save('interpLoadOriginalCrop','tq','pmxq','pmyq','plxq','plyq','req','bloodVq','abpq');
+
+tq = ti;
+pmxq = pmxi;
+pmyq = pmyi;
+plxq = plxi;
+plyq = plyi;
+req = rei;
+bloodVq = bloodVi;
+abpq = abpi;
+save('interpLoadOriginal','tq','pmxq','pmyq','plxq','plyq','req','bloodVq','abpq');
+
+% tq = single(0:dt:t(end)*2);
+% pmxq = [pmxi pmxi];
+% pmyq = [pmyi pmyi];
+% plxq = [plxi plxi];
+% plyq = [plyi plyi];
+% req = [rei rei];
+% bloodVq = [bloodVi bloodVi];
+% abpq = [abpi abpi];
+% save('interpLoadOriginal2','tq','pmxq','pmyq','plxq','plyq','req','bloodVq','abpq');

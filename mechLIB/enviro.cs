@@ -107,38 +107,14 @@ namespace mechLIB
         }
         public void Run()
         {
-            //float A = (float)Math.PI * (float)Math.Pow(phProps.D, 2) / 4;
-            //float maxLoad = ((phProps.E * A) / phProps.L / phProps.nodes) * phProps.MaxU;
             for (int t = 1; t < time.Length; t++)
             {
-                Parallel.ForEach(rope.Elements, (elem, loopState) =>
+                rope.StepOverElems(t, Re[t - 1], bloodV[t - 1], bloodP[t - 1]);
+                rope.StepOverNodes(t, Re[t - 1], phProps.dt);
+                foreach (var elem in rope.Elements)
                 {
-                    elem.CalcForce(ref rope, t, Re[t - 1], bloodV[t - 1], bloodP[t - 1]);
-                });
-                Parallel.ForEach(rope.Nodes, (node, loopState) =>
-                {
-                    float m = 0;
-                    float c = 0;
-                    node.GetPhysicParam(ref rope, t - 1, Re[t - 1], ref m, ref c);
-                    node.GetForces(ref rope, t, m, c);
-                    node.CalcAccel(t, m);
-                    /*integrate*/
-                    node.Integrate(t, t - 1, phProps.dt);
-                });
-                //foreach (var elem in rope.Elements)
-                //{
-                //    elem.CalcForce(ref rope, t, Re[t - 1], bloodV[t - 1], bloodP[t - 1]);
-                //}
-                //foreach (var node in rope.Nodes)
-                //{
-                //    float m = 0;
-                //    float c = 0;
-                //    node.GetPhysicParam(ref rope, t - 1, Re[t - 1], ref m, ref c);
-                //    node.GetForces(ref rope, t, m, c);
-                //    node.CalcAccel(t, m);
-                //    /*integrate*/
-                //    node.Integrate(t, t - 1, phProps.dt);
-                //}
+                    rope.L[t] += elem.L[t];
+                }
             }
             GC.Collect();
         }

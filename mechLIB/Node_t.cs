@@ -43,7 +43,7 @@ namespace mechLIB
             }
 
         }
-        public void GetForces(ref Rope_t model, int t, float m, float c)
+        public void GetForces(Rope_t model, int t, float m, float c)
         {
             //xyz_t Fg = new xyz_t();
             //Fg.y = m * maf._g;
@@ -69,13 +69,13 @@ namespace mechLIB
                 F[t].Plus(gFn);
             }
         }
-        public void GetPhysicParam(ref Rope_t rope, int t, float Re, ref float m, ref float c)
+        public void GetPhysicParam(Rope_t rope, int t, float Re, ref float m, ref float c)
         {
             foreach (var neigNode in Neigs)
             {
                 float mElem = 0;
                 float cElem = 0;
-                rope.GetElemRef(ID, neigNode).GetPhysicParam(ref rope, t, Re, ref mElem, ref cElem);
+                rope.GetElemRef(ID, neigNode).GetPhysicParam(rope, t, Re, ref mElem, ref cElem);
                 c += cElem;
                 m += mElem;
             }

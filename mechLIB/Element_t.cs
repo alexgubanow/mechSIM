@@ -15,11 +15,13 @@ namespace mechLIB
         public int n1;
         public int n2;
         public int ID;
+        public float[] L;
         public xyz_t[] F;
         public xyz_t radiusPoint;
         private readonly PhModels phMod;
         public Element_t(int _n1, int _n2, xyz_t _radiusPoint, int Counts, int _ID, props_t props)
         {
+            L = new float[props.Counts];
             phMod = props.phMod;
             ro = props.ro;
             DampRatio = props.DampRatio;
@@ -37,20 +39,20 @@ namespace mechLIB
             I = maf.P3(A) / 12.0f;
         }
         public bool IsMyNode(int id) => (n1 == id || n2 == id) ? true : false;
-        public void CalcForce(ref Rope_t rope, int t, float Re, float bloodV, float bloodP)
+        public void CalcForce(Rope_t rope, int t, float Re, float bloodV, float bloodP)
         {
             //getting length of link by measure between coords
-            float L = 0;
+            L[t] = 0;
             switch (phMod)
             {
                 case PhModels.hook:
-                    L = GetOwnLength(ref rope, 0);
+                    L[t] = GetOwnLength(rope, 0);
                     break;
                 case PhModels.hookGeomNon:
-                    L = GetOwnLength(ref rope, t - 1);
+                    L[t] = GetOwnLength(rope, t - 1);
                     break;
                 case PhModels.mooneyRiv:
-                    L = GetOwnLength(ref rope, t - 1);
+                    L[t] = GetOwnLength(rope, t - 1);
                     break;
                 default:
                     throw new Exception("unexpected behavior");
@@ -70,13 +72,13 @@ namespace mechLIB
             xyz_t deltaL = new xyz_t();
             //lBpUx.x - lNpUx.x
             deltaL.Minus(lBpUx, lNpUx);
-            GetFn(t, L, deltaL);
+            GetFn(t, L[t], deltaL);
             //GetPressureForce(t, bloodP, L);
             //GetDragForce(t, Re, bloodV, L);
         }
-        public void GetPhysicParam(ref Rope_t rope, int t, float Re, ref float m, ref float c)
+        public void GetPhysicParam(Rope_t rope, int t, float Re, ref float m, ref float c)
         {
-            float L = GetOwnLength(ref rope, t);
+            float L = GetOwnLength(rope, t);
             m += ro * A * L;
             if (Re > 0)
             {
@@ -95,7 +97,7 @@ namespace mechLIB
 
         }
 
-        private float GetOwnLength(ref Rope_t rope, int t)
+        private float GetOwnLength(Rope_t rope, int t)
         {
             float L = crds.GetTotL(rope.GetNodeRef(n1).deriv[t].p, rope.GetNodeRef(n2).deriv[t].p);
             if (L == 0)
@@ -145,7 +147,7 @@ namespace mechLIB
         private void GetPressureForce(int t, float bloodP, float L)
         {
             //float Fpress = bloodP * radiusPoint.z * 2 * L;
-            F[t].y = -1E-05f;
+            F[t].y = -1E-08f;
         }
         private void GetDragForce(int t, float Re, float v, float L)
         {
