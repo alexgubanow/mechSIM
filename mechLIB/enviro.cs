@@ -80,7 +80,7 @@ namespace mechLIB
             Re = new float[phProps.Counts];
             bloodV = new float[phProps.Counts];
             bloodP = new float[phProps.Counts];
-            float A = (float)Math.PI * (float)Math.Pow(phProps.D, 2) / 4;
+            float A = (float)Math.PI * maf.P2(phProps.D) / 4;
             float maxLoad = ((phProps.E * A) / phProps.L / phProps.nodes) * phProps.MaxU;
             float freq = 1 / (phProps.Counts * phProps.dt);
             rope.Nodes[0].LoadType = NodeLoad.p;

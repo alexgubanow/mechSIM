@@ -15,17 +15,17 @@ namespace mechLIB
 
         public static float P2(float value)
         {
-            return (float)Math.Pow(value, 2);
+            return value * value;
         }
 
         public static float P3(float value)
         {
-            return (float)Math.Pow(value, 3);
+            return value * value * value;
         }
 
         public static float P4(float value)
         {
-            return (float)Math.Pow(value, 4);
+            return value * value * value * value;
         }
         public static float sqrt(float value)
         {
