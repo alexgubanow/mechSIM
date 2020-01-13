@@ -18,9 +18,9 @@ LmooneyRivinterpLoadOriginal3 = LmooneyRivinterpLoadOriginal;
 clear('LmooneyRivinterpLoadOriginal');
 
 hold on;
-plot(ti, LhookinterpLoadOriginal3);
-plot(ti,LhookGeomNoninterpLoadOriginal3);
-plot(ti,LmooneyRivinterpLoadOriginal3);
+plot(ti, LhookinterpLoadOriginal3,'LineWidth',3);
+plot(ti,LhookGeomNoninterpLoadOriginal3,'LineWidth',3);
+plot(ti,LmooneyRivinterpLoadOriginal3,'LineWidth',3);
 legend('Linear Hook','Geometry Nonlin Hook',...
     'Mooney Rivlin','Location','northwest');
 
@@ -39,9 +39,9 @@ LmooneyRivinterpLoadOriginal9 = LmooneyRivinterpLoadOriginal;
 clear('LmooneyRivinterpLoadOriginal');
 
 hold on;
-plot(ti, LhookinterpLoadOriginal9);
-plot(ti,LhookGeomNoninterpLoadOriginal9);
-plot(ti,LmooneyRivinterpLoadOriginal9);
+plot(ti, LhookinterpLoadOriginal9,'LineWidth',3);
+plot(ti,LhookGeomNoninterpLoadOriginal9,'LineWidth',3);
+plot(ti,LmooneyRivinterpLoadOriginal9,'LineWidth',3);
 legend('Linear Hook','Geometry Nonlin Hook',...
     'Mooney Rivlin','Location','northwest');
 
@@ -60,9 +60,9 @@ LmooneyRivinterpLoadOriginal15 = LmooneyRivinterpLoadOriginal;
 clear('LmooneyRivinterpLoadOriginal');
 
 hold on;
-plot(ti, LhookinterpLoadOriginal15);
-plot(ti,LhookGeomNoninterpLoadOriginal15);
-plot(ti,LmooneyRivinterpLoadOriginal15);
+plot(ti, LhookinterpLoadOriginal15,'LineWidth',3);
+plot(ti,LhookGeomNoninterpLoadOriginal15,'LineWidth',3);
+plot(ti,LmooneyRivinterpLoadOriginal15,'LineWidth',3);
 legend('Linear Hook','Geometry Nonlin Hook',...
     'Mooney Rivlin','Location','northwest');
 
@@ -71,9 +71,9 @@ title('Compare all Linear Hook')
 xlabel('t, s')
 ylabel('L, m')
 hold on;
-plot(ti,LhookinterpLoadOriginal3);
-plot(ti,LhookinterpLoadOriginal9);
-plot(ti,LhookinterpLoadOriginal15);
+plot(ti,LhookinterpLoadOriginal3,'LineWidth',3);
+plot(ti,LhookinterpLoadOriginal9,'LineWidth',3);
+plot(ti,LhookinterpLoadOriginal15,'LineWidth',3);
 legend('2 elements','8 elements',...
     '14 elements','Location','northwest');
 
@@ -82,9 +82,9 @@ title('Compare all Geometry Nonlin Hook')
 xlabel('t, s')
 ylabel('L, m')
 hold on;
-plot(ti,LhookGeomNoninterpLoadOriginal3);
-plot(ti,LhookGeomNoninterpLoadOriginal9);
-plot(ti,LhookGeomNoninterpLoadOriginal15);
+plot(ti,LhookGeomNoninterpLoadOriginal3,'LineWidth',3);
+plot(ti,LhookGeomNoninterpLoadOriginal9,'LineWidth',3);
+plot(ti,LhookGeomNoninterpLoadOriginal15,'LineWidth',3);
 legend('2 elements','8 elements',...
     '14 elements','Location','northwest');
 
@@ -93,9 +93,9 @@ title('Compare all Mooney-Rivlin')
 xlabel('t, s')
 ylabel('L, m')
 hold on;
-plot(ti,LmooneyRivinterpLoadOriginal3);
-plot(ti,LmooneyRivinterpLoadOriginal9);
-plot(ti,LmooneyRivinterpLoadOriginal15);
+plot(ti,LmooneyRivinterpLoadOriginal3,'LineWidth',3);
+plot(ti,LmooneyRivinterpLoadOriginal9,'LineWidth',3);
+plot(ti,LmooneyRivinterpLoadOriginal15,'LineWidth',3);
 legend('2 elements','8 elements',...
     '14 elements','Location','northwest');
 

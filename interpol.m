@@ -13,6 +13,15 @@ pmxi = single(makima(t,pmx,ti));
 pmyi = single(makima(t,pmy,ti));
 plxi = single(makima(t,plx,ti));
 plyi = single(makima(t,ply,ti));
+
+figure('NumberTitle', 'off', 'Name','Endpoint movement');
+title('Endpoint movement')
+xlabel('t, s')
+ylabel('Coordinates, m')
+hold on;
+plot(pmxi, pmyi,'LineWidth',3);
+plot(plxi,plyi,'LineWidth',3);
+legend('Muscle','Leaflet');
 L = zeros(length(ti), 1);
 for i = 1:length(ti)
     L(i) = sqrt((pmxi(i) - plxi(i))^2 + (pmyi(i) - plyi(i))^2);
