@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,9 +46,9 @@ namespace mechLIB
             float[] plx = (mfr.Content["plxq"] as MLSingle).GetArray()[0];
             float[] pmy = (mfr.Content["pmyq"] as MLSingle).GetArray()[0];
             float[] ply = (mfr.Content["plyq"] as MLSingle).GetArray()[0];
-            xyz_t startCoord = new xyz_t() { x= pmx[0], y = pmy[0] };
-            xyz_t endCoord = new xyz_t() { x = plx[0], y = ply[0] };
-            phProps.L = crds.GetTotL(startCoord, endCoord);
+            Vector3 startCoord = new Vector3() { X= pmx[0], Y = pmy[0] };
+            Vector3 endCoord = new Vector3() { X = plx[0], Y = ply[0] };
+            phProps.L = Vector3.Distance(startCoord, endCoord);
             rope = new Rope_t(phProps, startCoord, endCoord);
             //fill load to rope
             Re = (mfr.Content["req"] as MLSingle).GetArray()[0];
@@ -55,12 +56,12 @@ namespace mechLIB
             bloodP = (mfr.Content["abpq"] as MLSingle).GetArray()[0];
             for (int t = 0; t < phProps.Counts; t++)
             {
-                rope.Nodes[0].deriv[t].p.x = pmx[t];
-                rope.Nodes[0].deriv[t].p.y = pmy[t];
+                rope.Nodes[0].deriv[t].p.X = pmx[t];
+                rope.Nodes[0].deriv[t].p.Y = pmy[t];
 
                 int lastN = phProps.nodes - 1;
-                rope.Nodes[lastN].deriv[t].p.x = plx[t];
-                rope.Nodes[lastN].deriv[t].p.y = ply[t];
+                rope.Nodes[lastN].deriv[t].p.X = plx[t];
+                rope.Nodes[lastN].deriv[t].p.Y = ply[t];
             }
             //choose load nodes
             rope.Nodes[0].LoadType = NodeLoad.p;

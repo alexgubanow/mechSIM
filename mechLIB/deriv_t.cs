@@ -1,4 +1,6 @@
-﻿namespace mechLIB
+﻿using System.Numerics;
+
+namespace mechLIB
 {
     public enum N_t
     {
@@ -20,24 +22,24 @@
     public class deriv_t
     {
         //coordinates
-        public xyz_t p;
+        public Vector3 p;
         //displacement
-        public xyz_t u;
+        public Vector3 u;
         //velocity
-        public xyz_t v;
+        public Vector3 v;
         //acceleration
-        public xyz_t a;
+        public Vector3 a;
         //jerk
-        public xyz_t b;
+        public Vector3 b;
         public deriv_t()
         {
-            p = new xyz_t();
-            u = new xyz_t();
-            v = new xyz_t();
-            a = new xyz_t();
-            b = new xyz_t();
+            p = new Vector3();
+            u = new Vector3();
+            v = new Vector3();
+            a = new Vector3();
+            b = new Vector3();
         }
-        public xyz_t GetByN(N_t N)
+        public Vector3 GetByN(N_t N)
         {
             switch (N)
             {
@@ -55,28 +57,28 @@
                     throw new System.Exception();
             }
         }
-        public void SetByN(N_t N, xyz_t val)
-        {
-            switch (N)
-            {
-                case N_t.p:
-                    p = val;
-                    break;
-                case N_t.u:
-                    u = val;
-                    break;
-                case N_t.v:
-                    v = val;
-                    break;
-                case N_t.a:
-                    a = val;
-                    break;
-                case N_t.b:
-                    b = val;
-                    break;
-                default:
-                    throw new System.Exception();
-            }
-        }
+        //public void SetByN(N_t N, xyz_t val)
+        //{
+        //    switch (N)
+        //    {
+        //        case N_t.p:
+        //            p = val;
+        //            break;
+        //        case N_t.u:
+        //            u = val;
+        //            break;
+        //        case N_t.v:
+        //            v = val;
+        //            break;
+        //        case N_t.a:
+        //            a = val;
+        //            break;
+        //        case N_t.b:
+        //            b = val;
+        //            break;
+        //        default:
+        //            throw new System.Exception();
+        //    }
+        //}
     }
 }

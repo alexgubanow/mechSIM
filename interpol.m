@@ -14,14 +14,14 @@ pmyi = single(makima(t,pmy,ti));
 plxi = single(makima(t,plx,ti));
 plyi = single(makima(t,ply,ti));
 
-figure('NumberTitle', 'off', 'Name','Endpoint movement');
-title('Endpoint movement')
-xlabel('t, s')
-ylabel('Coordinates, m')
-hold on;
-plot(pmxi, pmyi,'LineWidth',3);
-plot(plxi,plyi,'LineWidth',3);
-legend('Muscle','Leaflet');
+% figure('NumberTitle', 'off', 'Name','Endpoint movement');
+% title('Endpoint movement')
+% xlabel('t, s')
+% ylabel('Coordinates, m')
+% hold on;
+% plot(pmxi, pmyi,'LineWidth',3);
+% plot(plxi,plyi,'LineWidth',3);
+% legend('Muscle','Leaflet');
 L = zeros(length(ti), 1);
 for i = 1:length(ti)
     L(i) = sqrt((pmxi(i) - plxi(i))^2 + (pmyi(i) - plyi(i))^2);
@@ -32,10 +32,14 @@ for i = 2:length(ti)
         minLidx = i;
     end
 end
-hold on
-%plot(ti, L);
-%Lsh = circshift(L,length(ti) - minLidx);
-%plot(ti, Lsh);
+figure('NumberTitle', 'off', 'Name','Distance between endpoint over time');
+title('Distance between endpoint over time')
+xlabel('t, s')
+ylabel('Distance, m')
+hold on;
+plot(ti, L,'LineWidth',3);
+% Lsh = circshift(L,length(ti) - minLidx);
+%plot(ti, Lsh); 
 
 % pmxi = circshift(pmxi,length(ti) - minLidx);
 % pmyi = circshift(pmyi,length(ti) - minLidx);

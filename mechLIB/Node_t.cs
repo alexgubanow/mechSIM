@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 namespace mechLIB
 {
@@ -8,66 +9,69 @@ namespace mechLIB
         public NodeLoad LoadType;
         public deriv_t[] deriv;
         //public deriv_t[] derivAn;
-        public xyz_t[] F;
+        public Vector3[] F;
         public int[] Neigs;
         public int ID;
-        public xyz_t radiusPoint;
+        public Vector3 radiusPoint;
         //float w = 300;
         //float n = 1f;
 
-        public Node_t(int tCounts, xyz_t coords, xyz_t _radiusPoint, NodeFreedom _freedom, NodeLoad _LoadType, int _ID, int[] _Neigs)
+        public Node_t(int tCounts, Vector3 coords, Vector3 _radiusPoint, NodeFreedom _freedom, NodeLoad _LoadType, int _ID, int[] _Neigs)
         {
             ID = _ID;
             freedom = _freedom;
             LoadType = _LoadType;
             Neigs = _Neigs;
-            F = new xyz_t[tCounts];
+            F = new Vector3[tCounts];
             deriv = new deriv_t[tCounts];
             for (int i = 0; i < deriv.Length; i++)
             {
-                F[i] = new xyz_t();
+                F[i] = new Vector3();
                 deriv[i] = new deriv_t();
             }
             deriv[0].p = coords;
-            deriv[0].a = new xyz_t() { x = 0, y = maf._g, z = 0 };
-            deriv[0].v = new xyz_t() { x = 0, y = maf._g * 5E-06f, z = 0 };
+            deriv[0].a = new Vector3() { X = 0, Y = maf._g, Z = 0 };
+            deriv[0].v = new Vector3() { X = 0, Y = maf._g * 5E-06f, Z = 0 };
             radiusPoint = _radiusPoint;
         }
         public void CalcAccel(int t, float m)
         {
             if (LoadType == NodeLoad.none || LoadType == NodeLoad.f)
             {
-                deriv[t].a.x = F[t].x / m;
-                deriv[t].a.y = F[t].y / m;
-                deriv[t].a.z = F[t].z / m;//has to be different
+                deriv[t].a.X = F[t].X / m;
+                deriv[t].a.Y = F[t].Y / m;
+                //deriv[t].a.Z = F[t].Z / m;//has to be different
             }
 
         }
-        public void GetForces(Rope_t model, int t, float m, float c)
+        public void GetForces(Rope_t rope, int t, float m, float c)
         {
             //xyz_t Fg = new xyz_t();
             //Fg.y = m * maf._g;
             //F[t].Plus(Fg);
 
-            xyz_t Fd = new xyz_t();
-            Fd.x = 0 - (c * deriv[t - 1].v.x);
-            Fd.y = 0 - (c * deriv[t - 1].v.y);
-            Fd.z = 0 - (c * deriv[t - 1].v.z);
-            F[t].Plus(Fd);
+            Vector3 Fd = new Vector3
+            {
+                X = 0 - (c * deriv[t - 1].v.X),
+                Y = 0 - (c * deriv[t - 1].v.Y),
+                //Z = 0 - (c * deriv[t - 1].v.Z)
+            };
+            F[t] += Fd;
             /*getting element forces*/
             foreach (var neigNode in Neigs)
             {
                 //getting position of link according base point
-                xyz_t LinkPos = new xyz_t();
-                LinkPos.Minus(deriv[t - 1].p, model.GetNodeRef(neigNode).deriv[t - 1].p);
+                Vector3 LinkPos = deriv[t - 1].p - rope.GetNodeRef(neigNode).deriv[t - 1].p;
+                //LinkPos.Minus(deriv[t - 1].p, rope.GetNodeRef(neigNode).deriv[t - 1].p);
                 //getting DCM for this link
                 dcm_t dcm = new dcm_t(LinkPos, radiusPoint);
-                xyz_t gFn = new xyz_t();
+                Vector3 gFn = new Vector3();
                 //convert Fn to global coords and return
-                dcm.ToGlob(model.GetElemRef(ID, neigNode).F[t], ref gFn);
+                dcm.ToGlob(rope.GetElemRef(ID, neigNode).F[t], ref gFn);
                 //push it to this force pull
-                F[t].Plus(gFn);
+                F[t] += gFn;
             }
+            F[t].Y += -1E-07f;
         }
         public void GetPhysicParam(Rope_t rope, int t, float Re, ref float m, ref float c)
         {
