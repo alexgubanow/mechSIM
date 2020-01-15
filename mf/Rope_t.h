@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include "Node_t.h"
+#include "Element_t.h"
 class Rope_t
 {
 public:
 	std::vector<Node_t> Nodes;
-	std::vector < Element_t> Elements;
+	std::vector<Element_t> Elements;
 	std::vector <float> L;
 	Rope_t(int Counts, float L, int nodes)
 	{

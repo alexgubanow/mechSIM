@@ -53,6 +53,9 @@
     <ClInclude Include="coords.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Element_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

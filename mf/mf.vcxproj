@@ -158,6 +158,7 @@
     <ClInclude Include="coords.h" />
     <ClInclude Include="dcm_t.h" />
     <ClInclude Include="deriv_t.h" />
+    <ClInclude Include="Element_t.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="integr.h" />
     <ClInclude Include="maf.h" />
