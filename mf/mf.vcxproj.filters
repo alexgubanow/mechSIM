@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -24,6 +20,39 @@
     <ClInclude Include="mf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Node_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dcm_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="deriv_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="integr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="maf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeFreedom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeLoad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PhModels.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rope_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xyz_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="coords.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -33,6 +62,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="mf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Node_t.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dcm_t.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
