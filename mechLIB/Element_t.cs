@@ -74,7 +74,7 @@ namespace mechLIB
             deltaL.Minus(lBpUx, lNpUx);
             GetFn(t, L[t], deltaL);
             //GetPressureForce(t, bloodP, L);
-            //GetDragForce(t, Re, bloodV, L);
+            GetDragForce(t, bloodV);
         }
         public void GetPhysicParam(Rope_t rope, int t, float Re, ref float m, ref float c)
         {
@@ -149,12 +149,9 @@ namespace mechLIB
             //float Fpress = bloodP * radiusPoint.z * 2 * L;
             F[t].y = -1E-08f;
         }
-        private void GetDragForce(int t, float Re, float v, float L)
+        private void GetDragForce(int t, float v)
         {
-            float Awet = 2 * (float)Math.PI * radiusPoint.z * L;
-            float bloodViscosity = 3E-3f;
-            float Be = 0.9f;
-            float Cd = (Awet / A) * (Be / Re);
+            float Cd = 0.47f;//for sphere
             float Fdrag = maf.hlf * 1060 * maf.P2(v) * Cd * A;
             //is it has to be applied only on moving direction??
             F[t].Plus(Fdrag);
