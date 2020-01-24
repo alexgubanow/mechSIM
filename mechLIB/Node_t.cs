@@ -39,7 +39,7 @@ namespace mechLIB
             {
                 deriv[t].a.x = F[t].x / m;
                 deriv[t].a.y = F[t].y / m;
-                deriv[t].a.z = F[t].z / m;//has to be different
+                //deriv[t].a.z = F[t].z / m;//has to be different
             }
 
         }
@@ -52,7 +52,7 @@ namespace mechLIB
             xyz_t Fd = new xyz_t();
             Fd.x = 0 - (c * deriv[t - 1].v.x);
             Fd.y = 0 - (c * deriv[t - 1].v.y);
-            Fd.z = 0 - (c * deriv[t - 1].v.z);
+            //Fd.z = 0 - (c * deriv[t - 1].v.z);
             F[t].Plus(Fd);
             /*getting element forces*/
             foreach (var neigNode in Neigs)

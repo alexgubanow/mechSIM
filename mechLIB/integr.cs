@@ -24,9 +24,9 @@
                 now.u.y = before.u.y + now.v.y * dt;
                 now.p.y = before.p.y + now.u.y;
 
-                now.v.z = before.v.z + now.a.z * dt;
-                now.u.z = before.u.z + now.v.z * dt;
-                now.p.z = before.p.z + now.u.z;
+                //now.v.z = before.v.z + now.a.z * dt;
+                //now.u.z = before.u.z + now.v.z * dt;
+                //now.p.z = before.p.z + now.u.z;
             }
             else
             {
@@ -38,9 +38,9 @@
                 now.v.y = (now.u.y - before.u.y) / dt;
                 now.a.y = (now.v.y - before.v.y) / dt;
 
-                now.u.z = now.p.z - before.p.z;
-                now.v.z = (now.u.z - before.u.z) / dt;
-                now.a.z = (now.v.z - before.v.z) / dt;
+                //now.u.z = now.p.z - before.p.z;
+                //now.v.z = (now.u.z - before.u.z) / dt;
+                //now.a.z = (now.v.z - before.v.z) / dt;
             }
         }
 
@@ -63,9 +63,9 @@
                 now.u.y = before.u.y + now.v.y * dt + (maf.hlf * before.a.y * maf.P2(dt));
                 now.p.y = before.p.y + now.u.y;
 
-                now.v.z = before.v.z + (maf.hlf * (before.a.z + now.a.z)) * dt;
-                now.u.z = before.u.z + now.v.z * dt + (maf.hlf * before.a.z * maf.P2(dt));
-                now.p.z = before.p.z + now.u.z;
+                //now.v.z = before.v.z + (maf.hlf * (before.a.z + now.a.z)) * dt;
+                //now.u.z = before.u.z + now.v.z * dt + (maf.hlf * before.a.z * maf.P2(dt));
+                //now.p.z = before.p.z + now.u.z;
             }
             else
             {

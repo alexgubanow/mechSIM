@@ -14,6 +14,10 @@ pmyi = single(makima(t,pmy,ti));
 plxi = single(makima(t,plx,ti));
 plyi = single(makima(t,ply,ti));
 
+pmxi = smoothdata(pmxi,'gaussian','SmoothingFactor',0.1);
+pmyi = smoothdata(pmyi,'gaussian','SmoothingFactor',0.1);
+plxi = smoothdata(plxi,'gaussian','SmoothingFactor',0.1);
+plyi = smoothdata(plyi,'gaussian','SmoothingFactor',0.1);
 figure('NumberTitle', 'off', 'Name','Endpoint movement');
 title('Endpoint movement')
 xlabel('t, s')
@@ -22,6 +26,7 @@ hold on;
 plot(pmxi, pmyi,'LineWidth',3);
 plot(plxi,plyi,'LineWidth',3);
 legend('Muscle','Leaflet');
+
 L = zeros(length(ti), 1);
 for i = 1:length(ti)
     L(i) = sqrt((pmxi(i) - plxi(i))^2 + (pmyi(i) - plyi(i))^2);
@@ -79,7 +84,7 @@ plyq = plyi;
 req = rei;
 bloodVq = bloodVi;
 abpq = abpi;
-save('interpLoadOriginal','tq','pmxq','pmyq','plxq','plyq','req','bloodVq','abpq');
+save('interpLoadSmooth','tq','pmxq','pmyq','plxq','plyq','req','bloodVq','abpq');
 
 % tq = single(0:dt:t(end)*2);
 % pmxq = [pmxi pmxi];
