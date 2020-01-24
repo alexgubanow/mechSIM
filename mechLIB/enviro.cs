@@ -45,23 +45,22 @@ namespace mechLIB
             float[] plx = (mfr.Content["plxq"] as MLSingle).GetArray()[0];
             float[] pmy = (mfr.Content["pmyq"] as MLSingle).GetArray()[0];
             float[] ply = (mfr.Content["plyq"] as MLSingle).GetArray()[0];
-
-            rope = new Rope_t(phProps);
+            xyz_t startCoord = new xyz_t() { x= pmx[0], y = pmy[0] };
+            xyz_t endCoord = new xyz_t() { x = plx[0], y = ply[0] };
+            phProps.L = crds.GetTotL(startCoord, endCoord);
+            rope = new Rope_t(phProps, startCoord, endCoord);
             //fill load to rope
-            Re = new float[phProps.Counts];
-            bloodV = new float[phProps.Counts];
-            bloodP = new float[phProps.Counts];
+            Re = (mfr.Content["req"] as MLSingle).GetArray()[0];
+            bloodV = (mfr.Content["bloodVq"] as MLSingle).GetArray()[0];
+            bloodP = (mfr.Content["abpq"] as MLSingle).GetArray()[0];
             for (int t = 0; t < phProps.Counts; t++)
             {
-                Re[t] = 0;
-                bloodV[t] = 0;
-                bloodP[t] = 0;
-                rope.Nodes[0].deriv[t].p.x = rope.Nodes[0].deriv[0].p.x + pmx[t];
-                rope.Nodes[0].deriv[t].p.y = rope.Nodes[0].deriv[0].p.y + pmy[t];
+                rope.Nodes[0].deriv[t].p.x = pmx[t];
+                rope.Nodes[0].deriv[t].p.y = pmy[t];
 
                 int lastN = phProps.nodes - 1;
-                rope.Nodes[lastN].deriv[t].p.x = rope.Nodes[lastN].deriv[0].p.x + plx[t];
-                rope.Nodes[lastN].deriv[t].p.y = rope.Nodes[lastN].deriv[0].p.y + ply[t];
+                rope.Nodes[lastN].deriv[t].p.x = plx[t];
+                rope.Nodes[lastN].deriv[t].p.y = ply[t];
             }
             //choose load nodes
             rope.Nodes[0].LoadType = NodeLoad.p;
@@ -81,7 +80,7 @@ namespace mechLIB
             Re = new float[phProps.Counts];
             bloodV = new float[phProps.Counts];
             bloodP = new float[phProps.Counts];
-            float A = (float)Math.PI * (float)Math.Pow(phProps.D, 2) / 4;
+            float A = (float)Math.PI * maf.P2(phProps.D) / 4;
             float maxLoad = ((phProps.E * A) / phProps.L / phProps.nodes) * phProps.MaxU;
             float freq = 1 / (phProps.Counts * phProps.dt);
             rope.Nodes[0].LoadType = NodeLoad.p;
@@ -108,38 +107,14 @@ namespace mechLIB
         }
         public void Run()
         {
-            //float A = (float)Math.PI * (float)Math.Pow(phProps.D, 2) / 4;
-            //float maxLoad = ((phProps.E * A) / phProps.L / phProps.nodes) * phProps.MaxU;
             for (int t = 1; t < time.Length; t++)
             {
-                Parallel.ForEach(rope.Elements, (elem, loopState) =>
+                rope.StepOverElems(t, Re[t - 1], bloodV[t - 1], bloodP[t - 1]);
+                rope.StepOverNodes(t, Re[t - 1], phProps.dt);
+                foreach (var elem in rope.Elements)
                 {
-                    elem.CalcForce(ref rope, t, Re[t - 1], bloodV[t - 1], bloodP[t - 1]);
-                });
-                Parallel.ForEach(rope.Nodes, (node, loopState) =>
-                {
-                    float m = 0;
-                    float c = 0;
-                    node.GetPhysicParam(ref rope, t - 1, Re[t - 1], ref m, ref c);
-                    node.GetForces(ref rope, t, m, c);
-                    node.CalcAccel(t, m);
-                    /*integrate*/
-                    node.Integrate(t, t - 1, phProps.dt);
-                });
-                //foreach (var elem in rope.Elements)
-                //{
-                //    elem.CalcForce(ref rope, t, Re[t - 1], bloodV[t - 1], bloodP[t - 1]);
-                //}
-                //foreach (var node in rope.Nodes)
-                //{
-                //    float m = 0;
-                //    float c = 0;
-                //    node.GetPhysicParam(ref rope, t - 1, Re[t - 1], ref m, ref c);
-                //    node.GetForces(ref rope, t, m, c);
-                //    node.CalcAccel(t, m);
-                //    /*integrate*/
-                //    node.Integrate(t, t - 1, phProps.dt);
-                //}
+                    rope.L[t] += elem.L[t];
+                }
             }
             GC.Collect();
         }

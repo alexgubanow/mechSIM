@@ -1,4 +1,6 @@
-﻿using HelixToolkit.Wpf;
+﻿using DotNetDoctor.csmatio.io;
+using DotNetDoctor.csmatio.types;
+using HelixToolkit.Wpf;
 using mechLIB;
 using Microsoft.Win32;
 using OxyPlot;
@@ -92,9 +94,16 @@ namespace spring.ViewModels
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true) { fileName = openFileDialog.FileName; }
             world.PrepRun(Props.store, fileName);
+            Props.store.Counts = world.time.Length;
             world.Run();
             //ShowResults(SelDeriv);
             _ea.GetEvent<GotResultsEvent>().Publish();
+            MLSingle mlDoubleArray = new MLSingle("L" + Props.PhMod + openFileDialog.SafeFileName.Replace(".mat", ""), world.rope.L, Props.store.Counts);
+            List<MLArray> mlList = new List<MLArray>
+            {
+                mlDoubleArray
+            };
+            _ = new MatFileWriter(openFileDialog.FileName.Replace(openFileDialog.SafeFileName, "") + "L" + Props.PhMod + openFileDialog.SafeFileName, mlList, true);
         }
         private void ClearDataView()
         {

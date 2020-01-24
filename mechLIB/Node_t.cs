@@ -39,11 +39,11 @@ namespace mechLIB
             {
                 deriv[t].a.x = F[t].x / m;
                 deriv[t].a.y = F[t].y / m;
-                deriv[t].a.z = F[t].z / m;//has to be different
+                //deriv[t].a.z = F[t].z / m;//has to be different
             }
 
         }
-        public void GetForces(ref Rope_t model, int t, float m, float c)
+        public void GetForces(Rope_t model, int t, float m, float c)
         {
             //xyz_t Fg = new xyz_t();
             //Fg.y = m * maf._g;
@@ -52,7 +52,7 @@ namespace mechLIB
             xyz_t Fd = new xyz_t();
             Fd.x = 0 - (c * deriv[t - 1].v.x);
             Fd.y = 0 - (c * deriv[t - 1].v.y);
-            Fd.z = 0 - (c * deriv[t - 1].v.z);
+            //Fd.z = 0 - (c * deriv[t - 1].v.z);
             F[t].Plus(Fd);
             /*getting element forces*/
             foreach (var neigNode in Neigs)
@@ -69,13 +69,13 @@ namespace mechLIB
                 F[t].Plus(gFn);
             }
         }
-        public void GetPhysicParam(ref Rope_t rope, int t, float Re, ref float m, ref float c)
+        public void GetPhysicParam(Rope_t rope, int t, float Re, ref float m, ref float c)
         {
             foreach (var neigNode in Neigs)
             {
                 float mElem = 0;
                 float cElem = 0;
-                rope.GetElemRef(ID, neigNode).GetPhysicParam(ref rope, t, Re, ref mElem, ref cElem);
+                rope.GetElemRef(ID, neigNode).GetPhysicParam(rope, t, Re, ref mElem, ref cElem);
                 c += cElem;
                 m += mElem;
             }
@@ -84,16 +84,6 @@ namespace mechLIB
             if (m <= 0)
             {
                 throw new Exception("Calculated mass of node can't be eaqul to zero");
-            }
-            m = 1;
-            float w0 = maf.sqrt(k0 / m);
-            float Zm = maf.sqrt(maf.P2(2 * w0 * DampRatio) + (1 / maf.P2(w)) * maf.P2(maf.P2(w0) - maf.P2(w)));
-            float phi = maf.atan((2 * w * w0 * DampRatio) / (maf.P2(w) - maf.P2(w0))) + (n * maf.pi);
-
-            if (LoadType == NodeLoad.f)
-            {
-                float v0 = (maxLoad / (m * Zm)) * maf.cos(phi);
-                deriv[0].v.x = (maxLoad / (m * Zm)) * maf.cos(phi);
             }
         }
         public void Integrate(int now, int before, float dt)
