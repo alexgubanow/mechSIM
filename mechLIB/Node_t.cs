@@ -60,18 +60,17 @@ namespace mechLIB
             /*getting element forces*/
             foreach (var neigNode in Neigs)
             {
-                //getting position of link according base point
-                Vector3 LinkPos = deriv[t - 1].p - rope.GetNodeRef(neigNode).deriv[t - 1].p;
-                //LinkPos.Minus(deriv[t - 1].p, rope.GetNodeRef(neigNode).deriv[t - 1].p);
-                //getting DCM for this link
-                dcm_t dcm = new dcm_t(LinkPos, radiusPoint);
-                Vector3 gFn = new Vector3();
-                //convert Fn to global coords and return
-                dcm.ToGlob(rope.GetElemRef(ID, neigNode).F[t], ref gFn);
+                ////getting position of link according base point
+                //Vector3 LinkPos = deriv[t - 1].p - rope.GetNodeRef(neigNode).deriv[t - 1].p;
+                ////LinkPos.Minus(deriv[t - 1].p, rope.GetNodeRef(neigNode).deriv[t - 1].p);
+                ////getting DCM for this link
+                //dcm_t dcm = new dcm_t(LinkPos, radiusPoint);
+                //Vector3 gFn = new Vector3();
+                ////convert Fn to global coords and return
+                //dcm.ToGlob(rope.GetElemRef(ID, neigNode).F[t], ref gFn);
                 //push it to this force pull
-                F[t] += gFn;
+                F[t] += rope.GetElemRef(ID, neigNode).F[t];
             }
-            F[t].Y += -1E-07f;
         }
         public void GetPhysicParam(Rope_t rope, int t, float Re, ref float m, ref float c)
         {

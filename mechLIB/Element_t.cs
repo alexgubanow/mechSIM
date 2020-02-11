@@ -72,9 +72,15 @@ namespace mechLIB
             //store delta of expansion
             Vector3 deltaL = lBpUx - lNpUx;
             //deltaL.Minus(lBpUx, lNpUx);
-            GetFn(t, L[t], deltaL);
-            GetPressureForce(t, bloodP, L[t]);
+            Vector3 force = new Vector3();
+            GetFn(t, L[t], deltaL, ref force);
+            //GetPressureForce(t, bloodP, L[t]);
             //GetDragForce(t, Re, bloodV, L);
+
+            //force.Y += -1E-07f;
+            Vector3 gforce = new Vector3();
+            dcm.ToGlob(force, ref gforce);
+            F[t] += gforce;
         }
         public void GetPhysicParam(Rope_t rope, int t, float Re, ref float m, ref float c)
         {
@@ -108,25 +114,22 @@ namespace mechLIB
             return L;
         }
 
-        private void GetFn(int t, float L, Vector3 deltaL)
+        private void GetFn(int t, float L, Vector3 deltaL, ref Vector3 force)
         {
-            //calc Fn of link
-            Vector3 Fn = new Vector3();
             switch (phMod)
             {
                 case PhModels.hook:
-                    calcHookFn(ref Fn, L, deltaL);
+                    calcHookFn(ref force, L, deltaL);
                     break;
                 case PhModels.hookGeomNon:
-                    calcHookFn(ref Fn, L, deltaL);
+                    calcHookFn(ref force, L, deltaL);
                     break;
                 case PhModels.mooneyRiv:
-                    calcMooneyRivlinFn(ref Fn, L, deltaL);
+                    calcMooneyRivlinFn(ref force, L, deltaL);
                     break;
                 default:
                     throw new Exception("unexpected behavior");
             }
-            F[t] += Fn;
         }
         private void calcHookFn(ref Vector3 Fn, float oldL, Vector3 deltaL)
         {
@@ -150,7 +153,7 @@ namespace mechLIB
             //F[t].Y += -1E-07f;
             //F[t].Z += -1E-07f;
         }
-        private void GetDragForce(int t, float Re, float v, float L)
+        private void GetDragForce(int t, float Re, float v, float L, ref Vector3 force)
         {
             float Awet = 2 * (float)Math.PI * radiusPoint.Z * L;
             float bloodViscosity = 3E-3f;
@@ -158,8 +161,8 @@ namespace mechLIB
             float Cd = (Awet / A) * (Be / Re);
             float Fdrag = maf.hlf * 1060 * maf.P2(v) * Cd * A;
             //is it has to be applied only on moving direction??
-            F[t].Y += Fdrag;
-            F[t].Z += Fdrag;
+            force.Y += Fdrag;
+            force.Z += Fdrag;
         }
     }
 }
