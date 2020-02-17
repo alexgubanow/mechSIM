@@ -41,33 +41,33 @@
             }
         }
         
-        public static void Verlet(NodeLoad nodeLoad, ref deriv_t now, deriv_t before, float dt)
+        public static void Verlet(NodeLoad nodeLoad, ref deriv_t now, deriv_t before, deriv_t zero, float dt)
         {
-            //now.v.X = before.v.X + (maf.hlf * (before.a.X + now.a.X)) * dt;
-            //now.v.Y = before.v.Y + (maf.hlf * (before.a.Y + now.a.Y)) * dt;
-            //switch (nodeLoad)
-            //{
-            //    case NodeLoad.p:
-            //        break;
-            //    case NodeLoad.u:
-            //        break;
-            //    case NodeLoad.v:
-            //        break;
-            //    case NodeLoad.a:
-            //        break;
-            //    case NodeLoad.b:
-            //        break;
-            //    case NodeLoad.f:
-            //        break;
-            //    case NodeLoad.none:
-            //        now.u.X = before.u.X + now.v.X * dt + (maf.hlf * before.a.X * maf.P2(dt));
-            //        now.u.Y = before.u.Y + now.v.Y * dt + (maf.hlf * before.a.Y * maf.P2(dt));
-            //        now.p.X = before.p.X + now.u.X;
-            //        now.p.Y = before.p.Y + now.u.Y;
-            //        break;
-            //    default:
-            //        break;
-            //}
+            now.v.X = before.v.X + maf.hlf(before.a.X + now.a.X) * dt;
+            now.v.Y = before.v.Y + maf.hlf(before.a.Y + now.a.Y) * dt;
+            switch (nodeLoad)
+            {
+                case NodeLoad.p:
+                    break;
+                case NodeLoad.u:
+                    break;
+                case NodeLoad.v:
+                    break;
+                case NodeLoad.a:
+                    break;
+                case NodeLoad.b:
+                    break;
+                case NodeLoad.f:
+                    break;
+                case NodeLoad.none:
+                    now.u.X = now.v.X * dt + maf.hlf(before.a.X * maf.P2(dt));
+                    now.u.Y = now.v.Y * dt + maf.hlf(before.a.Y * maf.P2(dt));
+                    now.p.X = zero.p.X + now.u.X;
+                    now.p.Y = zero.p.Y + now.u.Y;
+                    break;
+                default:
+                    break;
+            }
         }
 
         //private static void GearP(ref float[][] now, float[][] before, float dt, float m)
