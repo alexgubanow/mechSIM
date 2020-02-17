@@ -30,19 +30,18 @@ namespace mechLIB
                 deriv[i] = new deriv_t();
             }
             deriv[0].p = coords;
-            deriv[0].a = new Vector3() { X = 0, Y = maf._g, Z = 0 };
-            deriv[0].v = new Vector3() { X = 0, Y = maf._g * 5E-06f, Z = 0 };
+            //deriv[0].a = new Vector3() { X = 0, Y = maf._g, Z = 0 };
+            //deriv[0].v = new Vector3() { X = 0, Y = maf._g * 5E-06f, Z = 0 };
             radiusPoint = _radiusPoint;
         }
         public void CalcAccel(int t, float m)
         {
-            if (LoadType == NodeLoad.none || LoadType == NodeLoad.f)
+            if (LoadType != NodeLoad.p )
             {
                 deriv[t].a.X = F[t].X / m;
                 deriv[t].a.Y = F[t].Y / m;
                 //deriv[t].a.Z = F[t].Z / m;//has to be different
             }
-
         }
         public void GetForces(Rope_t rope, int t, float m, float c)
         {
@@ -91,20 +90,7 @@ namespace mechLIB
         }
         public void Integrate(int now, int before, float dt)
         {
-            switch (LoadType)
-            {
-                case NodeLoad.p:
-                    Integr.EulerExpl(Integr.Direction.Backward, ref deriv[now], deriv[before], dt);
-                    break;
-                case NodeLoad.none:
-                    Integr.Verlet(Integr.Direction.Forward, ref deriv[now], deriv[before], dt);
-                    break;
-                case NodeLoad.f:
-                    Integr.Verlet(Integr.Direction.Forward, ref deriv[now], deriv[before], dt);
-                    break;
-                default:
-                    throw new Exception();
-            }
+            Integr.EulerExpl(LoadType, ref deriv[now], deriv[before], deriv[0], dt);
         }
 
     }

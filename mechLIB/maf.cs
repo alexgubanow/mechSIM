@@ -9,10 +9,14 @@ namespace mechLIB
     public class maf
     {
         public const float _g = -9.80666f;
-        public const float hlf = 1f / 2f;
+        //public const float hlf = 1f / 2f;
         public const float sxt = 1f / 6f;
         public const float pi = (float)Math.PI;
 
+        public static float hlf(float value)
+        {
+            return 0.5f * value;
+        }
         public static float P2(float value)
         {
             return value * value;

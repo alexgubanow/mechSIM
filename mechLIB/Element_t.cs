@@ -96,7 +96,7 @@ namespace mechLIB
             }
 
             c = DampRatio * 2f * (float)Math.Sqrt(m * ((E * A) / L));
-            if (c <= 0)
+            if (c <= 0 && DampRatio != 0)
             {
                 throw new Exception("Calculated damping ratio of element can't be eaqul to zero");
             }
@@ -159,7 +159,7 @@ namespace mechLIB
             float bloodViscosity = 3E-3f;
             float Be = 0.9f;
             float Cd = (Awet / A) * (Be / Re);
-            float Fdrag = maf.hlf * 1060 * maf.P2(v) * Cd * A;
+            float Fdrag = maf.hlf(1060 * maf.P2(v) * Cd * A);
             //is it has to be applied only on moving direction??
             force.Y += Fdrag;
             force.Z += Fdrag;

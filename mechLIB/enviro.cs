@@ -85,11 +85,12 @@ namespace mechLIB
             float maxLoad = ((phProps.E * A) / phProps.L / phProps.nodes) * phProps.MaxU;
             float freq = 1 / (phProps.Counts * phProps.dt);
             rope.Nodes[0].LoadType = NodeLoad.p;
-            rope.Nodes[phProps.nodes - 1].LoadType = NodeLoad.p;
+            rope.Nodes[phProps.nodes - 1].LoadType = NodeLoad.u;
+            int lastN = phProps.nodes - 1;
             for (int t = 0; t < phProps.Counts; t++)
             {
                 rope.Nodes[0].deriv[t].p = rope.Nodes[0].deriv[0].p;
-                rope.Nodes[phProps.nodes - 1].deriv[t].p = rope.Nodes[phProps.nodes - 1].deriv[0].p;
+                rope.Nodes[lastN].deriv[t].p = rope.Nodes[lastN].deriv[0].p;
                 //    Re[t] = 0;
                 //    bloodV[t] = 0;
                 //    bloodP[t] = 0;
@@ -101,9 +102,11 @@ namespace mechLIB
                 //    int lastN = phProps.nodes - 1;
                 //    rope.Nodes[lastN].deriv[t].p.z = rope.Nodes[lastN].deriv[0].p.z;
                 //    rope.Nodes[lastN].deriv[t].p.y = rope.Nodes[lastN].deriv[0].p.y;
-                //    rope.Nodes[lastN].deriv[t].p.x = rope.Nodes[lastN].deriv[0].p.x;
                 //    //model.Nodes[lastN].F[t].x = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
-                //    //model.Nodes[lastN].deriv[t].p.x =  ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad) + model.Nodes[lastN].deriv[0].p.x;
+                //rope.Nodes[lastN].deriv[t].p.X = t + rope.Nodes[lastN].deriv[0].p.X;
+                rope.Nodes[lastN].deriv[t].p.X = ((float)Math.Sin(2 * Math.PI * time[t] * freq) * phProps.MaxU) + rope.Nodes[lastN].deriv[0].p.X;
+                rope.Nodes[lastN].deriv[t].u.X = rope.Nodes[lastN].deriv[t].p.X - rope.Nodes[lastN].deriv[0].p.X;
+                //rope.Nodes[lastN].deriv[t].v.X = ((float)Math.Cos(2 * Math.PI * 0.5 * time[t] * freq) * phProps.MaxU) + rope.Nodes[lastN].deriv[0].v.X;
             }
         }
         public void Run()

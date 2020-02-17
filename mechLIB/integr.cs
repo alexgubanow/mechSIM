@@ -12,68 +12,62 @@
         private const float v3 = 1f;
         private const float v4 = 1f;
 
-        public static void EulerExpl(Direction dir, ref deriv_t now, deriv_t before, float dt)
+        public static void EulerExpl(NodeLoad nodeLoad, ref deriv_t now, deriv_t before, deriv_t zero, float dt)
         {
-            if (dir == Direction.Forward)
+            now.v.X = before.v.X + before.a.X * dt;
+            now.v.Y = before.v.Y + before.a.Y * dt;
+            switch (nodeLoad)
             {
-                now.v.X = before.v.X + now.a.X * dt;
-                now.u.X = before.u.X + now.v.X * dt;
-                now.p.X = before.p.X + now.u.X;
-
-                now.v.Y = before.v.Y + now.a.Y * dt;
-                now.u.Y = before.u.Y + now.v.Y * dt;
-                now.p.Y = before.p.Y + now.u.Y;
-
-                //now.v.Z = before.v.Z + now.a.Z * dt;
-                //now.u.Z = before.u.Z + now.v.Z * dt;
-                //now.p.Z = before.p.Z + now.u.Z;
-            }
-            else
-            {
-                now.u.X = now.p.X - before.p.X;
-                now.v.X = (now.u.X - before.u.X) / dt;
-                now.a.X = (now.v.X - before.v.X) / dt;
-
-                now.u.Y = now.p.Y - before.p.Y;
-                now.v.Y = (now.u.Y - before.u.Y) / dt;
-                now.a.Y = (now.v.Y - before.v.Y) / dt;
-
-                //now.u.Z = now.p.Z - before.p.Z;
-                //now.v.Z = (now.u.Z - before.u.Z) / dt;
-                //now.a.Z = (now.v.Z - before.v.Z) / dt;
+                case NodeLoad.p:
+                    break;
+                case NodeLoad.u:
+                    break;
+                case NodeLoad.v:
+                    break;
+                case NodeLoad.a:
+                    break;
+                case NodeLoad.b:
+                    break;
+                case NodeLoad.f:
+                    break;
+                case NodeLoad.none:
+                    now.u.X = maf.hlf(before.a.X * maf.P2(dt));
+                    now.u.Y = before.u.Y + before.v.Y * dt;
+                    now.p.X = zero.p.X + now.u.X;
+                    now.p.Y = zero.p.Y + now.u.Y;
+                    break;
+                default:
+                    break;
             }
         }
-
-        //private static void EulerImpl(Direction dir, ref deriv_t now, deriv_t before, float dt)
-        //{
-        //    now.v.X = before.v.X + now.a.X * dt;
-        //    now.u.X = before.u.X + now.v.X * dt;
-        //    now.p.X = before.p.X + now.u.X;
-        //}
-
-        public static void Verlet(Direction dir, ref deriv_t now, deriv_t before, float dt)
+        
+        public static void Verlet(NodeLoad nodeLoad, ref deriv_t now, deriv_t before, float dt)
         {
-            if (dir == Direction.Forward)
-            {
-                now.v.X = before.v.X + (maf.hlf * (before.a.X + now.a.X)) * dt;
-                now.u.X = before.u.X + now.v.X * dt + (maf.hlf * before.a.X * maf.P2(dt));
-                now.p.X = before.p.X + now.u.X;
-
-                now.v.Y = before.v.Y + (maf.hlf * (before.a.Y + now.a.Y)) * dt;
-                now.u.Y = before.u.Y + now.v.Y * dt + (maf.hlf * before.a.Y * maf.P2(dt));
-                now.p.Y = before.p.Y + now.u.Y;
-
-                //now.v.Z = before.v.Z + (maf.hlf * (before.a.Z + now.a.Z)) * dt;
-                //now.u.Z = before.u.Z + now.v.Z * dt + (maf.hlf * before.a.Z * maf.P2(dt));
-                //now.p.Z = before.p.Z + now.u.Z;
-            }
-            else
-            {
-                throw new System.NotImplementedException();
-                //now.u.X = before.u.X + now.v.X * dt + (maf.hlf * before.a.X * maf.P2(dt));
-                //now.v.X = before.v.X + (maf.hlf * before.a.X + now.a.X) * dt;
-                //now.p.X = before.p.X + now.u.X;
-            }
+            //now.v.X = before.v.X + (maf.hlf * (before.a.X + now.a.X)) * dt;
+            //now.v.Y = before.v.Y + (maf.hlf * (before.a.Y + now.a.Y)) * dt;
+            //switch (nodeLoad)
+            //{
+            //    case NodeLoad.p:
+            //        break;
+            //    case NodeLoad.u:
+            //        break;
+            //    case NodeLoad.v:
+            //        break;
+            //    case NodeLoad.a:
+            //        break;
+            //    case NodeLoad.b:
+            //        break;
+            //    case NodeLoad.f:
+            //        break;
+            //    case NodeLoad.none:
+            //        now.u.X = before.u.X + now.v.X * dt + (maf.hlf * before.a.X * maf.P2(dt));
+            //        now.u.Y = before.u.Y + now.v.Y * dt + (maf.hlf * before.a.Y * maf.P2(dt));
+            //        now.p.X = before.p.X + now.u.X;
+            //        now.p.Y = before.p.Y + now.u.Y;
+            //        break;
+            //    default:
+            //        break;
+            //}
         }
 
         //private static void GearP(ref float[][] now, float[][] before, float dt, float m)

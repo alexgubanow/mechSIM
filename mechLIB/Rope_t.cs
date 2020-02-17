@@ -29,8 +29,8 @@ namespace mechLIB
         }
         private void SetupNodesPositions(props_t props)
         {
-            float dl = props.L / Nodes.Length;
             int lastNode = Nodes.Length - 1;
+            float dl = props.L / lastNode;
             //xyz_t tmpCoord = new xyz_t { y = props.initDrop * maf.P2((0 * dl) - (props.L - dl) / 2) + 1E-3f };
             //Vector3 tmpRadPoint = new Vector3 { Z = props.D };
             Nodes[0] = new Node_t(props.Counts,
