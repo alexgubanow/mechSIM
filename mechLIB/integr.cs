@@ -31,8 +31,8 @@
                 case NodeLoad.f:
                     break;
                 case NodeLoad.none:
-                    now.u.X = maf.hlf(before.a.X * maf.P2(dt));
-                    now.u.Y = before.u.Y + before.v.Y * dt;
+                    now.u.X = now.v.X * dt;
+                    now.u.Y = now.v.Y * dt;
                     now.p.X = zero.p.X + now.u.X;
                     now.p.Y = zero.p.Y + now.u.Y;
                     break;
