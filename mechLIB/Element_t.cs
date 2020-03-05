@@ -145,7 +145,7 @@ namespace mechLIB
             const float C10 = 2295.69613f;
             const float C01 = -2351.28728f;
             float sigma = 2 * C10 * (lamda.x - (1 / maf.P2(lamda.x))) + 2 * C01 * (1 - (1 / maf.P3(lamda.x)));
-            Fn.X = A * sigma;
+            Fn.X = 0 - (A * sigma); 
         }
         private void GetPressureForce(int t, float bloodP, float L)
         {

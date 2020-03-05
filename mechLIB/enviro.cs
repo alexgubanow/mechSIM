@@ -54,18 +54,20 @@ namespace mechLIB
             Re = (mfr.Content["req"] as MLSingle).GetArray()[0];
             bloodV = (mfr.Content["bloodVq"] as MLSingle).GetArray()[0];
             bloodP = (mfr.Content["abpq"] as MLSingle).GetArray()[0];
+            int lastN = phProps.nodes - 1;
             for (int t = 0; t < phProps.Counts; t++)
             {
                 rope.Nodes[0].deriv[t].p.X = pmx[t];
                 rope.Nodes[0].deriv[t].p.Y = pmy[t];
+                rope.Nodes[0].deriv[t].u.X = rope.Nodes[0].deriv[t].p.X - rope.Nodes[0].deriv[0].p.X;
 
-                int lastN = phProps.nodes - 1;
                 rope.Nodes[lastN].deriv[t].p.X = plx[t];
                 rope.Nodes[lastN].deriv[t].p.Y = ply[t];
+                rope.Nodes[lastN].deriv[t].u.X = rope.Nodes[lastN].deriv[t].p.X - rope.Nodes[lastN].deriv[0].p.X;
             }
             //choose load nodes
-            rope.Nodes[0].LoadType = NodeLoad.p;
-            rope.Nodes[phProps.nodes - 1].LoadType = NodeLoad.p;
+            rope.Nodes[0].LoadType = NodeLoad.u;
+            rope.Nodes[phProps.nodes - 1].LoadType = NodeLoad.u;
         }
 
         private void allocateTime(float dt, int Counts)
