@@ -8,6 +8,7 @@ namespace mechLIB
 {
     public class maf
     {
+        public const float _e = (float)Math.E;
         public const float _g = -9.80666f;
         //public const float hlf = 1f / 2f;
         public const float sxt = 1f / 6f;
@@ -34,6 +35,18 @@ namespace mechLIB
         public static float sqrt(float value)
         {
             return (float)Math.Sqrt(value);
+        }
+        public static float Log10(float value)
+        {
+            return (float)Math.Log10(value);
+        }
+        public static float Log(float value, float newbase)
+        {
+            return (float)Math.Log(value);
+        }
+        public static float Ln(float value)
+        {
+            return (float)Math.Log(value, Math.E);
         }
         public static float sin(float value)
         {
