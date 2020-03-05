@@ -94,9 +94,12 @@ namespace mechLIB
                 m += (float)Math.PI * L * (maf.P2(radiusPoint.Z + thFluid) - maf.P2(radiusPoint.Z)) * 1060;
                 //add mass of this fluid to mass of rod
             }
-
-            c = DampRatio * 2f * (float)Math.Sqrt(m * ((E * A) / L));
-            if (c <= 0 && DampRatio != 0)
+            //c = DampRatio * 2f * (float)Math.Sqrt(m * ((E * A) / L));
+            float alpha = 0 - ((maf.sqrt(5) * maf.Ln(DampRatio)) / 
+                            (maf.sqrt(maf.P2(maf.Ln(DampRatio)) + maf.P2(maf.pi))));
+            float k = (E * A) / L;
+            c = alpha * maf.sqrt(m * k);
+            if (c < 0)
             {
                 throw new Exception("Calculated damping ratio of element can't be eaqul to zero");
             }
@@ -142,11 +145,11 @@ namespace mechLIB
             {
                 x = (deltaL.X / oldL) + 1
             };
-            const float C10 = 2295.69613f;
-            const float C01 = -2351.28728f;
+            const float C10 = 22956961.3f;
+            const float C01 = -23512872.8f;
             float sigma = 2 * C10 * (lamda.x - (1 / maf.P2(lamda.x))) + 2 * C01 * (1 - (1 / maf.P3(lamda.x)));
             Fn.X = 0 - (A * sigma); 
-        }
+        }   
         private void GetPressureForce(int t, float bloodP, float L)
         {
             //float Fpress = bloodP * radiusPoint.z * 2 * L;
