@@ -105,9 +105,10 @@ namespace mechLIB
                 //    rope.Nodes[lastN].deriv[t].p.z = rope.Nodes[lastN].deriv[0].p.z;
                 //    rope.Nodes[lastN].deriv[t].p.y = rope.Nodes[lastN].deriv[0].p.y;
                 //    //model.Nodes[lastN].F[t].x = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
-                //rope.Nodes[lastN].deriv[t].p.X = t + rope.Nodes[lastN].deriv[0].p.X;
-                rope.Nodes[lastN].deriv[t].p.X = ((float)Math.Sin(2 * Math.PI * time[t] * freq) * phProps.MaxU) + rope.Nodes[lastN].deriv[0].p.X;
-                rope.Nodes[lastN].deriv[t].u.X = rope.Nodes[lastN].deriv[t].p.X - rope.Nodes[lastN].deriv[0].p.X;
+                //rope.Nodes[lastN].deriv[t].p.X = rope.Nodes[lastN].deriv[0].p.X;
+                //rope.Nodes[lastN].deriv[t].p.X = 0 - ((float)Math.Sin(2 * Math.PI * time[t] * freq / 3) * phProps.MaxU) + rope.Nodes[lastN].deriv[0].p.X;
+                rope.Nodes[lastN].deriv[t].p.Y = ((float)Math.Sin(2 * Math.PI * time[t] * freq) * phProps.MaxU) + rope.Nodes[lastN].deriv[0].p.Y;
+                rope.Nodes[lastN].deriv[t].u = rope.Nodes[lastN].deriv[t].p - rope.Nodes[lastN].deriv[0].p;
                 //rope.Nodes[lastN].deriv[t].v.X = ((float)Math.Cos(2 * Math.PI * 0.5 * time[t] * freq) * phProps.MaxU) + rope.Nodes[lastN].deriv[0].v.X;
             }
         }

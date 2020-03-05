@@ -28,15 +28,17 @@ namespace mechLIB
             {
                 F[i] = new Vector3();
                 deriv[i] = new deriv_t();
+                deriv[i].a = new Vector3() { X = 0, Y = maf._g, Z = 0 };
+                deriv[i].v = new Vector3() { X = 0, Y = maf._g * 1E-06f, Z = 0 };
             }
             deriv[0].p = coords;
             //deriv[0].a = new Vector3() { X = 0, Y = maf._g, Z = 0 };
-            //deriv[0].v = new Vector3() { X = 0, Y = maf._g * 5E-06f, Z = 0 };
+            //deriv[0].v = new Vector3() { X = 0, Y = maf._g * 1E-06f, Z = 0 };
             radiusPoint = _radiusPoint;
         }
         public void CalcAccel(int t, float m)
         {
-            if (LoadType != NodeLoad.p )
+            if (LoadType != NodeLoad.p)
             {
                 deriv[t].a.X = F[t].X / m;
                 deriv[t].a.Y = F[t].Y / m;
@@ -45,28 +47,21 @@ namespace mechLIB
         }
         public void GetForces(Rope_t rope, int t, float m, float c)
         {
-            //xyz_t Fg = new xyz_t();
-            //Fg.y = m * maf._g;
-            //F[t].Plus(Fg);
-
-            Vector3 Fd = new Vector3
+            //gravity force
+            F[t] += new Vector3
+            {
+                Y = m * maf._g
+            };
+            //damping force
+            F[t] += new Vector3
             {
                 X = 0 - (c * deriv[t - 1].v.X),
                 Y = 0 - (c * deriv[t - 1].v.Y),
                 //Z = 0 - (c * deriv[t - 1].v.Z)
             };
-            F[t] += Fd;
             /*getting element forces*/
             foreach (var neigNode in Neigs)
             {
-                ////getting position of link according base point
-                //Vector3 LinkPos = deriv[t - 1].p - rope.GetNodeRef(neigNode).deriv[t - 1].p;
-                ////LinkPos.Minus(deriv[t - 1].p, rope.GetNodeRef(neigNode).deriv[t - 1].p);
-                ////getting DCM for this link
-                //dcm_t dcm = new dcm_t(LinkPos, radiusPoint);
-                //Vector3 gFn = new Vector3();
-                ////convert Fn to global coords and return
-                //dcm.ToGlob(rope.GetElemRef(ID, neigNode).F[t], ref gFn);
                 //push it to this force pull
                 F[t] += rope.GetElemRef(ID, neigNode).F[t];
             }
