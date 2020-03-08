@@ -5,14 +5,13 @@ using mechLIB;
 using Microsoft.Win32;
 using OxyPlot;
 using OxyPlot.Series;
-using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Numerics;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
@@ -98,12 +97,24 @@ namespace spring.ViewModels
             world.Run();
             //ShowResults(SelDeriv);
             _ea.GetEvent<GotResultsEvent>().Publish();
-            MLSingle mlDoubleArray = new MLSingle("L" + Props.PhMod + openFileDialog.SafeFileName.Replace(".mat", ""), world.rope.L, Props.store.Counts);
-            List<MLArray> mlList = new List<MLArray>
+            if (openFileDialog.SafeFileName.Length > 0)
+            {
+                MLSingle mlDoubleArray = new MLSingle("L" + Props.PhMod + openFileDialog.SafeFileName.Replace(".mat", ""), world.rope.L, Props.store.Counts);
+                List<MLArray> mlList = new List<MLArray>
             {
                 mlDoubleArray
             };
-            _ = new MatFileWriter(openFileDialog.FileName.Replace(openFileDialog.SafeFileName, "") + "L" + Props.PhMod + openFileDialog.SafeFileName, mlList, true);
+                _ = new MatFileWriter(openFileDialog.FileName.Replace(openFileDialog.SafeFileName, "") + "L" + Props.PhMod + openFileDialog.SafeFileName, mlList, true);
+            }
+            else
+            {
+                MLSingle mlDoubleArray = new MLSingle("L" + Props.PhMod, world.rope.L, Props.store.Counts);
+                List<MLArray> mlList = new List<MLArray>
+            {
+                mlDoubleArray
+            };
+                _ = new MatFileWriter("L" + Props.PhMod + ".mat", mlList, true);
+            }
         }
         private void ClearDataView()
         {
@@ -115,21 +126,21 @@ namespace spring.ViewModels
 
         private void Load3d()
         {
-            Rect3D BoundingBox = new Rect3D(0, 0, 0, 100, 100, 100);
+            //Rect3D BoundingBox = new Rect3D(0, 0, 0, 100, 100, 100);
             Objs3d.Add(new DefaultLights());
 
-            double bbSize = Math.Max(Math.Max(BoundingBox.SizeX, BoundingBox.SizeY), BoundingBox.SizeZ);
+            //double bbSize = Math.Max(Math.Max(BoundingBox.SizeX, BoundingBox.SizeY), BoundingBox.SizeZ);
 
-            Objs3d.Add(new GridLinesVisual3D
-            {
-                Center = new Point3D(0, 0, 0),
-                Length = BoundingBox.SizeX,
-                Width = BoundingBox.SizeY,
-                MinorDistance = 3,
-                MajorDistance = bbSize,
-                Thickness = bbSize / 1000,
-                Fill = Brushes.Gray
-            });
+            //Objs3d.Add(new GridLinesVisual3D
+            //{
+            //    Center = new Point3D(0, 0, 0),
+            //    Length = BoundingBox.SizeX,
+            //    Width = BoundingBox.SizeY,
+            //    MinorDistance = 3,
+            //    MajorDistance = bbSize,
+            //    Thickness = bbSize / 1000,
+            //    Fill = Brushes.Gray
+            //});
         }
 
         private void ShowResults(int Deriv)
@@ -165,19 +176,32 @@ namespace spring.ViewModels
             }
         }
 
-        public List<DataPoint> getDataPointList(float[] X, xyz_t[] Y, C_t axis, int step)
+        public List<DataPoint> getDataPointList(float[] X, Vector3[] Y, C_t axis, int step)
         {
             List<DataPoint> tmp = new List<DataPoint>();
             for (int t = 0; t < X.Length; t += step)
             {
-                tmp.Add(new DataPoint(X[t], Y[t].GetByC(axis)));
+                switch (axis)
+                {
+                    case C_t.x:
+                        tmp.Add(new DataPoint(X[t], Y[t].X));
+                        break;
+                    case C_t.y:
+                        tmp.Add(new DataPoint(X[t], Y[t].Y));
+                        break;
+                    case C_t.z:
+                        tmp.Add(new DataPoint(X[t], Y[t].Z));
+                        break;
+                    default:
+                        throw new System.Exception();
+                }
             }
             return tmp;
         }
 
-        private xyz_t[] ExtractArray(deriv_t[] derivs, N_t deriv)
+        private Vector3[] ExtractArray(deriv_t[] derivs, N_t deriv)
         {
-            xyz_t[] tmp = new xyz_t[world.time.Length];
+            Vector3[] tmp = new Vector3[world.time.Length];
             for (int t = 0; t < world.time.Length; t++)
             {
                 tmp[t] = derivs[t].GetByN(deriv);
@@ -185,7 +209,7 @@ namespace spring.ViewModels
             return tmp;
         }
 
-        private void plotData(string title, xyz_t[] Y)
+        private void plotData(string title, Vector3[] Y)
         {
             int step = 1;
             int maxPlotPx = (int)SystemParameters.PrimaryScreenWidth / 2;
@@ -224,17 +248,17 @@ namespace spring.ViewModels
                 Load3d();
                 Objs3d.Add(new CubeVisual3D
                 {
-                    Center = new Point3D(world.rope.Nodes[0].deriv[t].p.x * 10E2,
-                                         world.rope.Nodes[0].deriv[t].p.z * 10E2,
-                                         world.rope.Nodes[0].deriv[t].p.y * 10E2),
+                    Center = new Point3D(world.rope.Nodes[0].deriv[t].p.X * 10E2,
+                                         world.rope.Nodes[0].deriv[t].p.Z * 10E2,
+                                         world.rope.Nodes[0].deriv[t].p.Y * 10E2),
                     SideLength = .8,
                     Fill = Brushes.Gray
                 });
                 Objs3d.Add(new CubeVisual3D
                 {
-                    Center = new Point3D(world.rope.Nodes[world.rope.Nodes.Length - 1].deriv[t].p.x * 10E2,
-                                         world.rope.Nodes[world.rope.Nodes.Length - 1].deriv[t].p.z * 10E2,
-                                         world.rope.Nodes[world.rope.Nodes.Length - 1].deriv[t].p.y * 10E2),
+                    Center = new Point3D(world.rope.Nodes[world.rope.Nodes.Length - 1].deriv[t].p.X * 10E2,
+                                         world.rope.Nodes[world.rope.Nodes.Length - 1].deriv[t].p.Z * 10E2,
+                                         world.rope.Nodes[world.rope.Nodes.Length - 1].deriv[t].p.Y * 10E2),
                     SideLength = .8,
                     Fill = Brushes.Gray
                 });
@@ -242,20 +266,20 @@ namespace spring.ViewModels
                 {
                     Objs3d.Add(new LinesVisual3D
                     {
-                        Points = { new Point3D(world.rope.Nodes[node].deriv[t].p.x * 10E2,
-                                                world.rope.Nodes[node].deriv[t].p.z * 10E2,
-                                                world.rope.Nodes[node].deriv[t].p.y * 10E2),
-                            new Point3D(world.rope.Nodes[node + 1].deriv[t].p.x * 10E2,
-                                        world.rope.Nodes[node + 1].deriv[t].p.z * 10E2,
-                                        world.rope.Nodes[node + 1].deriv[t].p.y * 10E2) },
+                        Points = { new Point3D(world.rope.Nodes[node].deriv[t].p.X * 10E2,
+                                                world.rope.Nodes[node].deriv[t].p.Z * 10E2,
+                                                world.rope.Nodes[node].deriv[t].p.Y * 10E2),
+                            new Point3D(world.rope.Nodes[node + 1].deriv[t].p.X * 10E2,
+                                        world.rope.Nodes[node + 1].deriv[t].p.Z * 10E2,
+                                        world.rope.Nodes[node + 1].deriv[t].p.Y * 10E2) },
                         Thickness = 2,
                         Color = Brushes.Blue.Color
                     });
                     Objs3d.Add(new SphereVisual3D
                     {
-                        Center = new Point3D(world.rope.Nodes[node].deriv[t].p.x * 10E2,
-                                            world.rope.Nodes[node].deriv[t].p.z * 10E2,
-                                            world.rope.Nodes[node].deriv[t].p.y * 10E2),
+                        Center = new Point3D(world.rope.Nodes[node].deriv[t].p.X * 10E2,
+                                            world.rope.Nodes[node].deriv[t].p.Z * 10E2,
+                                            world.rope.Nodes[node].deriv[t].p.Y * 10E2),
                         Radius = .3,
                         Fill = Brushes.Black
                     });

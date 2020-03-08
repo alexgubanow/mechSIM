@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,26 +46,28 @@ namespace mechLIB
             float[] plx = (mfr.Content["plxq"] as MLSingle).GetArray()[0];
             float[] pmy = (mfr.Content["pmyq"] as MLSingle).GetArray()[0];
             float[] ply = (mfr.Content["plyq"] as MLSingle).GetArray()[0];
-            xyz_t startCoord = new xyz_t() { x= pmx[0], y = pmy[0] };
-            xyz_t endCoord = new xyz_t() { x = plx[0], y = ply[0] };
-            phProps.L = crds.GetTotL(startCoord, endCoord);
+            Vector3 startCoord = new Vector3() { X= pmx[0], Y = pmy[0] };
+            Vector3 endCoord = new Vector3() { X = plx[0], Y = ply[0] };
+            phProps.L = Vector3.Distance(startCoord, endCoord);
             rope = new Rope_t(phProps, startCoord, endCoord);
             //fill load to rope
             Re = (mfr.Content["req"] as MLSingle).GetArray()[0];
             bloodV = (mfr.Content["bloodVq"] as MLSingle).GetArray()[0];
             bloodP = (mfr.Content["abpq"] as MLSingle).GetArray()[0];
+            int lastN = phProps.nodes - 1;
             for (int t = 0; t < phProps.Counts; t++)
             {
-                rope.Nodes[0].deriv[t].p.x = pmx[t];
-                rope.Nodes[0].deriv[t].p.y = pmy[t];
+                rope.Nodes[0].deriv[t].p.X = pmx[t];
+                rope.Nodes[0].deriv[t].p.Y = pmy[t];
+                rope.Nodes[0].deriv[t].u.X = rope.Nodes[0].deriv[t].p.X - rope.Nodes[0].deriv[0].p.X;
 
-                int lastN = phProps.nodes - 1;
-                rope.Nodes[lastN].deriv[t].p.x = plx[t];
-                rope.Nodes[lastN].deriv[t].p.y = ply[t];
+                rope.Nodes[lastN].deriv[t].p.X = plx[t];
+                rope.Nodes[lastN].deriv[t].p.Y = ply[t];
+                rope.Nodes[lastN].deriv[t].u.X = rope.Nodes[lastN].deriv[t].p.X - rope.Nodes[lastN].deriv[0].p.X;
             }
             //choose load nodes
-            rope.Nodes[0].LoadType = NodeLoad.p;
-            rope.Nodes[phProps.nodes - 1].LoadType = NodeLoad.p;
+            rope.Nodes[0].LoadType = NodeLoad.u;
+            rope.Nodes[phProps.nodes - 1].LoadType = NodeLoad.u;
         }
 
         private void allocateTime(float dt, int Counts)
@@ -84,11 +87,12 @@ namespace mechLIB
             float maxLoad = ((phProps.E * A) / phProps.L / phProps.nodes) * phProps.MaxU;
             float freq = 1 / (phProps.Counts * phProps.dt);
             rope.Nodes[0].LoadType = NodeLoad.p;
-            rope.Nodes[phProps.nodes - 1].LoadType = NodeLoad.p;
+            rope.Nodes[phProps.nodes - 1].LoadType = NodeLoad.u;
+            int lastN = phProps.nodes - 1;
             for (int t = 0; t < phProps.Counts; t++)
             {
                 rope.Nodes[0].deriv[t].p = rope.Nodes[0].deriv[0].p;
-                rope.Nodes[phProps.nodes - 1].deriv[t].p = rope.Nodes[phProps.nodes - 1].deriv[0].p;
+                rope.Nodes[lastN].deriv[t].p = rope.Nodes[lastN].deriv[0].p;
                 //    Re[t] = 0;
                 //    bloodV[t] = 0;
                 //    bloodP[t] = 0;
@@ -100,9 +104,12 @@ namespace mechLIB
                 //    int lastN = phProps.nodes - 1;
                 //    rope.Nodes[lastN].deriv[t].p.z = rope.Nodes[lastN].deriv[0].p.z;
                 //    rope.Nodes[lastN].deriv[t].p.y = rope.Nodes[lastN].deriv[0].p.y;
-                //    rope.Nodes[lastN].deriv[t].p.x = rope.Nodes[lastN].deriv[0].p.x;
                 //    //model.Nodes[lastN].F[t].x = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
-                //    //model.Nodes[lastN].deriv[t].p.x =  ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad) + model.Nodes[lastN].deriv[0].p.x;
+                //rope.Nodes[lastN].deriv[t].p.X = rope.Nodes[lastN].deriv[0].p.X;
+                //rope.Nodes[lastN].deriv[t].p.X = 0 - ((float)Math.Sin(2 * Math.PI * time[t] * freq / 3) * phProps.MaxU) + rope.Nodes[lastN].deriv[0].p.X;
+                rope.Nodes[lastN].deriv[t].p.Y = ((float)Math.Sin(2 * Math.PI * time[t] * freq) * phProps.MaxU) + rope.Nodes[lastN].deriv[0].p.Y;
+                rope.Nodes[lastN].deriv[t].u = rope.Nodes[lastN].deriv[t].p - rope.Nodes[lastN].deriv[0].p;
+                //rope.Nodes[lastN].deriv[t].v.X = ((float)Math.Cos(2 * Math.PI * 0.5 * time[t] * freq) * phProps.MaxU) + rope.Nodes[lastN].deriv[0].v.X;
             }
         }
         public void Run()

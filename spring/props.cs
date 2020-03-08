@@ -7,17 +7,17 @@ namespace spring
     {
         public props()
         {
-            store.E = 2E6f;
+            store.E = 6E6f;
             store.L = 25E-3f;
             store.D = 1E-3f;
             store.ro = 1040;
             store.Counts = 20000;
             EndT = store.Counts - 1;
-            store.dt = 5E-6f;
+            store.dt = 1E-6f;
             store.nodes = 9;
             store.initDrop = 1E-08f;
             store.MaxU = 2E-3f;
-            store.DampRatio = 0.4f;
+            store.DampRatio = 0.9f;
         }
         public props_t store;
         public PhModels PhMod { get => store.phMod; set => store.phMod = value; }
