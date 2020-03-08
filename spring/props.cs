@@ -7,20 +7,30 @@ namespace spring
     {
         public props()
         {
-            store.E = 6E6f;
-            store.L = 25E-3f;
-            store.D = 1E-3f;
-            store.ro = 1040;
-            store.Counts = 20000;
-            EndT = store.Counts - 1;
-            store.dt = 1E-6f;
-            store.nodes = 9;
-            store.initDrop = 1E-08f;
-            store.MaxU = 2E-3f;
-            store.DampRatio = 0.9f;
+            E = 6E6f;
+            L = 25E-3f;
+            D = 1E-3f;
+            ro = 1040;
+            Counts = 20000;
+            EndT = Counts - 1;
+            dt = 1E-6f;
+            nodes = 9;
+            initDrop = 1E-08f;
+            MaxU = 2E-3f;
+            DampRatio = 0.9f;
         }
-        public props_t store;
-        public PhModels PhMod { get => store.phMod; set => store.phMod = value; }
+        public float DampRatio;
+        public float MaxU;
+        public float initDrop;
+        public int nodes;
+        public float E;
+        public float L;
+        public float D;
+        public int Counts;
+        public float dt;
+        public float ro;
+        public PhModels phMod;
+        public PhModels PhMod { get => phMod; set => phMod = value; }
         private int _EndT;
         public int EndT
         {
@@ -29,103 +39,103 @@ namespace spring
         }
         public string DampRatiostr
         {
-            get => store.DampRatio.ToString(); set
+            get => DampRatio.ToString(); set
             {
                 if (float.TryParse(value, out float tmp))
                 {
-                    store.DampRatio = tmp;
+                    DampRatio = tmp;
                 }
             }
         }
         public string MaxUstr
         {
-            get => store.MaxU.ToString(); set
+            get => MaxU.ToString(); set
             {
                 if (float.TryParse(value, out float tmp))
                 {
-                    store.MaxU = tmp;
+                    MaxU = tmp;
                 }
             }
         }
         public string initDropstr
         {
-            get => store.initDrop.ToString(); set
+            get => initDrop.ToString(); set
             {
                 if (float.TryParse(value, out float tmp))
                 {
-                    store.initDrop = tmp;
+                    initDrop = tmp;
                 }
             }
         }
         public string nodesstr
         {
-            get => store.nodes.ToString(); set
+            get => nodes.ToString(); set
             {
                 if (int.TryParse(value, out int tmp))
                 {
-                    store.nodes = tmp;
+                    nodes = tmp;
                 }
             }
         }
         public string Estr
         {
-            get => store.E.ToString(); set
+            get => E.ToString(); set
             {
                 if (float.TryParse(value, out float tmp))
                 {
-                    store.E = tmp;
+                    E = tmp;
                 }
             }
         }
         public string Lstr
         {
-            get => store.L.ToString(); set
+            get => L.ToString(); set
             {
                 if (float.TryParse(value, out float tmp))
                 {
-                    store.L = tmp;
+                    L = tmp;
                 }
             }
         }
         public string Dstr
         {
-            get => store.D.ToString(); set
+            get => D.ToString(); set
             {
                 if (float.TryParse(value, out float tmp))
                 {
-                    store.D = tmp;
+                    D = tmp;
                 }
             }
         }
         public string Countstr
         {
-            get => store.Counts.ToString(); set
+            get => Counts.ToString(); set
             {
                 if (int.TryParse(value, out int tmp))
                 {
-                    store.Counts = tmp;
+                    Counts = tmp;
                     EndT = tmp - 1;
                 }
             }
         }
         public string dtstr
         {
-            get => store.dt.ToString(); set
+            get => dt.ToString(); set
             {
                 if (float.TryParse(value, out float tmp))
                 {
-                    store.dt = tmp;
+                    dt = tmp;
                 }
             }
         }
 
         public string rostr
         {
-            get => store.ro.ToString(); set
+            get => ro.ToString(); set
             {
                 if (float.TryParse(value, out float tmp))
                 {
-                    store.ro = tmp;
+                    ro = tmp;
                 }
             }
         }

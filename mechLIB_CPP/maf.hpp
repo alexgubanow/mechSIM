@@ -6,17 +6,17 @@ class maf
 {
 public:
 
-	static float P2(float value)
+	static inline float P2(float value)
 	{
 		return value * value;
 	}
 
-	static float P3(float value)
+	static inline float P3(float value)
 	{
 		return value * value * value;
 	}
 
-	static float P4(float value)
+	static inline float P4(float value)
 	{
 		return value * value * value * value;
 	}

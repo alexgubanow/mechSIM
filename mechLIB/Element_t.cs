@@ -73,7 +73,7 @@ namespace mechLIB
             Vector3 deltaL = lBpUx - lNpUx;
             //deltaL.Minus(lBpUx, lNpUx);
             Vector3 force = new Vector3();
-            GetFn(t, L[t], deltaL, ref force);
+            GetFn(t, deltaL, ref force);
             //GetPressureForce(t, bloodP, L[t]);
             //GetDragForce(t, Re, bloodV, L);
 
@@ -117,18 +117,18 @@ namespace mechLIB
             return L;
         }
 
-        private void GetFn(int t, float L, Vector3 deltaL, ref Vector3 force)
+        private void GetFn(int t, Vector3 deltaL, ref Vector3 force)
         {
             switch (phMod)
             {
                 case PhModels.hook:
-                    calcHookFn(ref force, L, deltaL);
+                    calcHookFn(ref force, L[0], deltaL);
                     break;
                 case PhModels.hookGeomNon:
-                    calcHookFn(ref force, L, deltaL);
+                    calcHookFn(ref force, L[t], deltaL);
                     break;
                 case PhModels.mooneyRiv:
-                    calcMooneyRivlinFn(ref force, L, deltaL);
+                    calcMooneyRivlinFn(ref force, L[t], deltaL);
                     break;
                 default:
                     throw new Exception("unexpected behavior");

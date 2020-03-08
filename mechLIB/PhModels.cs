@@ -15,6 +15,7 @@ namespace mechLIB
         [Description("Hook model, nonlin geaometry")]
         hookGeomNon,
         [Description("Mooney-Rivlin model")]
-        mooneyRiv
+        mooneyRiv,
+        maxModel
     }
 }

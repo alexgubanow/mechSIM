@@ -1,5 +1,8 @@
-﻿namespace mechLIB
+﻿using System.Runtime.InteropServices;
+
+namespace mechLIB
 {
+    [StructLayout(LayoutKind.Sequential)]
     public struct props_t
     {
         public float DampRatio;

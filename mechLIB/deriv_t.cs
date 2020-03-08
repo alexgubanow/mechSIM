@@ -57,28 +57,5 @@ namespace mechLIB
                     throw new System.Exception();
             }
         }
-        //public void SetByN(N_t N, xyz_t val)
-        //{
-        //    switch (N)
-        //    {
-        //        case N_t.p:
-        //            p = val;
-        //            break;
-        //        case N_t.u:
-        //            u = val;
-        //            break;
-        //        case N_t.v:
-        //            v = val;
-        //            break;
-        //        case N_t.a:
-        //            a = val;
-        //            break;
-        //        case N_t.b:
-        //            b = val;
-        //            break;
-        //        default:
-        //            throw new System.Exception();
-        //    }
-        //}
     }
 }
