@@ -12,13 +12,16 @@ class Node_t
 public:
 	NodeFreedom freedom;
 	NodeLoad LoadType;
-	std::vector<deriv_t> deriv;
-	std::vector<DirectX::SimpleMath::Vector3> F;
-	std::vector<int> Neigs;
+	deriv_t* deriv;
+	DirectX::SimpleMath::Vector3* F;
+	int* Neigs;
+	size_t NeigsSize;
 	int ID;
 	DirectX::SimpleMath::Vector3 radiusPoint;
-	Node_t(int tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::SimpleMath::Vector3
-		_radiusPoint, NodeFreedom _freedom, NodeLoad _LoadType, int _ID, std::vector<int> _Neigs);
+	Node_t();
+	~Node_t();
+	void init(int tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::SimpleMath::Vector3
+		_radiusPoint, NodeFreedom _freedom, NodeLoad _LoadType, int _ID, int* _Neigs, size_t _NeigsSize);
 	void CalcAccel(int t, float m);
 	void GetForces(Rope_t* model, int t, float m, float c);
 	void GetPhysicParam(Rope_t* rope, int t, float Re, float& m, float& c);

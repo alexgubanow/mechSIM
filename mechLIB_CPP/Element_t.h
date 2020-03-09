@@ -4,11 +4,6 @@
 #include <d3d11_1.h>
 #include <DirectXMath.h>
 #include "SimpleMath.h"
-#define _USE_MATH_DEFINES
-#include <math.h>
-#include "maf.hpp"
-#include <vector>
-#include "coords.hpp"
 
 class Rope_t;
 
@@ -23,10 +18,11 @@ public:
 	int n1;
 	int n2;
 	int ID;
-	std::vector<float> L;
-	std::vector<DirectX::SimpleMath::Vector3> F;
+	float* L;
+	DirectX::SimpleMath::Vector3* F;
 	DirectX::SimpleMath::Vector3 radiusPoint;
-	Element_t(int _n1, int _n2, int Counts, int _ID, mechLIB_CPPWrapper::props_t* _props);
+	Element_t();
+	void init(int _n1, int _n2, int Counts, int _ID, mechLIB_CPPWrapper::props_t* _props);
 	inline bool IsMyNode(int id) { return (n1 == id || n2 == id) ? true : false; };
 	void CalcForce(Rope_t* rope, int t, float Re, float bloodV, float bloodP, mechLIB_CPPWrapper::PhModels phMod);
 	void GetPhysicParam(Rope_t* rope, int t, float Re, float& m, float& c);

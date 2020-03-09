@@ -13,42 +13,46 @@ class Element_t;
 class Rope_t
 {
 public:
-	std::vector<Node_t*> Nodes;
-	std::vector<Element_t*> Elements;
+	Node_t* Nodes;
+	int NodesSize;
+	Element_t* Elements;
+	int ElementsSize;
 	float* L;
-	Rope_t(mechLIB_CPPWrapper::props_t* Props)
+	Rope_t(mechLIB_CPPWrapper::props_t* props)
 	{
-		L = new float[Props->Counts];
-		L[0] = Props->L;
-		Nodes.reserve(Props->nodes);
-		Elements.reserve(Props->nodes - 1);
-		SetupNodesPositions(Props);
-		EvalElements(Props);
+		L = new float[props->Counts];
+		L[0] = props->L;
+		NodesSize = props->nodes;
+		ElementsSize = props->nodes - 1;
+		Nodes = new Node_t[NodesSize];
+		Elements = new Element_t[ElementsSize];
+		SetupNodesPositions(props);
+		EvalElements(props);
 	};
-	Rope_t(mechLIB_CPPWrapper::props_t* Props, DirectX::SimpleMath::Vector3 startCoord, DirectX::SimpleMath::Vector3 endCoord)
+	Rope_t(mechLIB_CPPWrapper::props_t* props, DirectX::SimpleMath::Vector3 startCoord, DirectX::SimpleMath::Vector3 endCoord)
 	{
-		L = new float[Props->Counts];
-		L[0] = Props->L;
-		Nodes.reserve(Props->nodes);
-		Elements.reserve(Props->nodes - 1);
-		SetupNodesPositions(Props, startCoord, endCoord);
-		EvalElements(Props);
+		L = new float[props->Counts];
+		L[0] = props->L;
+		NodesSize = props->nodes;
+		ElementsSize = props->nodes - 1;
+		Nodes = new Node_t[NodesSize];
+		Elements = new Element_t[ElementsSize];
+		SetupNodesPositions(props, startCoord, endCoord);
+		EvalElements(props);
 	};
 	~Rope_t()
 	{
 		delete L;
-		for (auto itr : Elements)
-		{
-			delete itr;
-		}
+		delete[] Nodes;
+		delete[] Elements;
 	}
 	void SetupNodesPositions(mechLIB_CPPWrapper::props_t* props);
 	void SetupNodesPositions(mechLIB_CPPWrapper::props_t* props, DirectX::SimpleMath::Vector3 startCoord, DirectX::SimpleMath::Vector3 endCoord);
 	void EvalElements(mechLIB_CPPWrapper::props_t* props)
 	{
-		for (size_t i = 0; i < Elements.capacity(); i++)
+		for (int i = 0; i < ElementsSize; i++)
 		{
-			Elements.push_back(new Element_t(i, i + 1, props->Counts, i, props));
+			Elements[i].init(i, i + 1, props->Counts, i, props);
 		}
 	};
 
@@ -58,15 +62,15 @@ public:
 		{
 			throw std::exception("Not valid ID");
 		}
-		return Nodes[id];
+		return &Nodes[id];
 	};
 	Element_t* GetElemRef(int baseNode, int neigNode)
 	{
-		for (auto elem : Elements)
+		for (int i = 0; i < ElementsSize; i++)
 		{
-			if (elem->IsMyNode(baseNode) && elem->IsMyNode(neigNode))
+			if (Elements[i].IsMyNode(baseNode) && Elements[i].IsMyNode(neigNode))
 			{
-				return elem;
+				return &Elements[i];
 			}
 		}
 		throw std::exception("Element not found");

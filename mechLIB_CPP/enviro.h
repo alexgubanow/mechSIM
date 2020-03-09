@@ -9,9 +9,9 @@ namespace mechLIB_CPP
     class Enviro
     {
     private:
-        /*float[] Re;
-        float[] bloodV;
-        float[] bloodP;*/
+        float* Re;
+        float* bloodV;
+        float* bloodP;
         void allocateTime(float dt, int Counts)
         {
             time = new float[Counts];
@@ -29,20 +29,23 @@ namespace mechLIB_CPP
         void GenerateLoad(mechLIB_CPPWrapper::C_t axis);
         ~Enviro()
         {
+            delete[] Re;
+            delete[] bloodV;
+            delete[] bloodP;
+            delete[] time;
             delete rope;
-            delete time;
         }
         void Run()
         {
-            /*for (int t = 1; t < time.Length; t++)
+            for (int t = 1; t < phProps.Counts; t++)
             {
-                rope.StepOverElems(t, Re[t - 1], bloodV[t - 1], bloodP[t - 1]);
-                rope.StepOverNodes(t, Re[t - 1], phProps.dt);
-                foreach(var elem in rope.Elements)
+                rope->StepOverElems(t, Re[t - 1], bloodV[t - 1], bloodP[t - 1]);
+                rope->StepOverNodes(t, Re[t - 1], phProps.dt);
+                for (size_t i = 0; i < sizeof(rope->Elements); i++)
                 {
-                    rope.L[t] += elem.L[t];
+                    rope->L[t] += rope->Elements[i].L[t];
                 }
-            }*/
+            }
         }
     };
 }

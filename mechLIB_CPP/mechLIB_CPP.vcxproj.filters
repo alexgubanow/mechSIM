@@ -51,16 +51,10 @@
     <ClInclude Include="dcm_t.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mat.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="matrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tmwtypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="enviro.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="matioWrap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -83,11 +77,11 @@
     <ClCompile Include="Enviro.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="matioWrap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="libmat.lib" />
   </ItemGroup>
 </Project>

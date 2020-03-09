@@ -2,14 +2,21 @@
 #include "Rope_t.h"
 #include "Element_t.h"
 #include "dcm_t.hpp"
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include "maf.hpp"
+#include "coords.hpp"
 
-Element_t::Element_t(int _n1, int _n2,
-	int Counts, int _ID, mechLIB_CPPWrapper::props_t* _props)
+Element_t::Element_t()
+{
+}
+
+void Element_t::init(int _n1, int _n2, int Counts, int _ID, mechLIB_CPPWrapper::props_t* _props)
 {
 	props = _props;
-	L.reserve(props->Counts);
+	L = new float[props->Counts];
+	F = new DirectX::SimpleMath::Vector3[props->Counts];
 	ID = _ID;
-	F.reserve(props->Counts);
 	n1 = _n1;
 	n2 = _n2;
 	radiusPoint.z = props->D;
