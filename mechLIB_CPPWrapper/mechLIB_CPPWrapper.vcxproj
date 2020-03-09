@@ -107,6 +107,8 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <DisableSpecificWarnings>4561</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <AdditionalDependencies />
@@ -125,7 +127,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="C_t.h" />
+    <ClInclude Include="Derivatives.h" />
     <ClInclude Include="mechLIB_CPPWrapper.h" />
+    <ClInclude Include="NodeFreedom.h" />
+    <ClInclude Include="NodeLoad.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PhModels.h" />
     <ClInclude Include="props_t.h" />
@@ -150,6 +155,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>

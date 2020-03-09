@@ -11,25 +11,25 @@ private:
 	const float v3 = 1;
 	const float v4 = 1;
 public:
-    static void EulerExpl(NodeLoad &nodeLoad, deriv_t &now, deriv_t &before, deriv_t &zero, float dt)
+    static void EulerExpl(mechLIB_CPPWrapper::NodeLoad &nodeLoad, deriv_t &now, deriv_t &before, deriv_t &zero, float dt)
     {
         now.v.x = before.v.x + before.a.x * dt;
         now.v.y = before.v.y + before.a.y * dt;
         switch (nodeLoad)
         {
-        case NodeLoad::p:
+        case mechLIB_CPPWrapper::NodeLoad::p:
             break;
-        case NodeLoad::u:
+        case mechLIB_CPPWrapper::NodeLoad::u:
             break;
-        case NodeLoad::v:
+        case mechLIB_CPPWrapper::NodeLoad::v:
             break;
-        case NodeLoad::a:
+        case mechLIB_CPPWrapper::NodeLoad::a:
             break;
-        case NodeLoad::b:
+        case mechLIB_CPPWrapper::NodeLoad::b:
             break;
-        case NodeLoad::f:
+        case mechLIB_CPPWrapper::NodeLoad::f:
             break;
-        case NodeLoad::none:
+        case mechLIB_CPPWrapper::NodeLoad::none:
             now.u.x = now.v.x * dt;
             now.u.y = now.v.y * dt;
             now.p.x = zero.p.x + now.u.x;

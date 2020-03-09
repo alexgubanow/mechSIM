@@ -20,10 +20,8 @@ public:
 	std::vector<float> L;
 	std::vector<DirectX::SimpleMath::Vector3> F;
 	DirectX::SimpleMath::Vector3 radiusPoint;
-	Element_t();
-	~Element_t()
-	{
-	}
+	Element_t() : props(nullptr), A(0), I(0), n1(0), n2(0), ID(), L(0), F(0), radiusPoint() { }
+	~Element_t() { }
 	void init(int _n1, int _n2, int Counts, int _ID, mechLIB_CPPWrapper::props_t* _props);
 	inline bool IsMyNode(int id) { return (n1 == id || n2 == id) ? true : false; };
 	void CalcForce(Rope_t* rope, int t, float Re, float bloodV, float bloodP);

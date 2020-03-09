@@ -32,6 +32,8 @@ namespace spring.ViewModels
 
         private readonly IEventAggregator _ea;
         public props Props { get; set; }
+        private float[][][][] NodesDerivs;
+        private float[] timeArr;
         private mechLIB_CPPWrapper.Enviro world;
 
         private int _CurrT;
@@ -90,6 +92,7 @@ namespace spring.ViewModels
 
         private void Simulate()
         {
+            NodesDerivs = null;
             string fileName = "";
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true) { fileName = openFileDialog.FileName; }
@@ -98,30 +101,13 @@ namespace spring.ViewModels
             world.CreateWorld(Props.DampRatio, Props.MaxU, Props.initDrop, Props.nodes, Props.E, Props.L,
                 Props.D, Props.Counts, Props.dt, Props.ro, (mechLIB_CPPWrapper.PhModels)Props.phMod, fileName);
             //Props.Counts = world.time.Length;
-            world.Run();
+            //world.Run();
             //ShowResults(SelDeriv);
-            _ea.GetEvent<GotResultsEvent>().Publish();
-            float[] ropeL = Array.Empty<float>();
-            world.GetRopeL(ref ropeL);
-            if (openFileDialog.SafeFileName.Length > 0)
-            {
-                MLSingle mlDoubleArray = new MLSingle("L" + Props.PhMod + openFileDialog.SafeFileName.Replace(".mat", ""), ropeL, Props.Counts);
-                List<MLArray> mlList = new List<MLArray>
-            {
-                mlDoubleArray
-            };
-                _ = new MatFileWriter(openFileDialog.FileName.Replace(openFileDialog.SafeFileName, "") + "L" + Props.PhMod + openFileDialog.SafeFileName, mlList, true);
-            }
-            else
-            {
-                MLSingle mlDoubleArray = new MLSingle("L" + Props.PhMod, ropeL, Props.Counts);
-                List<MLArray> mlList = new List<MLArray>
-            {
-                mlDoubleArray
-            };
-                _ = new MatFileWriter("L" + Props.PhMod + ".mat", mlList, true);
-            }
+            NodesDerivs = Array.Empty<float[][][]>();
+            world.GetNodesDerivs(ref NodesDerivs);
+            world.GetTimeArr(ref timeArr);
             world.Destroy();
+            _ea.GetEvent<GotResultsEvent>().Publish();
         }
         private void ClearDataView()
         {
@@ -138,51 +124,51 @@ namespace spring.ViewModels
 
         private void ShowResults(int Deriv)
         {
-            //if (world.rope.Nodes != null)
-            //{
-            //    DrawPoints(Deriv);
-            //    Draw3d(CurrT, Deriv);
-            //}
+            if (NodesDerivs != null)
+            {
+                DrawPoints(Deriv);
+                Draw3d(CurrT, Deriv);
+            }
         }
 
         private void DrawPoints(int Deriv)
         {
             ClearDataView();
-            //if ((NodeLoad)Deriv == NodeLoad.f)
-            //{
-            //    foreach (var elem in world.rope.Elements)
-            //    {
-            //        plotData("elem #" + elem.ID, elem.F);
-            //    }
-            //    foreach (var node in world.rope.Nodes)
-            //    {
-            //        plotData("node #" + node.ID, node.F);
-            //    }
-            //}
-            //else
-            //{
-            //    foreach (var node in world.rope.Nodes)
-            //    {
-            //        plotData("node #" + node.ID, ExtractArray(node.deriv, (N_t)Deriv));
-            //    }
-            //}
+            if ((mechLIB_CPPWrapper.NodeLoad)Deriv == mechLIB_CPPWrapper.NodeLoad.f)
+            {
+                //foreach (var elem in world.rope.Elements)
+                //{
+                //    plotData("elem #" + elem.ID, elem.F);
+                //}
+                for (int i = 0; i < NodesDerivs.Length; i++)
+                {
+                    plotData("node #" + i, NodesDerivs[i][(int)mechLIB_CPPWrapper.Derivatives.f]);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < NodesDerivs.Length; i++)
+                {
+                    plotData("node #" + i, NodesDerivs[i][Deriv]);
+                }
+            }
         }
 
-        public List<DataPoint> getDataPointList(float[] X, Vector3[] Y, mechLIB.C_t axis, int step)
+        public List<DataPoint> getDataPointList(float[] X, float[][] Y, mechLIB_CPPWrapper.C_t axis, int step)
         {
             List<DataPoint> tmp = new List<DataPoint>();
             for (int t = 0; t < X.Length; t += step)
             {
                 switch (axis)
                 {
-                    case mechLIB.C_t.x:
-                        tmp.Add(new DataPoint(X[t], Y[t].X));
+                    case mechLIB_CPPWrapper.C_t.x:
+                        tmp.Add(new DataPoint(X[t], Y[t][0]));
                         break;
-                    case mechLIB.C_t.y:
-                        tmp.Add(new DataPoint(X[t], Y[t].Y));
+                    case mechLIB_CPPWrapper.C_t.y:
+                        tmp.Add(new DataPoint(X[t], Y[t][1]));
                         break;
-                    case mechLIB.C_t.z:
-                        tmp.Add(new DataPoint(X[t], Y[t].Z));
+                    case mechLIB_CPPWrapper.C_t.z:
+                        tmp.Add(new DataPoint(X[t], Y[t][2]));
                         break;
                     default:
                         throw new System.Exception();
@@ -190,43 +176,33 @@ namespace spring.ViewModels
             }
             return tmp;
         }
+        
+        private void plotData(string title, float[][] Y)
+        {
+            int step = 1;
+            int maxPlotPx = (int)SystemParameters.PrimaryScreenWidth / 2;
 
-        //private Vector3[] ExtractArray(deriv_t[] derivs, N_t deriv)
-        //{
-        //    Vector3[] tmp = new Vector3[world.time.Length];
-        //    for (int t = 0; t < world.time.Length; t++)
-        //    {
-        //        tmp[t] = derivs[t].GetByN(deriv);
-        //    }
-        //    return tmp;
-        //}
+            if (Y.Length > maxPlotPx)
+            {
+                step = Y.Length / maxPlotPx;
+            }
 
-        //private void plotData(string title, Vector3[] Y)
-        //{
-        //    int step = 1;
-        //    int maxPlotPx = (int)SystemParameters.PrimaryScreenWidth / 2;
-
-        //    if (Y.Length > maxPlotPx)
-        //    {
-        //        step = Y.Length / maxPlotPx;
-        //    }
-
-        //    List<DataPoint> data = getDataPointList(world.time, Y, C_t.x, step);
-        //    LineSeries aweLineSeries = new LineSeries { Title = title };
-        //    aweLineSeries.Points.AddRange(data);
-        //    awePlotModelX.Series.Add(aweLineSeries);
-        //    awePlotModelX.InvalidatePlot(true);
-        //    data = getDataPointList(world.time, Y, C_t.y, step);
-        //    aweLineSeries = new LineSeries { Title = title };
-        //    aweLineSeries.Points.AddRange(data);
-        //    awePlotModelY.Series.Add(aweLineSeries);
-        //    awePlotModelY.InvalidatePlot(true);
-        //    data = getDataPointList(world.time, Y, C_t.z, step);
-        //    aweLineSeries = new LineSeries { Title = title };
-        //    aweLineSeries.Points.AddRange(data);
-        //    awePlotModelZ.Series.Add(aweLineSeries);
-        //    awePlotModelZ.InvalidatePlot(true);
-        //}
+            List<DataPoint> data = getDataPointList(timeArr, Y, mechLIB_CPPWrapper.C_t.x, step);
+            LineSeries aweLineSeries = new LineSeries { Title = title };
+            aweLineSeries.Points.AddRange(data);
+            awePlotModelX.Series.Add(aweLineSeries);
+            awePlotModelX.InvalidatePlot(true);
+            data = getDataPointList(timeArr, Y, mechLIB_CPPWrapper.C_t.y, step);
+            aweLineSeries = new LineSeries { Title = title };
+            aweLineSeries.Points.AddRange(data);
+            awePlotModelY.Series.Add(aweLineSeries);
+            awePlotModelY.InvalidatePlot(true);
+            data = getDataPointList(timeArr, Y, mechLIB_CPPWrapper.C_t.z, step);
+            aweLineSeries = new LineSeries { Title = title };
+            aweLineSeries.Points.AddRange(data);
+            awePlotModelZ.Series.Add(aweLineSeries);
+            awePlotModelZ.InvalidatePlot(true);
+        }
 
         private void Draw3d(int t, int Deriv)
         {

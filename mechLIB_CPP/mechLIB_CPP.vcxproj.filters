@@ -39,12 +39,6 @@
     <ClInclude Include="Node_t.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NodeFreedom.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NodeLoad.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Rope_t.h">
       <Filter>Header Files</Filter>
     </ClInclude>

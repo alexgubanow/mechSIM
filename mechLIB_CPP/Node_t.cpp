@@ -14,18 +14,15 @@ Node_t::~Node_t()
 	delete[] F;*/
 }
 void Node_t::init(int tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::SimpleMath::Vector3 _radiusPoint,
-	NodeFreedom _freedom, NodeLoad _LoadType, int _ID, std::vector<int> _Neigs, size_t _NeigsSize)
+	mechLIB_CPPWrapper::NodeFreedom _freedom, mechLIB_CPPWrapper::NodeLoad _LoadType, int _ID, std::vector<int> _Neigs, size_t _NeigsSize)
 {
 	ID = _ID;
 	freedom = _freedom;
 	LoadType = _LoadType;
 	NeigsSize = _NeigsSize;
 	Neigs = _Neigs;
-	for (size_t i = 0; i < tCounts; i++)
-	{
-		deriv.push_back(deriv_t());
-		F.push_back(DirectX::SimpleMath::Vector3());
-	}
+	F = std::vector<DirectX::SimpleMath::Vector3>(tCounts);
+	deriv = std::vector<deriv_t>(tCounts);
 	deriv[0].p = coords;
 	deriv[0].a.y = _g;
 	deriv[0].v.y = _g * 5E-06f;
@@ -33,7 +30,7 @@ void Node_t::init(int tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::Sim
 }
 void Node_t::CalcAccel(int t, float m)
 {
-	if (LoadType != NodeLoad::p)
+	if (LoadType != mechLIB_CPPWrapper::NodeLoad::p)
 	{
 		deriv[t].a.x = F[t].x / m;
 		deriv[t].a.y = F[t].y / m;

@@ -33,6 +33,15 @@
     <ClInclude Include="C_t.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NodeFreedom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeLoad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Derivatives.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">

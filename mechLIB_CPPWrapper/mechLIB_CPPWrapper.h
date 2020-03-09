@@ -12,7 +12,8 @@ namespace mechLIB_CPPWrapper {
 		void CreateWorld(float DampRatio, float MaxU, float initDrop, int nodes, float E,
 			float L, float D, int Counts, float dt, float ro, mechLIB_CPPWrapper::PhModels phMod, System::String^ loadFile);
 		void Run();
-		void GetRopeL(array<float>^% L);
+		void GetNodesDerivs(array<array<array<array<float>^>^>^>^% arr);
+		void GetTimeArr(array<float>^% arr);
 		void Destroy()
 		{
 			delete world;

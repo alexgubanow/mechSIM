@@ -1,10 +1,22 @@
 #include "pch.h"
 #include "enviro.h"
 #include "matioWrap.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include "maf.hpp"
 
 namespace mechLIB_CPP
 {
-    Enviro::Enviro(mechLIB_CPPWrapper::props_t _phProps, std::string loadFile)
+    void Enviro::allocateTime(float dt, int Counts)
+    {
+        time = std::vector<float>(Counts);
+        //time = new float[Counts];
+        for (int i = 1; i < Counts; i++)
+        {
+            time[i] = time[i - 1] + dt;
+        }
+    }
+    Enviro::Enviro(mechLIB_CPPWrapper::props_t _phProps, std::string _loadFile)
     {
         phProps = _phProps;
         if (loadFile.size() > 0)
@@ -24,50 +36,69 @@ namespace mechLIB_CPP
                 matioW->readFloatArrFromMAT("plxq", &time);
                 matioW->readFloatArrFromMAT("pmyq", &time);
                 matioW->readFloatArrFromMAT("plyq", &time);*/
-                matioW->readFloatArrFromMAT("tq", &time);
-                matioW->readFloatArrFromMAT("req", &Re);
-                matioW->readFloatArrFromMAT("bloodVq", &bloodV);
-                matioW->readFloatArrFromMAT("abpq", &bloodP);
+                matioW->readFloatArrFromMAT("tq", time);
+                matioW->readFloatArrFromMAT("req", Re);
+                matioW->readFloatArrFromMAT("bloodVq", bloodV);
+                matioW->readFloatArrFromMAT("abpq", bloodP);
+                rope = new Rope_t();
+                rope->init(&phProps);
+                //rope->SetupNodesPositions(&phProps, startCoord, endCoord);
+                rope->EvalElements(&phProps);
                 delete matioW;
                 return;
             }
         }
         allocateTime(phProps.dt, phProps.Counts);
-        rope = new Rope_t(&phProps);
+        rope = new Rope_t();
+        rope->init(&phProps);
+        rope->SetupNodesPositions(&phProps);
+        rope->EvalElements(&phProps);
         GenerateLoad(mechLIB_CPPWrapper::C_t::x);
     }
     void Enviro::GenerateLoad(mechLIB_CPPWrapper::C_t axis)
     {
-        Re = new float[phProps.Counts];
-        bloodV = new float[phProps.Counts];
-        bloodP = new float[phProps.Counts];
-        //float A = (float)Math.PI * maf.P2(phProps.D) / 4;
-        //float maxLoad = ((phProps.E * A) / phProps.L / phProps.nodes) * phProps.MaxU;
-        //float freq = 1 / (phProps.Counts * phProps.dt);
-        //rope.Nodes[0].LoadType = NodeLoad.p;
-        //rope.Nodes[phProps.nodes - 1].LoadType = NodeLoad.u;
-        //int lastN = phProps.nodes - 1;
-        //for (int t = 0; t < phProps.Counts; t++)
-        //{
-        //rope.Nodes[0].deriv[t].p = rope.Nodes[0].deriv[0].p;
-        //rope.Nodes[lastN].deriv[t].p = rope.Nodes[lastN].deriv[0].p;
-        ////    Re[t] = 0;
-        ////    bloodV[t] = 0;
-        ////    bloodP[t] = 0;
-        ////    rope.Nodes[0].F[t].x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
-        ////    //model.Nodes[0].deriv[t].p.z = model.Nodes[0].deriv[0].p.z;
-        ////    //model.Nodes[0].deriv[t].p.y = model.Nodes[0].deriv[0].p.y;
-        ////    //model.Nodes[0].deriv[t].p.x = 0 - ((time[t] + time[1]) * phProps.MaxU);
-        ////    //model.Nodes[0].deriv[t].v.x = (model.Nodes[0].deriv[t].p.x - (0 - (time[t] * phProps.MaxU))) / time[1];
-        ////    int lastN = phProps.nodes - 1;
-        ////    rope.Nodes[lastN].deriv[t].p.z = rope.Nodes[lastN].deriv[0].p.z;
-        ////    rope.Nodes[lastN].deriv[t].p.y = rope.Nodes[lastN].deriv[0].p.y;
-        ////    //model.Nodes[lastN].F[t].x = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
-        ////rope.Nodes[lastN].deriv[t].p.X = rope.Nodes[lastN].deriv[0].p.X;
-        ////rope.Nodes[lastN].deriv[t].p.X = 0 - ((float)Math.Sin(2 * Math.PI * time[t] * freq / 3) * phProps.MaxU) + rope.Nodes[lastN].deriv[0].p.X;
-        //rope.Nodes[lastN].deriv[t].p.Y = ((float)Math.Sin(2 * Math.PI * time[t] * freq) * phProps.MaxU) + rope.Nodes[lastN].deriv[0].p.Y;
-        //rope.Nodes[lastN].deriv[t].u = rope.Nodes[lastN].deriv[t].p - rope.Nodes[lastN].deriv[0].p;
-        ////rope.Nodes[lastN].deriv[t].v.X = ((float)Math.Cos(2 * Math.PI * 0.5 * time[t] * freq) * phProps.MaxU) + rope.Nodes[lastN].deriv[0].v.X;
-        //}
+        Re = std::vector<float>(phProps.Counts);
+        bloodV = std::vector<float>(phProps.Counts);
+        bloodP = std::vector<float>(phProps.Counts);
+        float A = (float)M_PI * maf::P2(phProps.D) / 4;
+        float maxLoad = ((phProps.E * A) / phProps.L / phProps.nodes) * phProps.MaxU;
+        float freq = 1 / (phProps.Counts * phProps.dt);
+        rope->Nodes[0].LoadType = mechLIB_CPPWrapper::NodeLoad::p;
+        rope->Nodes[phProps.nodes - 1].LoadType = mechLIB_CPPWrapper::NodeLoad::u;
+        int lastN = phProps.nodes - 1;
+        for (int t = 0; t < phProps.Counts; t++)
+        {
+        rope->Nodes[0].deriv[t].p = rope->Nodes[0].deriv[0].p;
+        rope->Nodes[lastN].deriv[t].p = rope->Nodes[lastN].deriv[0].p;
+        //    Re[t] = 0;
+        //    bloodV[t] = 0;
+        //    bloodP[t] = 0;
+        //    rope->Nodes[0].F[t].x = 0 - ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
+        //    //model.Nodes[0].deriv[t].p.z = model.Nodes[0].deriv[0].p.z;
+        //    //model.Nodes[0].deriv[t].p.y = model.Nodes[0].deriv[0].p.y;
+        //    //model.Nodes[0].deriv[t].p.x = 0 - ((time[t] + time[1]) * phProps.MaxU);
+        //    //model.Nodes[0].deriv[t].v.x = (model.Nodes[0].deriv[t].p.x - (0 - (time[t] * phProps.MaxU))) / time[1];
+        //    int lastN = phProps.nodes - 1;
+        //    rope->Nodes[lastN].deriv[t].p.z = rope->Nodes[lastN].deriv[0].p.z;
+        //    rope->Nodes[lastN].deriv[t].p.y = rope->Nodes[lastN].deriv[0].p.y;
+        //    //model.Nodes[lastN].F[t].x = ((float)Math.Sin(2 * Math.PI * 0.5 * time[t] * freq) * maxLoad);
+        //rope->Nodes[lastN].deriv[t].p.X = rope->Nodes[lastN].deriv[0].p.X;
+        //rope->Nodes[lastN].deriv[t].p.X = 0 - ((float)Math.Sin(2 * Math.PI * time[t] * freq / 3) * phProps.MaxU) + rope->Nodes[lastN].deriv[0].p.X;
+        rope->Nodes[lastN].deriv[t].p.y = (sinf(2 * (float)M_PI * time[t] * freq) * phProps.MaxU) + rope->Nodes[lastN].deriv[0].p.y;
+        rope->Nodes[lastN].deriv[t].u = rope->Nodes[lastN].deriv[t].p - rope->Nodes[lastN].deriv[0].p;
+        //rope->Nodes[lastN].deriv[t].v.X = ((float)Math.Cos(2 * Math.PI * 0.5 * time[t] * freq) * phProps.MaxU) + rope->Nodes[lastN].deriv[0].v.X;
+        }
+    }
+    void Enviro::Run()
+    {
+        for (int t = 1; t < phProps.Counts; t++)
+        {
+            rope->StepOverElems(t, Re[t - 1], bloodV[t - 1], bloodP[t - 1]);
+            rope->StepOverNodes(t, Re[t - 1], phProps.dt);
+            for (int i = 0; i < rope->ElementsSize; i++)
+            {
+                rope->L[t] += rope->Elements[i].L[t];
+            }
+        }
     }
 };

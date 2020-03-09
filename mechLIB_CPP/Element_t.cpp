@@ -7,20 +7,11 @@
 #include "maf.hpp"
 #include "coords.hpp"
 
-Element_t::Element_t() : props(nullptr), A(0), I(0), n1(0), n2(0), ID(), L(0), F(0), radiusPoint()
-{
-}
-
 void Element_t::init(int _n1, int _n2, int Counts, int _ID, mechLIB_CPPWrapper::props_t* _props)
 {
 	props = _props;
-	for (size_t i = 0; i < props->Counts; i++)
-	{
-		L.push_back(0);
-		F.push_back(DirectX::SimpleMath::Vector3());
-	}
-	/*L = new float[props->Counts];
-	F = new DirectX::SimpleMath::Vector3[props->Counts];*/
+	L = std::vector<float>(props->Counts);
+	F = std::vector<DirectX::SimpleMath::Vector3>(props->Counts);
 	ID = _ID;
 	n1 = _n1;
 	n2 = _n2;
@@ -92,7 +83,7 @@ void Element_t::GetPhysicParam(Rope_t* rope, int t, float Re, float& m, float& c
 
 }
 
-inline float Element_t::GetOwnLength(Rope_t* rope, int t)
+float Element_t::GetOwnLength(Rope_t* rope, int t)
 {
 	float len = crds::GetTotL(rope->GetNodeRef(n1)->deriv[t].p, rope->GetNodeRef(n2)->deriv[t].p);
 	if (len == 0)
@@ -120,7 +111,7 @@ void Element_t::GetFn(int t, DirectX::SimpleMath::Vector3 deltaL, DirectX::Simpl
 	}
 }
 
-inline void Element_t::calcHookFn(DirectX::SimpleMath::Vector3& Fn, float oldL, DirectX::SimpleMath::Vector3 deltaL)
+void Element_t::calcHookFn(DirectX::SimpleMath::Vector3& Fn, float oldL, DirectX::SimpleMath::Vector3 deltaL)
 {
 	Fn.x = 0 - (props->E * A / oldL * deltaL.x);
 	//Fn[(int)C.y] = 12f * E * I / maf.P3(oldL2) * oldUy2;
@@ -135,13 +126,13 @@ void Element_t::calcMooneyRivlinFn(DirectX::SimpleMath::Vector3& Fn, float oldL,
 	Fn.x = 0 - (A * sigma);
 }
 
-inline void Element_t::GetPressureForce(int t, float bloodP, float L)
+void Element_t::GetPressureForce(int t, float bloodP, float L)
 {
 	//float Fpress = bloodP * radiusPoint.z * 2 * L;
 	F[t].y = -1E-08f;
 }
 
-inline void Element_t::GetDragForce(int t, float Re, float v, float L, DirectX::SimpleMath::Vector3& force)
+void Element_t::GetDragForce(int t, float Re, float v, float L, DirectX::SimpleMath::Vector3& force)
 {
 	float Awet = 2 * (float)M_PI * radiusPoint.z * L;
 	float bloodViscosity = 3E-3f;

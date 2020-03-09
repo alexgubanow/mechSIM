@@ -1,6 +1,8 @@
 #pragma once
 #include <matio.h>
 #include <string>
+#include <vector>
+
 class matioWrap
 {
     mat_t* mat;
@@ -21,7 +23,7 @@ public:
         }
         mat = NULL;
     }
-    void readFloatArrFromMAT(const char* varName, float** pArr)
+    void readFloatArrFromMAT(const char* varName, std::vector<float> &pArr)
     {
         matvar_t* matVar = Mat_VarRead(mat, (char*)varName);
         if (matVar)

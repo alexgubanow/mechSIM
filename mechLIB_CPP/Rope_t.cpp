@@ -4,6 +4,17 @@
 #include <execution>
 #include "maf.hpp"
 
+void Rope_t::init(mechLIB_CPPWrapper::props_t* props)
+{
+
+	L = std::vector<float>(props->Counts);
+	L[0] = props->L;
+	NodesSize = props->nodes;
+	Nodes = std::vector<Node_t>(NodesSize);
+	ElementsSize = props->nodes - 1;
+	Elements = std::vector<Element_t>(ElementsSize);
+}
+
 void Rope_t::SetupNodesPositions(mechLIB_CPPWrapper::props_t* props)
 {
 	int lastNode = NodesSize - 1;
@@ -11,18 +22,18 @@ void Rope_t::SetupNodesPositions(mechLIB_CPPWrapper::props_t* props)
 	Nodes[0].init(props->Counts,
 		DirectX::SimpleMath::Vector3{ 0,props->initDrop * maf::P2((0 * dl) - (props->L - dl) / 2) + 1E-3f,0 },
 		DirectX::SimpleMath::Vector3{ 0,props->initDrop * maf::P2((0 * dl) - (props->L - dl) / 2) + 1E-3f ,props->D },
-		NodeFreedom::xyz, NodeLoad::none, 0, std::vector<int>{ 1 }, 1);
+		mechLIB_CPPWrapper::NodeFreedom::xyz, mechLIB_CPPWrapper::NodeLoad::none, 0, std::vector<int>{ 1 }, 1);
 	for (int i = 1; i < lastNode; i++)
 	{
 		Nodes[i].init(props->Counts,
 			DirectX::SimpleMath::Vector3{ i * dl, props->initDrop * maf::P2((i * dl) - (props->L - dl) / 2) + 1E-3f,0 },
 			DirectX::SimpleMath::Vector3{ i * dl, props->initDrop * maf::P2((i * dl) - (props->L - dl) / 2) + 1E-3f, props->D },
-			NodeFreedom::xyz, NodeLoad::none, i, std::vector<int>{ i - 1, i + 1 }, 2);
+			mechLIB_CPPWrapper::NodeFreedom::xyz, mechLIB_CPPWrapper::NodeLoad::none, i, std::vector<int>{ i - 1, i + 1 }, 2);
 	}
 	Nodes[lastNode].init(props->Counts,
 		DirectX::SimpleMath::Vector3{ lastNode * dl, props->initDrop * maf::P2((lastNode * dl) - (props->L - dl) / 2) + 1E-3f,0 },
 		DirectX::SimpleMath::Vector3{ lastNode * dl, props->initDrop * maf::P2((lastNode * dl) - (props->L - dl) / 2) + 1E-3f, props->D },
-		NodeFreedom::xyz, NodeLoad::none, lastNode, std::vector<int>{ lastNode - 1 }, 1);
+		mechLIB_CPPWrapper::NodeFreedom::xyz, mechLIB_CPPWrapper::NodeLoad::none, lastNode, std::vector<int>{ lastNode - 1 }, 1);
 }
 
 void Rope_t::SetupNodesPositions(mechLIB_CPPWrapper::props_t* props, DirectX::SimpleMath::Vector3 startCoord,
