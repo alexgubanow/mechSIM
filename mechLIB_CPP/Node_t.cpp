@@ -23,9 +23,12 @@ void Node_t::init(int tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::Sim
 	Neigs = _Neigs;
 	F = std::vector<DirectX::SimpleMath::Vector3>(tCounts);
 	deriv = std::vector<deriv_t>(tCounts);
+	for (int i = 0; i < tCounts; i++)
+	{
+		deriv[i].a.y = _g;
+		deriv[i].v.y = _g * 1E-06f;
+	}
 	deriv[0].p = coords;
-	deriv[0].a.y = _g;
-	deriv[0].v.y = _g * 5E-06f;
 	radiusPoint = _radiusPoint;
 }
 void Node_t::CalcAccel(int t, float m)

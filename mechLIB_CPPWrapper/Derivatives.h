@@ -16,11 +16,7 @@ namespace mechLIB_CPPWrapper {
 		v,
 
 		//acceleration
-		a,
-
-		//jerk
-		b,
-
+		a,		
 		f, maxDerivatives
 	};
 

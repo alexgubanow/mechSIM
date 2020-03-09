@@ -100,9 +100,7 @@ namespace spring.ViewModels
             world = new mechLIB_CPPWrapper.Enviro();
             world.CreateWorld(Props.DampRatio, Props.MaxU, Props.initDrop, Props.nodes, Props.E, Props.L,
                 Props.D, Props.Counts, Props.dt, Props.ro, (mechLIB_CPPWrapper.PhModels)Props.phMod, fileName);
-            //Props.Counts = world.time.Length;
-            //world.Run();
-            //ShowResults(SelDeriv);
+            world.Run();
             NodesDerivs = Array.Empty<float[][][]>();
             world.GetNodesDerivs(ref NodesDerivs);
             world.GetTimeArr(ref timeArr);

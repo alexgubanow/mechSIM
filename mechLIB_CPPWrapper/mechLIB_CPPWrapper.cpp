@@ -42,6 +42,8 @@ void mechLIB_CPPWrapper::Enviro::GetNodesDerivs(array<array<array<array<float>^>
 		arr[i] = gcnew array<array<array<float>^>^>((int)Derivatives::maxDerivatives);
 		arr[i][(int)Derivatives::a] = gcnew array<array<float>^>(world->phProps.Counts);
 		arr[i][(int)Derivatives::p] = gcnew array<array<float>^>(world->phProps.Counts);
+		arr[i][(int)Derivatives::u] = gcnew array<array<float>^>(world->phProps.Counts);
+		arr[i][(int)Derivatives::v] = gcnew array<array<float>^>(world->phProps.Counts);
 		arr[i][(int)Derivatives::f] = gcnew array<array<float>^>(world->phProps.Counts);
 		for (int t = 0; t < world->phProps.Counts; t++)
 		{
@@ -57,6 +59,14 @@ void mechLIB_CPPWrapper::Enviro::GetNodesDerivs(array<array<array<array<float>^>
 			arr[i][(int)Derivatives::f][t][0] = world->rope->Nodes[i].F[t].x;
 			arr[i][(int)Derivatives::f][t][1] = world->rope->Nodes[i].F[t].y;
 			arr[i][(int)Derivatives::f][t][2] = world->rope->Nodes[i].F[t].z;
+			arr[i][(int)Derivatives::u][t] = gcnew array<float>(3);
+			arr[i][(int)Derivatives::u][t][0] = world->rope->Nodes[i].deriv[t].u.x;
+			arr[i][(int)Derivatives::u][t][1] = world->rope->Nodes[i].deriv[t].u.y;
+			arr[i][(int)Derivatives::u][t][2] = world->rope->Nodes[i].deriv[t].u.z;
+			arr[i][(int)Derivatives::v][t] = gcnew array<float>(3);
+			arr[i][(int)Derivatives::v][t][0] = world->rope->Nodes[i].deriv[t].v.x;
+			arr[i][(int)Derivatives::v][t][1] = world->rope->Nodes[i].deriv[t].v.y;
+			arr[i][(int)Derivatives::v][t][2] = world->rope->Nodes[i].deriv[t].v.z;
 		}
 	}
 	/*pin_ptr<float> pinned1 = &arr[0];

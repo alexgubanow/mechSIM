@@ -71,16 +71,14 @@ void Element_t::GetPhysicParam(Rope_t* rope, int t, float Re, float& m, float& c
 		//calc h of fluid on rod
 		float thFluid = (radiusPoint.z * 2) / sqrtf(Re);
 		//calc mass of fluid on rod
-		m += (float)M_PI * len * (maf::P2(radiusPoint.z + thFluid) - maf::P2(radiusPoint.z)) * 1060;
 		//add mass of this fluid to mass of rod
+		m += (float)M_PI * len * (maf::P2(radiusPoint.z + thFluid) - 
+			maf::P2(radiusPoint.z)) * 1060;		
 	}
-
-	c = props->DampRatio * 2 * sqrtf(m * ((props->E * A) / len));
-	if (c <= 0)
-	{
-		throw std::exception("Calculated damping ratio of element can't be eaqul to zero");
-	}
-
+	float alpha = 0 - ((sqrtf(5) * log10f(props->DampRatio)) /
+		(sqrtf(maf::P2(log10f(props->DampRatio)) + maf::P2(M_PI))));
+	float k = (props->E * A) / len;
+	c = alpha * sqrtf(m * k);
 }
 
 float Element_t::GetOwnLength(Rope_t* rope, int t)
@@ -129,17 +127,17 @@ void Element_t::calcMooneyRivlinFn(DirectX::SimpleMath::Vector3& Fn, float oldL,
 void Element_t::GetPressureForce(int t, float bloodP, float L)
 {
 	//float Fpress = bloodP * radiusPoint.z * 2 * L;
-	F[t].y = -1E-08f;
+	//F[t].y = -1E-08f;
 }
 
 void Element_t::GetDragForce(int t, float Re, float v, float L, DirectX::SimpleMath::Vector3& force)
 {
-	float Awet = 2 * (float)M_PI * radiusPoint.z * L;
+	/*float Awet = 2 * (float)M_PI * radiusPoint.z * L;
 	float bloodViscosity = 3E-3f;
 	float Be = 0.9f;
 	float Cd = (Awet / A) * (Be / Re);
 	float Fdrag = hlf * 1060 * maf::P2(v) * Cd * A;
 	//is it has to be applied only on moving direction??
 	force.y += Fdrag;
-	force.z += Fdrag;
+	force.z += Fdrag;*/
 }
