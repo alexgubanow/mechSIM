@@ -30,6 +30,9 @@
     <ClInclude Include="PhModels.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="C_t.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">

@@ -1,13 +1,14 @@
 #include "pch.h"
 
 #include "mechLIB_CPPWrapper.h"
+#include <msclr\marshal_cppstd.h>
 
 mechLIB_CPPWrapper::Enviro::Enviro()
 {
 }
 
 void mechLIB_CPPWrapper::Enviro::CreateWorld(float DampRatio, float MaxU, float initDrop, int nodes, float E, float L, 
-	float D, int Counts, float dt, float ro, mechLIB_CPPWrapper::PhModels phMod)
+	float D, int Counts, float dt, float ro, mechLIB_CPPWrapper::PhModels phMod, System::String^ loadFile)
 {
 	props_t phProps;
 	phProps.DampRatio = DampRatio;
@@ -21,7 +22,7 @@ void mechLIB_CPPWrapper::Enviro::CreateWorld(float DampRatio, float MaxU, float 
 	phProps.dt = dt;
 	phProps.ro = ro;
 	phProps.phMod = phMod;
-	world = new mechLIB_CPP::Enviro(phProps);
+	world = new mechLIB_CPP::Enviro(phProps, msclr::interop::marshal_as<std::string>(loadFile));
 }
 
 void mechLIB_CPPWrapper::Enviro::Run()

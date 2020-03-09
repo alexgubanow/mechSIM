@@ -121,6 +121,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="C_t.h" />
     <ClInclude Include="mechLIB_CPPWrapper.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PhModels.h" />

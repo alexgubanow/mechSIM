@@ -159,19 +159,23 @@
     <ClInclude Include="dcm_t.hpp" />
     <ClInclude Include="deriv_t.hpp" />
     <ClInclude Include="Element_t.h" />
-    <ClInclude Include="enviro.hpp" />
+    <ClInclude Include="enviro.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="integr.h" />
     <ClInclude Include="maf.hpp" />
+    <ClInclude Include="mat.h" />
+    <ClInclude Include="matrix.h" />
     <ClInclude Include="NodeFreedom.h" />
     <ClInclude Include="NodeLoad.h" />
     <ClInclude Include="Node_t.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Rope_t.h" />
+    <ClInclude Include="tmwtypes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Element_t.cpp" />
+    <ClCompile Include="Enviro.cpp" />
     <ClCompile Include="Node_t.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -183,6 +187,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="libmat.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

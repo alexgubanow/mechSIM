@@ -1,6 +1,8 @@
 #pragma once
 #include "Rope_t.h"
 #include "../mechLIB_CPPWrapper/props_t.h"
+#include "../mechLIB_CPPWrapper/C_t.h"
+#include <string>
 
 namespace mechLIB_CPP
 {
@@ -23,13 +25,8 @@ namespace mechLIB_CPP
         mechLIB_CPPWrapper::props_t phProps;
         Rope_t* rope;
         float* time;
-        Enviro(mechLIB_CPPWrapper::props_t _phProps)
-        {
-            phProps = _phProps;
-            allocateTime(phProps.dt, phProps.Counts);
-            rope = new Rope_t(&phProps);
-            //GenerateLoad(C_t.x);
-        }
+        Enviro(mechLIB_CPPWrapper::props_t _phProps, std::string loadFile);
+        void GenerateLoad(mechLIB_CPPWrapper::C_t axis);
         ~Enviro()
         {
             delete rope;
@@ -48,22 +45,4 @@ namespace mechLIB_CPP
             }*/
         }
     };
-
-
-    //void MECHLIB_API DisposeEnviro(Enviro* a_pObject)
-    //{
-    //    if (a_pObject != NULL)
-    //    {
-    //        delete a_pObject;
-    //        a_pObject = NULL;
-    //    }
-    //}
-    //
-    //void MECHLIB_API EnviroRun(Enviro* a_pObject)
-    //{
-    //    if (a_pObject != NULL)
-    //    {
-    //        a_pObject->Run();
-    //    }
-    //}
 }

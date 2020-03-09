@@ -1,6 +1,7 @@
 #pragma once
 #include "props_t.h"
-#include "../mechLIB_CPP/enviro.hpp"
+#include "../mechLIB_CPP/enviro.h"
+#include <string>
 
 namespace mechLIB_CPPWrapper {
 	public ref class Enviro
@@ -9,7 +10,7 @@ namespace mechLIB_CPPWrapper {
 	public:
 		Enviro();
 		void CreateWorld(float DampRatio, float MaxU, float initDrop, int nodes, float E,
-			float L, float D, int Counts, float dt, float ro, mechLIB_CPPWrapper::PhModels phMod);
+			float L, float D, int Counts, float dt, float ro, mechLIB_CPPWrapper::PhModels phMod, System::String^ loadFile);
 		void Run();
 		void GetRopeL(array<float>^% L);
 		~Enviro()
