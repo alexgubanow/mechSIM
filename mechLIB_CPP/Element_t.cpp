@@ -7,7 +7,7 @@
 #include "maf.hpp"
 #include "coords.hpp"
 
-Element_t::Element_t()
+Element_t::Element_t() : props(nullptr), A(0), I(0), n1(0), n2(0), ID(), L(nullptr), F(nullptr), radiusPoint()
 {
 }
 
@@ -24,11 +24,11 @@ void Element_t::init(int _n1, int _n2, int Counts, int _ID, mechLIB_CPPWrapper::
 	I = maf::P3(A) / 12.0f;
 }
 
-void Element_t::CalcForce(Rope_t* rope, int t, float Re, float bloodV, float bloodP, mechLIB_CPPWrapper::PhModels phMod)
+void Element_t::CalcForce(Rope_t* rope, int t, float Re, float bloodV, float bloodP)
 {
 	//getting length of link by measure between coords
 	L[t] = 0;
-	switch (phMod)
+	switch (props->phMod)
 	{
 	case mechLIB_CPPWrapper::PhModels::hook:
 		L[t] = GetOwnLength(rope, 0);

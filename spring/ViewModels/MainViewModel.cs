@@ -121,6 +121,7 @@ namespace spring.ViewModels
             };
                 _ = new MatFileWriter("L" + Props.PhMod + ".mat", mlList, true);
             }
+            world.Destroy();
         }
         private void ClearDataView()
         {

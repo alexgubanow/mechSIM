@@ -5,11 +5,13 @@
 #include "integr.h"
 #include "Rope_t.h"
 
-Node_t::Node_t()
+Node_t::Node_t() : freedom(), LoadType(), deriv(nullptr), F(nullptr), Neigs(nullptr), NeigsSize(0), ID(-1), radiusPoint()
 {
 }
 Node_t::~Node_t()
 {
+	delete[] deriv;
+	delete[] F;
 }
 void Node_t::init(int tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::SimpleMath::Vector3 _radiusPoint,
 	NodeFreedom _freedom, NodeLoad _LoadType, int _ID, int _Neigs[], size_t _NeigsSize)

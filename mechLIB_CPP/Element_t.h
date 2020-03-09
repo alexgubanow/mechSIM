@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "../mechLIB_CPPWrapper/props_t.h"
-#include "../mechLIB_CPPWrapper/PhModels.h"
 #include <d3d11_1.h>
 #include <DirectXMath.h>
 #include "SimpleMath.h"
@@ -22,9 +21,14 @@ public:
 	DirectX::SimpleMath::Vector3* F;
 	DirectX::SimpleMath::Vector3 radiusPoint;
 	Element_t();
+	~Element_t()
+	{
+		delete[] L;
+		delete[] F;
+	}
 	void init(int _n1, int _n2, int Counts, int _ID, mechLIB_CPPWrapper::props_t* _props);
 	inline bool IsMyNode(int id) { return (n1 == id || n2 == id) ? true : false; };
-	void CalcForce(Rope_t* rope, int t, float Re, float bloodV, float bloodP, mechLIB_CPPWrapper::PhModels phMod);
+	void CalcForce(Rope_t* rope, int t, float Re, float bloodV, float bloodP);
 	void GetPhysicParam(Rope_t* rope, int t, float Re, float& m, float& c);
 	float GetOwnLength(Rope_t* rope, int t);
 	void GetFn(int t, DirectX::SimpleMath::Vector3 deltaL, DirectX::SimpleMath::Vector3& force);

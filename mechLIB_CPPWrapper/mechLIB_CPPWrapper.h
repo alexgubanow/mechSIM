@@ -13,7 +13,7 @@ namespace mechLIB_CPPWrapper {
 			float L, float D, int Counts, float dt, float ro, mechLIB_CPPWrapper::PhModels phMod, System::String^ loadFile);
 		void Run();
 		void GetRopeL(array<float>^% L);
-		~Enviro()
+		void Destroy()
 		{
 			delete world;
 		}
