@@ -28,12 +28,14 @@ void mechLIB_CPPWrapper::Enviro::CreateWorld(float DampRatio, float MaxU, float 
 void mechLIB_CPPWrapper::Enviro::Run()
 {
 	world->Run();
-	world->rope->L[0] = 13;
-	world->rope->L[1] = 13;
 }
 
 void mechLIB_CPPWrapper::Enviro::GetRopeL(array<float>^% L)
 {
+	float sxs = world->rope->Elements[0].F[10].x;
+	float dsv = world->rope->L[1];
+	float gbf = world->rope->L[2];
+	float we = world->rope->L[3];
 	L = gcnew array<float>(world->phProps.Counts);
 	pin_ptr<float> pinned1 = &L[0];
 	pin_ptr<float> pinned2 = &world->rope->L[0];

@@ -7,15 +7,20 @@
 #include "maf.hpp"
 #include "coords.hpp"
 
-Element_t::Element_t() : props(nullptr), A(0), I(0), n1(0), n2(0), ID(), L(nullptr), F(nullptr), radiusPoint()
+Element_t::Element_t() : props(nullptr), A(0), I(0), n1(0), n2(0), ID(), L(0), F(0), radiusPoint()
 {
 }
 
 void Element_t::init(int _n1, int _n2, int Counts, int _ID, mechLIB_CPPWrapper::props_t* _props)
 {
 	props = _props;
-	L = new float[props->Counts];
-	F = new DirectX::SimpleMath::Vector3[props->Counts];
+	for (size_t i = 0; i < props->Counts; i++)
+	{
+		L.push_back(0);
+		F.push_back(DirectX::SimpleMath::Vector3());
+	}
+	/*L = new float[props->Counts];
+	F = new DirectX::SimpleMath::Vector3[props->Counts];*/
 	ID = _ID;
 	n1 = _n1;
 	n2 = _n2;
@@ -68,18 +73,18 @@ void Element_t::CalcForce(Rope_t* rope, int t, float Re, float bloodV, float blo
 
 void Element_t::GetPhysicParam(Rope_t* rope, int t, float Re, float& m, float& c)
 {
-	float L = GetOwnLength(rope, t);
-	m += props->ro * A * L;
+	float len = GetOwnLength(rope, t);
+	m += props->ro * A * len;
 	if (Re > 0)
 	{
 		//calc h of fluid on rod
 		float thFluid = (radiusPoint.z * 2) / sqrtf(Re);
 		//calc mass of fluid on rod
-		m += (float)M_PI * L * (maf::P2(radiusPoint.z + thFluid) - maf::P2(radiusPoint.z)) * 1060;
+		m += (float)M_PI * len * (maf::P2(radiusPoint.z + thFluid) - maf::P2(radiusPoint.z)) * 1060;
 		//add mass of this fluid to mass of rod
 	}
 
-	c = props->DampRatio * 2 * sqrtf(m * ((props->E * A) / L));
+	c = props->DampRatio * 2 * sqrtf(m * ((props->E * A) / len));
 	if (c <= 0)
 	{
 		throw std::exception("Calculated damping ratio of element can't be eaqul to zero");
@@ -89,12 +94,12 @@ void Element_t::GetPhysicParam(Rope_t* rope, int t, float Re, float& m, float& c
 
 inline float Element_t::GetOwnLength(Rope_t* rope, int t)
 {
-	float L = crds::GetTotL(rope->GetNodeRef(n1)->deriv[t].p, rope->GetNodeRef(n2)->deriv[t].p);
-	if (L == 0)
+	float len = crds::GetTotL(rope->GetNodeRef(n1)->deriv[t].p, rope->GetNodeRef(n2)->deriv[t].p);
+	if (len == 0)
 	{
 		throw std::exception("Calculated length of element can't be eaqul to zero");
 	}
-	return L;
+	return len;
 }
 
 void Element_t::GetFn(int t, DirectX::SimpleMath::Vector3 deltaL, DirectX::SimpleMath::Vector3& force)

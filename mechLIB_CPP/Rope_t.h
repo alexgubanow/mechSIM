@@ -13,38 +13,58 @@ class Element_t;
 class Rope_t
 {
 public:
-	Node_t* Nodes;
+	std::vector<Node_t> Nodes;
 	int NodesSize;
-	Element_t* Elements;
+	std::vector<Element_t> Elements;
 	int ElementsSize;
-	float* L;
+	std::vector<float> L;
 	Rope_t(mechLIB_CPPWrapper::props_t* props)
 	{
-		L = new float[props->Counts];
+		for (size_t i = 0; i < props->Counts; i++)
+		{
+			L.push_back(0);
+		}
+		//L = new float[props->Counts];
 		L[0] = props->L;
 		NodesSize = props->nodes;
 		ElementsSize = props->nodes - 1;
-		Nodes = new Node_t[NodesSize];
-		Elements = new Element_t[ElementsSize];
+		for (size_t i = 0; i < NodesSize; i++)
+		{
+			Nodes.push_back(Node_t());
+		}
+		for (size_t i = 0; i < ElementsSize; i++)
+		{
+			Elements.push_back(Element_t());
+		}
 		SetupNodesPositions(props);
 		EvalElements(props);
 	};
 	Rope_t(mechLIB_CPPWrapper::props_t* props, DirectX::SimpleMath::Vector3 startCoord, DirectX::SimpleMath::Vector3 endCoord)
 	{
-		L = new float[props->Counts];
+		for (size_t i = 0; i < props->Counts; i++)
+		{
+			L.push_back(0);
+		}
+		//L = new float[props->Counts];
 		L[0] = props->L;
 		NodesSize = props->nodes;
 		ElementsSize = props->nodes - 1;
-		Nodes = new Node_t[NodesSize];
-		Elements = new Element_t[ElementsSize];
+		for (size_t i = 0; i < NodesSize; i++)
+		{
+			Nodes.push_back(Node_t());
+		}
+		for (size_t i = 0; i < ElementsSize; i++)
+		{
+			Elements.push_back(Element_t());
+		}
 		SetupNodesPositions(props, startCoord, endCoord);
 		EvalElements(props);
 	};
 	~Rope_t()
 	{
-		delete L;
-		delete[] Nodes;
-		delete[] Elements;
+		//delete[] L;
+		/*delete[] Nodes;
+		delete[] Elements;*/
 	}
 	void SetupNodesPositions(mechLIB_CPPWrapper::props_t* props);
 	void SetupNodesPositions(mechLIB_CPPWrapper::props_t* props, DirectX::SimpleMath::Vector3 startCoord, DirectX::SimpleMath::Vector3 endCoord);

@@ -17,14 +17,12 @@ public:
 	int n1;
 	int n2;
 	int ID;
-	float* L;
-	DirectX::SimpleMath::Vector3* F;
+	std::vector<float> L;
+	std::vector<DirectX::SimpleMath::Vector3> F;
 	DirectX::SimpleMath::Vector3 radiusPoint;
 	Element_t();
 	~Element_t()
 	{
-		delete[] L;
-		delete[] F;
 	}
 	void init(int _n1, int _n2, int Counts, int _ID, mechLIB_CPPWrapper::props_t* _props);
 	inline bool IsMyNode(int id) { return (n1 == id || n2 == id) ? true : false; };

@@ -5,24 +5,27 @@
 #include "integr.h"
 #include "Rope_t.h"
 
-Node_t::Node_t() : freedom(), LoadType(), deriv(nullptr), F(nullptr), Neigs(nullptr), NeigsSize(0), ID(-1), radiusPoint()
+Node_t::Node_t() : freedom(), LoadType(), deriv(0), F(0), Neigs(0), NeigsSize(0), ID(-1), radiusPoint()
 {
 }
 Node_t::~Node_t()
 {
-	delete[] deriv;
-	delete[] F;
+	/*delete[] deriv;
+	delete[] F;*/
 }
 void Node_t::init(int tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::SimpleMath::Vector3 _radiusPoint,
-	NodeFreedom _freedom, NodeLoad _LoadType, int _ID, int _Neigs[], size_t _NeigsSize)
+	NodeFreedom _freedom, NodeLoad _LoadType, int _ID, std::vector<int> _Neigs, size_t _NeigsSize)
 {
 	ID = _ID;
 	freedom = _freedom;
 	LoadType = _LoadType;
 	NeigsSize = _NeigsSize;
 	Neigs = _Neigs;
-	deriv = new deriv_t[tCounts];
-	F = new DirectX::SimpleMath::Vector3[tCounts];
+	for (size_t i = 0; i < tCounts; i++)
+	{
+		deriv.push_back(deriv_t());
+		F.push_back(DirectX::SimpleMath::Vector3());
+	}
 	deriv[0].p = coords;
 	deriv[0].a.y = _g;
 	deriv[0].v.y = _g * 5E-06f;

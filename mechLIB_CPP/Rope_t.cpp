@@ -11,18 +11,18 @@ void Rope_t::SetupNodesPositions(mechLIB_CPPWrapper::props_t* props)
 	Nodes[0].init(props->Counts,
 		DirectX::SimpleMath::Vector3{ 0,props->initDrop * maf::P2((0 * dl) - (props->L - dl) / 2) + 1E-3f,0 },
 		DirectX::SimpleMath::Vector3{ 0,props->initDrop * maf::P2((0 * dl) - (props->L - dl) / 2) + 1E-3f ,props->D },
-		NodeFreedom::xyz, NodeLoad::none, 0, new int[1]{ 1 }, 1);
+		NodeFreedom::xyz, NodeLoad::none, 0, std::vector<int>{ 1 }, 1);
 	for (int i = 1; i < lastNode; i++)
 	{
 		Nodes[i].init(props->Counts,
 			DirectX::SimpleMath::Vector3{ i * dl, props->initDrop * maf::P2((i * dl) - (props->L - dl) / 2) + 1E-3f,0 },
 			DirectX::SimpleMath::Vector3{ i * dl, props->initDrop * maf::P2((i * dl) - (props->L - dl) / 2) + 1E-3f, props->D },
-			NodeFreedom::xyz, NodeLoad::none, i, new int[2]{ i - 1, i + 1 }, 2);
+			NodeFreedom::xyz, NodeLoad::none, i, std::vector<int>{ i - 1, i + 1 }, 2);
 	}
 	Nodes[lastNode].init(props->Counts,
 		DirectX::SimpleMath::Vector3{ lastNode * dl, props->initDrop * maf::P2((lastNode * dl) - (props->L - dl) / 2) + 1E-3f,0 },
 		DirectX::SimpleMath::Vector3{ lastNode * dl, props->initDrop * maf::P2((lastNode * dl) - (props->L - dl) / 2) + 1E-3f, props->D },
-		NodeFreedom::xyz, NodeLoad::none, lastNode, new int[1]{ lastNode - 1 }, 1);
+		NodeFreedom::xyz, NodeLoad::none, lastNode, std::vector<int>{ lastNode - 1 }, 1);
 }
 
 void Rope_t::SetupNodesPositions(mechLIB_CPPWrapper::props_t* props, DirectX::SimpleMath::Vector3 startCoord,
