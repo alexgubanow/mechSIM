@@ -80,9 +80,9 @@ void Rope_t::StepOverNodes(int t, float Re, float dt)
 	{
 		float m = 0;
 		float c = 0;
-		Nodes[i].GetPhysicParam(this, t - 1, Re, m, c);
-		Nodes[i].GetForces(this, t, m, c);
-		Nodes[i].CalcAccel(t, m);
+		//Nodes[i].GetPhysicParam(this, t - 1, Re, m, c);
+		//Nodes[i].GetForces(this, t, m, c);
+		//Nodes[i].CalcAccel(t, m);
 		/*integrate*/
 		Nodes[i].Integrate(t, t - 1, dt);
 	}

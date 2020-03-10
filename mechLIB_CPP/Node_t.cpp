@@ -23,11 +23,11 @@ void Node_t::init(int tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::Sim
 	Neigs = _Neigs;
 	F = std::vector<DirectX::SimpleMath::Vector3>(tCounts);
 	deriv = std::vector<deriv_t>(tCounts);
-	for (int i = 0; i < tCounts; i++)
+	/*for (int i = 0; i < tCounts; i++)
 	{
 		deriv[i].a.y = _g;
 		deriv[i].v.y = _g * 1E-06f;
-	}
+	}*/
 	deriv[0].p = coords;
 	radiusPoint = _radiusPoint;
 }
