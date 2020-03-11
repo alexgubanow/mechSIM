@@ -22,7 +22,7 @@ void Element_t::init(Node_t* _n1, Node_t* _n2, int Counts, mechLIB_CPPWrapper::p
 void Element_t::CalcForce(int t, float Re, float bloodV, float bloodP)
 {
 	//getting length of link by measure between coords
-	L[t] = 0;
+	//L[t] = 0;
 	switch (props->phMod)
 	{
 	case mechLIB_CPPWrapper::PhModels::hook:

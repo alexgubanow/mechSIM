@@ -69,6 +69,7 @@ void Rope_t::EvalElements(mechLIB_CPPWrapper::props_t* props)
 	for (int i = 0; i < ElementsSize; i++)
 	{
 		Elements[i].init(&Nodes[i], &Nodes[i + 1], props->Counts, props);
+		Elements[i].L[0] = Elements[i].GetOwnLength(0);
 	}
 }
 
