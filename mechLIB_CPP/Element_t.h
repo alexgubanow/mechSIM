@@ -14,19 +14,17 @@ private:
 	float A;
 	float I;
 public:
-	int n1;
-	int n2;
-	int ID;
+	Node_t* n1;
+	Node_t* n2;
 	std::vector<float> L;
 	std::vector<DirectX::SimpleMath::Vector3> F;
 	DirectX::SimpleMath::Vector3 radiusPoint;
-	Element_t() : props(nullptr), A(0), I(0), n1(0), n2(0), ID(), L(0), F(0), radiusPoint() { }
+	Element_t() : props(nullptr), A(0), I(0), n1(0), n2(0), L(0), F(0), radiusPoint() { }
 	~Element_t() { }
-	void init(int _n1, int _n2, int Counts, int _ID, mechLIB_CPPWrapper::props_t* _props);
-	inline bool IsMyNode(int id) { return (n1 == id || n2 == id) ? true : false; };
-	void CalcForce(Rope_t* rope, int t, float Re, float bloodV, float bloodP);
-	void GetPhysicParam(Rope_t* rope, int t, float Re, float& m, float& c);
-	float GetOwnLength(Rope_t* rope, int t);
+	void init(Node_t* _n1, Node_t* _n2, int Counts, mechLIB_CPPWrapper::props_t* _props);
+	void CalcForce(int t, float Re, float bloodV, float bloodP);
+	void GetPhysicParam(int t, float Re, float& m, float& c);
+	float GetOwnLength(int t);
 	void GetFn(int t, DirectX::SimpleMath::Vector3 deltaL, DirectX::SimpleMath::Vector3& force);
 	void calcHookFn(DirectX::SimpleMath::Vector3& Fn, float oldL, DirectX::SimpleMath::Vector3 deltaL);
 	void calcMooneyRivlinFn(DirectX::SimpleMath::Vector3& Fn, float oldL, DirectX::SimpleMath::Vector3 deltaL);

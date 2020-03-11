@@ -7,12 +7,11 @@
 #include "maf.hpp"
 #include "coords.hpp"
 
-void Element_t::init(int _n1, int _n2, int Counts, int _ID, mechLIB_CPPWrapper::props_t* _props)
+void Element_t::init(Node_t* _n1, Node_t* _n2, int Counts, mechLIB_CPPWrapper::props_t* _props)
 {
 	props = _props;
 	L = std::vector<float>(props->Counts);
 	F = std::vector<DirectX::SimpleMath::Vector3>(props->Counts);
-	ID = _ID;
 	n1 = _n1;
 	n2 = _n2;
 	radiusPoint.z = props->D;
@@ -20,35 +19,35 @@ void Element_t::init(int _n1, int _n2, int Counts, int _ID, mechLIB_CPPWrapper::
 	I = maf::P3(A) / 12.0f;
 }
 
-void Element_t::CalcForce(Rope_t* rope, int t, float Re, float bloodV, float bloodP)
+void Element_t::CalcForce(int t, float Re, float bloodV, float bloodP)
 {
 	//getting length of link by measure between coords
 	L[t] = 0;
 	switch (props->phMod)
 	{
 	case mechLIB_CPPWrapper::PhModels::hook:
-		L[t] = GetOwnLength(rope, 0);
+		L[t] = GetOwnLength(0);
 		break;
 	case mechLIB_CPPWrapper::PhModels::hookGeomNon:
-		L[t] = GetOwnLength(rope, t - 1);
+		L[t] = GetOwnLength(t - 1);
 		break;
 	case mechLIB_CPPWrapper::PhModels::mooneyRiv:
-		L[t] = GetOwnLength(rope, t - 1);
+		L[t] = GetOwnLength(t - 1);
 		break;
 	default:
 		throw std::exception("unexpected behavior");
 	}
 	//getting position of link according base point
 	DirectX::SimpleMath::Vector3 LinkPos = 
-		rope->GetNodeRef(n1)->deriv[t - 1].p - rope->GetNodeRef(n2)->deriv[t - 1].p;
+		n1->deriv[t - 1].p - n2->deriv[t - 1].p;
 	//getting DCM for this link
 	dcm_t dcm(LinkPos, radiusPoint);
 	//convert base point Ux to local coords
 	DirectX::SimpleMath::Vector3 lBpUx;
-	dcm.ToLoc(rope->GetNodeRef(n1)->deriv[t - 1].u, lBpUx);
+	dcm.ToLoc(n1->deriv[t - 1].u, lBpUx);
 	//convert n point Ux to local coords
 	DirectX::SimpleMath::Vector3 lNpUx;
-	dcm.ToLoc(rope->GetNodeRef(n2)->deriv[t - 1].u, lNpUx);
+	dcm.ToLoc(n2->deriv[t - 1].u, lNpUx);
 	//store delta of expansion
 	DirectX::SimpleMath::Vector3 deltaL = lBpUx - lNpUx;
 	DirectX::SimpleMath::Vector3 force;
@@ -62,9 +61,9 @@ void Element_t::CalcForce(Rope_t* rope, int t, float Re, float bloodV, float blo
 	F[t] += gforce;
 }
 
-void Element_t::GetPhysicParam(Rope_t* rope, int t, float Re, float& m, float& c)
+void Element_t::GetPhysicParam(int t, float Re, float& m, float& c)
 {
-	float len = GetOwnLength(rope, t);
+	float len = GetOwnLength(t);
 	m += props->ro * A * len;
 	if (Re > 0)
 	{
@@ -81,9 +80,9 @@ void Element_t::GetPhysicParam(Rope_t* rope, int t, float Re, float& m, float& c
 	c = alpha * sqrtf(m * k);
 }
 
-float Element_t::GetOwnLength(Rope_t* rope, int t)
+float Element_t::GetOwnLength(int t)
 {
-	float len = crds::GetTotL(rope->GetNodeRef(n1)->deriv[t].p, rope->GetNodeRef(n2)->deriv[t].p);
+	float len = crds::GetTotL(n1->deriv[t].p, n2->deriv[t].p);
 	if (len == 0)
 	{
 		throw std::exception("Calculated length of element can't be eaqul to zero");

@@ -5,7 +5,7 @@
 #include "integr.h"
 #include "Rope_t.h"
 
-Node_t::Node_t() : freedom(), LoadType(), deriv(0), F(0), Neigs(0), NeigsSize(0), ID(-1), radiusPoint()
+Node_t::Node_t() : freedom(), LoadType(), deriv(0), F(0), Neigs(0), radiusPoint()
 {
 }
 Node_t::~Node_t()
@@ -14,12 +14,10 @@ Node_t::~Node_t()
 	delete[] F;*/
 }
 void Node_t::init(int tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::SimpleMath::Vector3 _radiusPoint,
-	mechLIB_CPPWrapper::NodeFreedom _freedom, mechLIB_CPPWrapper::NodeLoad _LoadType, int _ID, std::vector<int> _Neigs, size_t _NeigsSize)
+	mechLIB_CPPWrapper::NodeFreedom _freedom, mechLIB_CPPWrapper::NodeLoad _LoadType, std::vector<Element_t *> _Neigs)
 {
-	ID = _ID;
 	freedom = _freedom;
 	LoadType = _LoadType;
-	NeigsSize = _NeigsSize;
 	Neigs = _Neigs;
 	F = std::vector<DirectX::SimpleMath::Vector3>(tCounts);
 	deriv = std::vector<deriv_t>(tCounts);
@@ -41,7 +39,7 @@ void Node_t::CalcAccel(int t, float m)
 	}
 
 }
-void Node_t::GetForces(Rope_t* rope, int t, float m, float c)
+void Node_t::GetForces(int t, float m, float c)
 {
 	//gravity force
 	F[t].y += m * _g;
@@ -49,24 +47,24 @@ void Node_t::GetForces(Rope_t* rope, int t, float m, float c)
 	F[t].x += 0 - (c * deriv[t - 1].v.x);
 	F[t].y += 0 - (c * deriv[t - 1].v.y);
 	/*getting element forces*/
-	for (size_t i = 0; i < NeigsSize; i++)
+	for (auto element : Neigs)
 	{
 		//push it to this force pull
-		F[t] += rope->GetElemRef(ID, Neigs[i])->F[t];
+		F[t] += element->F[t];
 	}
 }
-void Node_t::GetPhysicParam(Rope_t* rope, int t, float Re, float& m, float& c)
+void Node_t::GetPhysicParam(int t, float Re, float& m, float& c)
 {
-	for (size_t i = 0; i < NeigsSize; i++)
+	for (auto element : Neigs)
 	{
 		float mElem = 0;
 		float cElem = 0;
-		rope->GetElemRef(ID, Neigs[i])->GetPhysicParam(rope, t, Re, mElem, cElem);
+		element->GetPhysicParam(t, Re, mElem, cElem);
 		c += cElem;
 		m += mElem;
 	}
 	//m = 1E-04f;
-	c /= NeigsSize;
+	c /= Neigs.size();
 	if (m <= 0)
 	{
 		throw "Calculated mass of node can't be eaqul to zero";

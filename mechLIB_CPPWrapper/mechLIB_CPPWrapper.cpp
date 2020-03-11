@@ -78,6 +78,5 @@ void mechLIB_CPPWrapper::Enviro::GetTimeArr(array<float>^% arr)
 {
 	arr = gcnew array<float>(world->phProps.Counts);
 	pin_ptr<float> pinned1 = &arr[0];
-	pin_ptr<float> pinned2 = &world->time[0];
-	std::memcpy(pinned1, pinned2, world->phProps.Counts);
+	std::memcpy(pinned1, &world->time[0], (world->phProps.Counts)*sizeof(world->time[0]));
 }

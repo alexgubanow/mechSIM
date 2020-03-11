@@ -22,18 +22,18 @@ void Rope_t::SetupNodesPositions(mechLIB_CPPWrapper::props_t* props)
 	Nodes[0].init(props->Counts,
 		DirectX::SimpleMath::Vector3{ 0, props->initDrop * maf::P2((0 * dl) - (props->L - dl) / 2) + 1E-3f, 0 },
 		DirectX::SimpleMath::Vector3{ 0, props->initDrop * maf::P2((0 * dl) - (props->L - dl) / 2) + 1E-3f, props->D },
-		mechLIB_CPPWrapper::NodeFreedom::xyz, mechLIB_CPPWrapper::NodeLoad::none, 0, std::vector<int>{ 1 }, 1);
+		mechLIB_CPPWrapper::NodeFreedom::xyz, mechLIB_CPPWrapper::NodeLoad::none, std::vector<Element_t*>{ &Elements[0] });
 	for (int i = 1; i < lastNode; i++)
 	{
 		Nodes[i].init(props->Counts,
 			DirectX::SimpleMath::Vector3{ i * dl, props->initDrop * maf::P2((i * dl) - (props->L - dl) / 2) + 1E-3f, 0 },
 			DirectX::SimpleMath::Vector3{ i * dl, props->initDrop * maf::P2((i * dl) - (props->L - dl) / 2) + 1E-3f, props->D },
-			mechLIB_CPPWrapper::NodeFreedom::xyz, mechLIB_CPPWrapper::NodeLoad::none, i, std::vector<int>{ i - 1, i + 1 }, 2);
+			mechLIB_CPPWrapper::NodeFreedom::xyz, mechLIB_CPPWrapper::NodeLoad::none, std::vector<Element_t*>{ &Elements[i - 1], &Elements[i] });
 	}
 	Nodes[lastNode].init(props->Counts,
 		DirectX::SimpleMath::Vector3{ lastNode * dl, props->initDrop * maf::P2((lastNode * dl) - (props->L - dl) / 2) + 1E-3f, 0 },
 		DirectX::SimpleMath::Vector3{ lastNode * dl, props->initDrop * maf::P2((lastNode * dl) - (props->L - dl) / 2) + 1E-3f, props->D },
-		mechLIB_CPPWrapper::NodeFreedom::xyz, mechLIB_CPPWrapper::NodeLoad::none, lastNode, std::vector<int>{ lastNode - 1 }, 1);
+		mechLIB_CPPWrapper::NodeFreedom::xyz, mechLIB_CPPWrapper::NodeLoad::none, std::vector<Element_t*>{ &Elements[lastNode - 1] });
 }
 
 void Rope_t::SetupNodesPositions(mechLIB_CPPWrapper::props_t* props, DirectX::SimpleMath::Vector3 startCoord,
@@ -64,12 +64,20 @@ void Rope_t::SetupNodesPositions(mechLIB_CPPWrapper::props_t* props, DirectX::Si
 	//Nodes[lastNode] = new Node_t(props->Counts, endCoord, tmpRadPoint, NodeFreedom.xyz, NodeLoad.none, lastNode, new int[1]{ lastNode - 1 });
 }
 
+void Rope_t::EvalElements(mechLIB_CPPWrapper::props_t* props)
+{
+	for (int i = 0; i < ElementsSize; i++)
+	{
+		Elements[i].init(&Nodes[i], &Nodes[i + 1], props->Counts, props);
+	}
+}
+
 void Rope_t::StepOverElems(int t, float Re, float bloodV, float bloodP)
 {
 #pragma omp parallel for
 	for (int i = 0; i < ElementsSize; i++)
 	{
-		Elements[i].CalcForce(this, t, Re, bloodV, bloodP);
+		Elements[i].CalcForce(t, Re, bloodV, bloodP);
 	}
 }
 
@@ -80,9 +88,9 @@ void Rope_t::StepOverNodes(int t, float Re, float dt)
 	{
 		float m = 0;
 		float c = 0;
-		//Nodes[i].GetPhysicParam(this, t - 1, Re, m, c);
-		//Nodes[i].GetForces(this, t, m, c);
-		//Nodes[i].CalcAccel(t, m);
+		Nodes[i].GetPhysicParam(t - 1, Re, m, c);
+		Nodes[i].GetForces(t, m, c);
+		Nodes[i].CalcAccel(t, m);
 		/*integrate*/
 		Nodes[i].Integrate(t, t - 1, dt);
 	}
