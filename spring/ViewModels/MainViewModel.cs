@@ -1,6 +1,4 @@
-﻿using DotNetDoctor.csmatio.io;
-using DotNetDoctor.csmatio.types;
-using HelixToolkit.Wpf;
+﻿using HelixToolkit.Wpf;
 using Microsoft.Win32;
 using OxyPlot;
 using OxyPlot.Series;
@@ -212,44 +210,44 @@ namespace spring.ViewModels
             {
                 Objs3d.Clear();
                 Load3d();
-                //Objs3d.Add(new CubeVisual3D
-                //{
-                //    Center = new Point3D(world.rope.Nodes[0].deriv[t].p.X * 10E2,
-                //                         world.rope.Nodes[0].deriv[t].p.Z * 10E2,
-                //                         world.rope.Nodes[0].deriv[t].p.Y * 10E2),
-                //    SideLength = .8,
-                //    Fill = Brushes.Gray
-                //});
-                //Objs3d.Add(new CubeVisual3D
-                //{
-                //    Center = new Point3D(world.rope.Nodes[world.rope.Nodes.Length - 1].deriv[t].p.X * 10E2,
-                //                         world.rope.Nodes[world.rope.Nodes.Length - 1].deriv[t].p.Z * 10E2,
-                //                         world.rope.Nodes[world.rope.Nodes.Length - 1].deriv[t].p.Y * 10E2),
-                //    SideLength = .8,
-                //    Fill = Brushes.Gray
-                //});
-                //for (int node = 0; node < world.rope.Nodes.Length - 1; node++)
-                //{
-                //    Objs3d.Add(new LinesVisual3D
-                //    {
-                //        Points = { new Point3D(world.rope.Nodes[node].deriv[t].p.X * 10E2,
-                //                                world.rope.Nodes[node].deriv[t].p.Z * 10E2,
-                //                                world.rope.Nodes[node].deriv[t].p.Y * 10E2),
-                //            new Point3D(world.rope.Nodes[node + 1].deriv[t].p.X * 10E2,
-                //                        world.rope.Nodes[node + 1].deriv[t].p.Z * 10E2,
-                //                        world.rope.Nodes[node + 1].deriv[t].p.Y * 10E2) },
-                //        Thickness = 2,
-                //        Color = Brushes.Blue.Color
-                //    });
-                //    Objs3d.Add(new SphereVisual3D
-                //    {
-                //        Center = new Point3D(world.rope.Nodes[node].deriv[t].p.X * 10E2,
-                //                            world.rope.Nodes[node].deriv[t].p.Z * 10E2,
-                //                            world.rope.Nodes[node].deriv[t].p.Y * 10E2),
-                //        Radius = .3,
-                //        Fill = Brushes.Black
-                //    });
-                //}
+                Objs3d.Add(new CubeVisual3D
+                {
+                    Center = new Point3D(NodesDerivs[0][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
+                                         NodesDerivs[0][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
+                                         NodesDerivs[0][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2),
+                    SideLength = .8,
+                    Fill = Brushes.Gray
+                });
+                Objs3d.Add(new CubeVisual3D
+                {
+                    Center = new Point3D(NodesDerivs[NodesDerivs.Length - 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
+                                         NodesDerivs[NodesDerivs.Length - 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
+                                         NodesDerivs[NodesDerivs.Length - 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2),
+                    SideLength = .8,
+                    Fill = Brushes.Gray
+                });
+                for (int node = 0; node < NodesDerivs.Length - 1; node++)
+                {
+                    Objs3d.Add(new LinesVisual3D
+                    {
+                        Points = { new Point3D(NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
+                                                NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
+                                                NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2),
+                            new Point3D(NodesDerivs[node + 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
+                                        NodesDerivs[node + 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
+                                        NodesDerivs[node + 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2) },
+                        Thickness = 2,
+                        Color = Brushes.Blue.Color
+                    });
+                    Objs3d.Add(new SphereVisual3D
+                    {
+                        Center = new Point3D(NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
+                                            NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
+                                            NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2),
+                        Radius = .3,
+                        Fill = Brushes.Black
+                    });
+                }
             });
         }
     }
