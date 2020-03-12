@@ -87,7 +87,7 @@ namespace mechLIB_CPP
 
 
 
-        rope->Nodes[lastN].deriv[t].p.y = (phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq)) + rope->Nodes[lastN].deriv[0].p.y;
+        rope->Nodes[lastN].deriv[t].p.x = (phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq / 2)) + rope->Nodes[lastN].deriv[0].p.x;
         rope->Nodes[lastN].deriv[t].u = rope->Nodes[lastN].deriv[t].p - rope->Nodes[lastN].deriv[0].p;
 
 
