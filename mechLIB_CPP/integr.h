@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "maf.hpp"
-#include "deriv_t.hpp"
 
 class Integr
 {
@@ -11,10 +10,13 @@ private:
 	const float v3 = 1;
 	const float v4 = 1;
 public:
-    static void EulerExpl(mechLIB_CPPWrapper::NodeLoad &nodeLoad, deriv_t &now, deriv_t &before, deriv_t &zero, float dt)
+    static void EulerExpl(mechLIB_CPPWrapper::NodeLoad &nodeLoad, DirectX::SimpleMath::Vector3& now_p, 
+        DirectX::SimpleMath::Vector3& now_u, DirectX::SimpleMath::Vector3& now_v,
+        DirectX::SimpleMath::Vector3& now_a, DirectX::SimpleMath::Vector3& before_p, DirectX::SimpleMath::Vector3& before_u, 
+        DirectX::SimpleMath::Vector3& before_v, DirectX::SimpleMath::Vector3& before_a, DirectX::SimpleMath::Vector3&zero_p, float dt)
     {
-        now.v.x = before.v.x + before.a.x * dt;
-        now.v.y = before.v.y + before.a.y * dt;
+        now_v.x = before_v.x + before_a.x * dt;
+        now_v.y = before_v.y + before_a.y * dt;
         switch (nodeLoad)
         {
         case mechLIB_CPPWrapper::NodeLoad::p:
@@ -25,15 +27,13 @@ public:
             break;
         case mechLIB_CPPWrapper::NodeLoad::a:
             break;
-        case mechLIB_CPPWrapper::NodeLoad::b:
-            break;
         case mechLIB_CPPWrapper::NodeLoad::f:
             break;
         case mechLIB_CPPWrapper::NodeLoad::none:
-            now.u.x = now.v.x * dt;
-            now.u.y = now.v.y * dt;
-            now.p.x = zero.p.x + now.u.x;
-            now.p.y = zero.p.y + now.u.y;
+            now_u.x = now_v.x * dt;
+            now_u.y = now_v.y * dt;
+            now_p.x = zero_p.x + now_u.x;
+            now_p.y = zero_p.y + now_u.y;
             break;
         default:
             break;

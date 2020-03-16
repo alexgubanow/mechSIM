@@ -1,5 +1,4 @@
 #include "pch.h"
-
 #include "mechLIB_CPPWrapper.h"
 #include <msclr\marshal_cppstd.h>
 #include "Derivatives.h"
@@ -34,49 +33,99 @@ void mechLIB_CPPWrapper::Enviro::Run()
 	world->Run();
 }
 
-void mechLIB_CPPWrapper::Enviro::GetNodesDerivs(array<array<array<array<float>^>^>^>^% arr)
+void mechLIB_CPPWrapper::Enviro::GetNodesF(int step, array<array<mechLIB_CPPWrapper::DataPointCPP^>^>^% arr)
 {
-	arr = gcnew array<array<array<array<float>^>^>^>(world->rope->NodesSize);
-	for (int i = 0; i < world->rope->NodesSize; i++)
+	arr = gcnew array<array<mechLIB_CPPWrapper::DataPointCPP^>^>(world->rope->NodesSize);
+#pragma omp parallel for
+	for (int n = 0; n < world->rope->NodesSize; n++)
 	{
-		arr[i] = gcnew array<array<array<float>^>^>((int)Derivatives::maxDerivatives);
-		arr[i][(int)Derivatives::a] = gcnew array<array<float>^>(world->phProps.Counts);
-		arr[i][(int)Derivatives::p] = gcnew array<array<float>^>(world->phProps.Counts);
-		arr[i][(int)Derivatives::u] = gcnew array<array<float>^>(world->phProps.Counts);
-		arr[i][(int)Derivatives::v] = gcnew array<array<float>^>(world->phProps.Counts);
-		arr[i][(int)Derivatives::f] = gcnew array<array<float>^>(world->phProps.Counts);
-		for (int t = 0; t < world->phProps.Counts; t++)
+		arr[n] = gcnew array<mechLIB_CPPWrapper::DataPointCPP^>(world->phProps.Counts / step);
+		/*pin_ptr<float> pinned1 = &arr[n][0][0];
+		std::memcpy(pinned1, &world->rope->Nodes[n].F[0].x, sizeof(pinned1));*/
+		//#pragma omp parallel for
+		for (size_t t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
 		{
-			arr[i][(int)Derivatives::a][t] = gcnew array<float>(3);
-			arr[i][(int)Derivatives::a][t][0] = world->rope->Nodes[i].deriv[t].a.x;
-			arr[i][(int)Derivatives::a][t][1] = world->rope->Nodes[i].deriv[t].a.y;
-			arr[i][(int)Derivatives::a][t][2] = world->rope->Nodes[i].deriv[t].a.z;
-			arr[i][(int)Derivatives::p][t] = gcnew array<float>(3);
-			arr[i][(int)Derivatives::p][t][0] = world->rope->Nodes[i].deriv[t].p.x;
-			arr[i][(int)Derivatives::p][t][1] = world->rope->Nodes[i].deriv[t].p.y;
-			arr[i][(int)Derivatives::p][t][2] = world->rope->Nodes[i].deriv[t].p.z;
-			arr[i][(int)Derivatives::f][t] = gcnew array<float>(3);
-			arr[i][(int)Derivatives::f][t][0] = world->rope->Nodes[i].F[t].x;
-			arr[i][(int)Derivatives::f][t][1] = world->rope->Nodes[i].F[t].y;
-			arr[i][(int)Derivatives::f][t][2] = world->rope->Nodes[i].F[t].z;
-			arr[i][(int)Derivatives::u][t] = gcnew array<float>(3);
-			arr[i][(int)Derivatives::u][t][0] = world->rope->Nodes[i].deriv[t].u.x;
-			arr[i][(int)Derivatives::u][t][1] = world->rope->Nodes[i].deriv[t].u.y;
-			arr[i][(int)Derivatives::u][t][2] = world->rope->Nodes[i].deriv[t].u.z;
-			arr[i][(int)Derivatives::v][t] = gcnew array<float>(3);
-			arr[i][(int)Derivatives::v][t][0] = world->rope->Nodes[i].deriv[t].v.x;
-			arr[i][(int)Derivatives::v][t][1] = world->rope->Nodes[i].deriv[t].v.y;
-			arr[i][(int)Derivatives::v][t][2] = world->rope->Nodes[i].deriv[t].v.z;
+			arr[n][tout] = gcnew mechLIB_CPPWrapper::DataPointCPP();
+			arr[n][tout]->X = world->rope->Nodes[n].F[t].x;
+			arr[n][tout]->Y = world->rope->Nodes[n].F[t].y;
+			arr[n][tout]->Z = world->rope->Nodes[n].F[t].z;
 		}
 	}
-	/*pin_ptr<float> pinned1 = &arr[0];
-	pin_ptr<float> pinned2 = &world->rope->L[0];
-	std::memcpy(pinned1, pinned2, world->phProps.Counts);*/
+}
+void mechLIB_CPPWrapper::Enviro::GetNodesA(int step, array<array<mechLIB_CPPWrapper::DataPointCPP^>^>^% arr)
+{
+	arr = gcnew array<array<mechLIB_CPPWrapper::DataPointCPP^>^>(world->rope->NodesSize);
+#pragma omp parallel for
+	for (int n = 0; n < world->rope->NodesSize; n++)
+	{
+		arr[n] = gcnew array<mechLIB_CPPWrapper::DataPointCPP^>(world->phProps.Counts / step);
+		for (size_t t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
+		{
+			arr[n][tout] = gcnew mechLIB_CPPWrapper::DataPointCPP();
+			arr[n][tout]->X = world->rope->Nodes[n].a[t].x;
+			arr[n][tout]->Y = world->rope->Nodes[n].a[t].y;
+			arr[n][tout]->Z = world->rope->Nodes[n].a[t].z;
+		}
+	}
+}
+void mechLIB_CPPWrapper::Enviro::GetNodesV(int step, array<array<mechLIB_CPPWrapper::DataPointCPP^>^>^% arr)
+{
+	arr = gcnew array<array<mechLIB_CPPWrapper::DataPointCPP^>^>(world->rope->NodesSize);
+#pragma omp parallel for
+	for (int n = 0; n < world->rope->NodesSize; n++)
+	{
+		arr[n] = gcnew array<mechLIB_CPPWrapper::DataPointCPP^>(world->phProps.Counts / step);
+		for (size_t t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
+		{
+			arr[n][tout] = gcnew mechLIB_CPPWrapper::DataPointCPP();
+			arr[n][tout]->X = world->rope->Nodes[n].v[t].x;
+			arr[n][tout]->Y = world->rope->Nodes[n].v[t].y;
+			arr[n][tout]->Z = world->rope->Nodes[n].v[t].z;
+		}
+	}
+}
+void mechLIB_CPPWrapper::Enviro::GetNodesU(int step, array<array<mechLIB_CPPWrapper::DataPointCPP^>^>^% arr)
+{
+	arr = gcnew array<array<mechLIB_CPPWrapper::DataPointCPP^>^>(world->rope->NodesSize);
+#pragma omp parallel for
+	for (int n = 0; n < world->rope->NodesSize; n++)
+	{
+		arr[n] = gcnew array<mechLIB_CPPWrapper::DataPointCPP^>(world->phProps.Counts / step);
+		for (size_t t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
+		{
+			arr[n][tout] = gcnew mechLIB_CPPWrapper::DataPointCPP();
+			arr[n][tout]->X = world->rope->Nodes[n].u[t].x;
+			arr[n][tout]->Y = world->rope->Nodes[n].u[t].y;
+			arr[n][tout]->Z = world->rope->Nodes[n].u[t].z;
+		}
+	}
+}
+void mechLIB_CPPWrapper::Enviro::GetNodesP(int step, array<array<mechLIB_CPPWrapper::DataPointCPP^>^>^% arr)
+{
+	arr = gcnew array<array<mechLIB_CPPWrapper::DataPointCPP^>^>(world->rope->NodesSize);
+#pragma omp parallel for
+	for (int n = 0; n < world->rope->NodesSize; n++)
+	{
+		arr[n] = gcnew array<mechLIB_CPPWrapper::DataPointCPP^>(world->phProps.Counts / step);
+		for (size_t t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
+		{
+			arr[n][tout] = gcnew mechLIB_CPPWrapper::DataPointCPP();
+			arr[n][tout]->X = world->rope->Nodes[n].p[t].x;
+			arr[n][tout]->Y = world->rope->Nodes[n].p[t].y;
+			arr[n][tout]->Z = world->rope->Nodes[n].p[t].z;
+		}
+	}
 }
 
-void mechLIB_CPPWrapper::Enviro::GetTimeArr(array<float>^% arr)
-{
+void mechLIB_CPPWrapper::Enviro::GetTimeArr(int step, array<float>^% arr)
+{/*
 	arr = gcnew array<float>(world->phProps.Counts);
 	pin_ptr<float> pinned1 = &arr[0];
-	std::memcpy(pinned1, &world->time[0], (world->phProps.Counts)*sizeof(world->time[0]));
+	std::memcpy(pinned1, &world->time[0], (world->phProps.Counts)*sizeof(world->time[0]));*/
+	arr = gcnew array<float>(world->phProps.Counts / step);
+#pragma omp parallel for
+	for (size_t t = 0, tout = 0; t < world->time.size() && tout < arr->Length; t += step, tout++)
+	{
+		arr[tout] = world->time[t];
+	}
 }

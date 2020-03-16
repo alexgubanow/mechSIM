@@ -68,8 +68,8 @@ namespace mechLIB_CPP
         int lastN = phProps.nodes - 1;
         for (int t = 0; t < phProps.Counts; t++)
         {
-        rope->Nodes[0].deriv[t].p = rope->Nodes[0].deriv[0].p;
-        rope->Nodes[lastN].deriv[t].p = rope->Nodes[lastN].deriv[0].p;
+        rope->Nodes[0].p[t] = rope->Nodes[0].p[0];
+        rope->Nodes[lastN].p[t] = rope->Nodes[lastN].p[0];
         //    Re[t] = 0;
         //    bloodV[t] = 0;
         //    bloodP[t] = 0;
@@ -87,8 +87,8 @@ namespace mechLIB_CPP
 
 
 
-        rope->Nodes[lastN].deriv[t].p.x = (phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq / 2)) + rope->Nodes[lastN].deriv[0].p.x;
-        rope->Nodes[lastN].deriv[t].u = rope->Nodes[lastN].deriv[t].p - rope->Nodes[lastN].deriv[0].p;
+        rope->Nodes[lastN].p[t].x = (phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq / 2)) + rope->Nodes[lastN].p[0].x;
+        rope->Nodes[lastN].u[t] = rope->Nodes[lastN].p[t] - rope->Nodes[lastN].p[0];
 
 
         //rope->Nodes[lastN].deriv[t].v.X = ((float)Math.Cos(2 * Math.PI * 0.5 * time[t] * freq) * phProps.MaxU) + rope->Nodes[lastN].deriv[0].v.X;

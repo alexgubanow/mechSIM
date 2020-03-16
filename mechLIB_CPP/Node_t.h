@@ -5,7 +5,6 @@
 #include <DirectXMath.h>
 #include "SimpleMath.h"
 #include <vector>
-#include "deriv_t.hpp"
 class Rope_t;
 class Element_t;
 class Node_t
@@ -13,7 +12,10 @@ class Node_t
 public:
 	mechLIB_CPPWrapper::NodeFreedom freedom;
 	mechLIB_CPPWrapper::NodeLoad LoadType;
-	std::vector<deriv_t> deriv;
+	std::vector<DirectX::SimpleMath::Vector3> p;
+	std::vector<DirectX::SimpleMath::Vector3> u;
+	std::vector<DirectX::SimpleMath::Vector3> v;
+	std::vector<DirectX::SimpleMath::Vector3> a;
 	std::vector<DirectX::SimpleMath::Vector3> F;
 	std::vector<Element_t*> Neigs;
 	//int ID;

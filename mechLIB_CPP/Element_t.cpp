@@ -39,15 +39,15 @@ void Element_t::CalcForce(int t, float Re, float bloodV, float bloodP)
 	}
 	//getting position of link according base point
 	DirectX::SimpleMath::Vector3 LinkPos = 
-		n1->deriv[t - 1].p - n2->deriv[t - 1].p;
+		n1->p[t - 1] - n2->p[t - 1];
 	//getting DCM for this link
 	dcm_t dcm(LinkPos, radiusPoint);
 	//convert base point Ux to local coords
 	DirectX::SimpleMath::Vector3 lBpUx;
-	dcm.ToLoc(n1->deriv[t - 1].u, lBpUx);
+	dcm.ToLoc(n1->u[t - 1], lBpUx);
 	//convert n point Ux to local coords
 	DirectX::SimpleMath::Vector3 lNpUx;
-	dcm.ToLoc(n2->deriv[t - 1].u, lNpUx);
+	dcm.ToLoc(n2->u[t - 1], lNpUx);
 	//store delta of expansion
 	DirectX::SimpleMath::Vector3 deltaL = lBpUx - lNpUx;
 	DirectX::SimpleMath::Vector3 force;
@@ -82,7 +82,7 @@ void Element_t::GetPhysicParam(int t, float Re, float& m, float& c)
 
 float Element_t::GetOwnLength(int t)
 {
-	float len = crds::GetTotL(n1->deriv[t].p, n2->deriv[t].p);
+	float len = crds::GetTotL(n1->p[t], n2->p[t]);
 	if (len == 0)
 	{
 		throw std::exception("Calculated length of element can't be eaqul to zero");

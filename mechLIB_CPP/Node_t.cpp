@@ -5,7 +5,7 @@
 #include "integr.h"
 #include "Rope_t.h"
 
-Node_t::Node_t() : freedom(), LoadType(), deriv(0), F(0), Neigs(0), radiusPoint()
+Node_t::Node_t() : freedom(), LoadType(), p(0), u(0), v(0), a(0), F(0), Neigs(0), radiusPoint()
 {
 }
 Node_t::~Node_t()
@@ -20,21 +20,19 @@ void Node_t::init(int tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::Sim
 	LoadType = _LoadType;
 	Neigs = _Neigs;
 	F = std::vector<DirectX::SimpleMath::Vector3>(tCounts);
-	deriv = std::vector<deriv_t>(tCounts);
-	/*for (int i = 0; i < tCounts; i++)
-	{
-		deriv[i].a.y = _g;
-		deriv[i].v.y = _g * 1E-06f;
-	}*/
-	deriv[0].p = coords;
+	p = std::vector<DirectX::SimpleMath::Vector3>(tCounts);
+	u = std::vector<DirectX::SimpleMath::Vector3>(tCounts);
+	v = std::vector<DirectX::SimpleMath::Vector3>(tCounts);
+	a = std::vector<DirectX::SimpleMath::Vector3>(tCounts);
+	p[0] = coords;
 	radiusPoint = _radiusPoint;
 }
 void Node_t::CalcAccel(int t, float m)
 {
 	if (LoadType != mechLIB_CPPWrapper::NodeLoad::p)
 	{
-		deriv[t].a.x = F[t].x / m;
-		deriv[t].a.y = F[t].y / m;
+		a[t].x = F[t].x / m;
+		a[t].y = F[t].y / m;
 		//deriv[t].a.z = F[t].z / m;//has to be different
 	}
 
@@ -44,8 +42,8 @@ void Node_t::GetForces(int t, float m, float c)
 	//gravity force
 	F[t].y += m * _g;
 	//damping force
-	F[t].x += 0 - (c * deriv[t - 1].v.x);
-	F[t].y += 0 - (c * deriv[t - 1].v.y);
+	F[t].x += 0 - (c * v[t - 1].x);
+	F[t].y += 0 - (c * v[t - 1].y);
 	/*getting element forces*/
 	for (auto element : Neigs)
 	{
@@ -72,5 +70,5 @@ void Node_t::GetPhysicParam(int t, float Re, float& m, float& c)
 }
 void Node_t::Integrate(int now, int before, float dt)
 {
-	Integr::EulerExpl(LoadType, deriv[now], deriv[before], deriv[0], dt);
+	Integr::EulerExpl(LoadType, p[now], u[now], v[now], a[now], p[before], u[before], v[before], a[before], p[0], dt);
 }

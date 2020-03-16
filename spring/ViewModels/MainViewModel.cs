@@ -10,10 +10,10 @@ using System.Collections.ObjectModel;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
-
 
 namespace spring.ViewModels
 {
@@ -30,7 +30,11 @@ namespace spring.ViewModels
 
         private readonly IEventAggregator _ea;
         public props Props { get; set; }
-        private float[][][][] NodesDerivs;
+        private mechLIB_CPPWrapper.DataPointCPP[][] F;
+        private mechLIB_CPPWrapper.DataPointCPP[][] p;
+        private mechLIB_CPPWrapper.DataPointCPP[][] u;
+        private mechLIB_CPPWrapper.DataPointCPP[][] v;
+        private mechLIB_CPPWrapper.DataPointCPP[][] a;
         private float[] timeArr;
         private mechLIB_CPPWrapper.Enviro world;
 
@@ -75,7 +79,19 @@ namespace spring.ViewModels
             {
                 _ea.GetEvent<ClearPlotsEvent>().Publish();
                 thrsim = new Thread(delegate ()
-                { Simulate(); });
+                {
+                    try
+                    {
+                        Simulate();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                        world.Destroy();
+                        world = null;
+                        _ea.GetEvent<GotResultsEvent>().Publish();
+                    }
+                });
                 thrsim.Start();
             }
 
@@ -90,18 +106,33 @@ namespace spring.ViewModels
 
         private void Simulate()
         {
-            NodesDerivs = null;
+            F = null;
+            p = u = v = a = null;
             string fileName = "";
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true) { fileName = openFileDialog.FileName; }
-            
+
             world = new mechLIB_CPPWrapper.Enviro();
             world.CreateWorld(Props.DampRatio, Props.MaxU, Props.initDrop, Props.nodes, Props.E, Props.L,
                 Props.D, Props.Counts, Props.dt, Props.ro, (mechLIB_CPPWrapper.PhModels)Props.phMod, fileName);
             world.Run();
-            NodesDerivs = Array.Empty<float[][][]>();
-            world.GetNodesDerivs(ref NodesDerivs);
-            world.GetTimeArr(ref timeArr);
+            timeArr = Array.Empty<float>();
+            F = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
+            p = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
+            u = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
+            v = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
+            a = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
+            int step = 1;
+            if (Props.Counts > (int)SystemParameters.PrimaryScreenWidth / 2)
+            {
+                step = Props.Counts / (int)SystemParameters.PrimaryScreenWidth / 2;
+            }
+            world.GetTimeArr(step, ref timeArr);
+            world.GetNodesF(step, ref F);
+            world.GetNodesP(step, ref p);
+            world.GetNodesU(step, ref u);
+            world.GetNodesV(step, ref v);
+            world.GetNodesA(step, ref a);
             world.Destroy();
             _ea.GetEvent<GotResultsEvent>().Publish();
         }
@@ -120,7 +151,7 @@ namespace spring.ViewModels
 
         private void ShowResults(int Deriv)
         {
-            if (NodesDerivs != null)
+            if (F != null && p != null && u != null && v != null && a != null)
             {
                 DrawPoints(Deriv);
                 Draw3d(CurrT, Deriv);
@@ -130,70 +161,99 @@ namespace spring.ViewModels
         private void DrawPoints(int Deriv)
         {
             ClearDataView();
-            if ((mechLIB_CPPWrapper.NodeLoad)Deriv == mechLIB_CPPWrapper.NodeLoad.f)
+            if (Deriv == (int)mechLIB_CPPWrapper.NodeLoad.f)
             {
                 //foreach (var elem in world.rope.Elements)
                 //{
                 //    plotData("elem #" + elem.ID, elem.F);
                 //}
-                for (int i = 0; i < NodesDerivs.Length; i++)
+                for (int n = 0; n < F.Length; n++)
                 {
-                    plotData("node #" + i, NodesDerivs[i][(int)mechLIB_CPPWrapper.Derivatives.f]);
+                    plotData("node #" + n, ref F[n]);
                 }
             }
             else
             {
-                for (int i = 0; i < NodesDerivs.Length; i++)
+                switch ((mechLIB_CPPWrapper.Derivatives)Deriv)
                 {
-                    plotData("node #" + i, NodesDerivs[i][Deriv]);
-                }
-            }
-        }
-
-        public List<DataPoint> getDataPointList(float[] X, float[][] Y, mechLIB_CPPWrapper.C_t axis, int step)
-        {
-            List<DataPoint> tmp = new List<DataPoint>();
-            for (int t = 0; t < X.Length; t += step)
-            {
-                switch (axis)
-                {
-                    case mechLIB_CPPWrapper.C_t.x:
-                        tmp.Add(new DataPoint(X[t], Y[t][0]));
+                    case mechLIB_CPPWrapper.Derivatives.p:
+                        for (int n = 0; n < p.Length; n++)
+                        {
+                            plotData("node #" + n, ref p[n]);
+                        }
                         break;
-                    case mechLIB_CPPWrapper.C_t.y:
-                        tmp.Add(new DataPoint(X[t], Y[t][1]));
+                    case mechLIB_CPPWrapper.Derivatives.u:
+                        for (int n = 0; n < u.Length; n++)
+                        {
+                            plotData("node #" + n, ref u[n]);
+                        }
                         break;
-                    case mechLIB_CPPWrapper.C_t.z:
-                        tmp.Add(new DataPoint(X[t], Y[t][2]));
+                    case mechLIB_CPPWrapper.Derivatives.v:
+                        for (int n = 0; n < v.Length; n++)
+                        {
+                            plotData("node #" + n, ref v[n]);
+                        }
                         break;
+                    case mechLIB_CPPWrapper.Derivatives.a:
+                        for (int n = 0; n < a.Length; n++)
+                        {
+                            plotData("node #" + n, ref a[n]);
+                        }
+                        break;
+                    case mechLIB_CPPWrapper.Derivatives.maxDerivatives:
+                        throw new System.Exception();
                     default:
                         throw new System.Exception();
                 }
             }
+        }
+
+        public List<DataPoint> getDataPointListX(float[] X, mechLIB_CPPWrapper.DataPointCPP[] Y)
+        {
+            List<DataPoint> tmp = new List<DataPoint>();
+            tmp.AddRange(new DataPoint[X.Length]);
+            Parallel.For(0, X.Length,
+                t =>
+                {
+                    tmp[t] = new DataPoint(X[t], Y[t].X);
+                });
             return tmp;
         }
-        
-        private void plotData(string title, float[][] Y)
+        public List<DataPoint> getDataPointListY(float[] X, mechLIB_CPPWrapper.DataPointCPP[] Y)
         {
-            int step = 1;
-            int maxPlotPx = (int)SystemParameters.PrimaryScreenWidth / 2;
-
-            if (Y.Length > maxPlotPx)
-            {
-                step = Y.Length / maxPlotPx;
-            }
-
-            List<DataPoint> data = getDataPointList(timeArr, Y, mechLIB_CPPWrapper.C_t.x, step);
+            List<DataPoint> tmp = new List<DataPoint>();
+            tmp.AddRange(new DataPoint[X.Length]);
+            Parallel.For(0, X.Length,
+                t =>
+                {
+                    tmp.Add(new DataPoint(X[t], Y[t].Y));
+                });
+            return tmp;
+        }
+        public List<DataPoint> getDataPointListZ(float[] X, mechLIB_CPPWrapper.DataPointCPP[] Y)
+        {
+            List<DataPoint> tmp = new List<DataPoint>();
+            tmp.AddRange(new DataPoint[X.Length]);
+            Parallel.For(0, X.Length,
+                t =>
+                   {
+                       tmp.Add(new DataPoint(X[t], Y[t].Z));
+                   });
+            return tmp;
+        }
+        private void plotData(string title, ref mechLIB_CPPWrapper.DataPointCPP[] Y)
+        {
             LineSeries aweLineSeries = new LineSeries { Title = title };
+            List<DataPoint> data = getDataPointListX(timeArr, Y);
             aweLineSeries.Points.AddRange(data);
             awePlotModelX.Series.Add(aweLineSeries);
             awePlotModelX.InvalidatePlot(true);
-            data = getDataPointList(timeArr, Y, mechLIB_CPPWrapper.C_t.y, step);
+            data = getDataPointListY(timeArr, Y);
             aweLineSeries = new LineSeries { Title = title };
             aweLineSeries.Points.AddRange(data);
             awePlotModelY.Series.Add(aweLineSeries);
             awePlotModelY.InvalidatePlot(true);
-            data = getDataPointList(timeArr, Y, mechLIB_CPPWrapper.C_t.z, step);
+            data = getDataPointListZ(timeArr, Y);
             aweLineSeries = new LineSeries { Title = title };
             aweLineSeries.Points.AddRange(data);
             awePlotModelZ.Series.Add(aweLineSeries);
@@ -210,44 +270,44 @@ namespace spring.ViewModels
             {
                 Objs3d.Clear();
                 Load3d();
-                Objs3d.Add(new CubeVisual3D
-                {
-                    Center = new Point3D(NodesDerivs[0][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
-                                         NodesDerivs[0][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
-                                         NodesDerivs[0][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2),
-                    SideLength = .8,
-                    Fill = Brushes.Gray
-                });
-                Objs3d.Add(new CubeVisual3D
-                {
-                    Center = new Point3D(NodesDerivs[NodesDerivs.Length - 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
-                                         NodesDerivs[NodesDerivs.Length - 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
-                                         NodesDerivs[NodesDerivs.Length - 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2),
-                    SideLength = .8,
-                    Fill = Brushes.Gray
-                });
-                for (int node = 0; node < NodesDerivs.Length - 1; node++)
-                {
-                    Objs3d.Add(new LinesVisual3D
-                    {
-                        Points = { new Point3D(NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
-                                                NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
-                                                NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2),
-                            new Point3D(NodesDerivs[node + 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
-                                        NodesDerivs[node + 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
-                                        NodesDerivs[node + 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2) },
-                        Thickness = 2,
-                        Color = Brushes.Blue.Color
-                    });
-                    Objs3d.Add(new SphereVisual3D
-                    {
-                        Center = new Point3D(NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
-                                            NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
-                                            NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2),
-                        Radius = .3,
-                        Fill = Brushes.Black
-                    });
-                }
+                //Objs3d.Add(new CubeVisual3D
+                //{
+                //    Center = new Point3D(NodesDerivs[0][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
+                //                         NodesDerivs[0][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
+                //                         NodesDerivs[0][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2),
+                //    SideLength = .8,
+                //    Fill = Brushes.Gray
+                //});
+                //Objs3d.Add(new CubeVisual3D
+                //{
+                //    Center = new Point3D(NodesDerivs[NodesDerivs.Length - 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
+                //                         NodesDerivs[NodesDerivs.Length - 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
+                //                         NodesDerivs[NodesDerivs.Length - 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2),
+                //    SideLength = .8,
+                //    Fill = Brushes.Gray
+                //});
+                //for (int node = 0; node < NodesDerivs.Length - 1; node++)
+                //{
+                //    Objs3d.Add(new LinesVisual3D
+                //    {
+                //        Points = { new Point3D(NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
+                //                                NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
+                //                                NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2),
+                //            new Point3D(NodesDerivs[node + 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
+                //                        NodesDerivs[node + 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
+                //                        NodesDerivs[node + 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2) },
+                //        Thickness = 2,
+                //        Color = Brushes.Blue.Color
+                //    });
+                //    Objs3d.Add(new SphereVisual3D
+                //    {
+                //        Center = new Point3D(NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
+                //                            NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
+                //                            NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2),
+                //        Radius = .3,
+                //        Fill = Brushes.Black
+                //    });
+                //}
             });
         }
     }

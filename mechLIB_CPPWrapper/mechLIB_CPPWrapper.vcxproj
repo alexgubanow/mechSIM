@@ -134,6 +134,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="C_t.h" />
+    <ClInclude Include="DataPointCPP.hpp" />
     <ClInclude Include="Derivatives.h" />
     <ClInclude Include="mechLIB_CPPWrapper.h" />
     <ClInclude Include="NodeFreedom.h" />
@@ -142,6 +143,7 @@
     <ClInclude Include="PhModels.h" />
     <ClInclude Include="props_t.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="v3.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />

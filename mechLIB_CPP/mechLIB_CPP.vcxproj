@@ -166,7 +166,6 @@
   <ItemGroup>
     <ClInclude Include="coords.hpp" />
     <ClInclude Include="dcm_t.hpp" />
-    <ClInclude Include="deriv_t.hpp" />
     <ClInclude Include="Element_t.h" />
     <ClInclude Include="enviro.h" />
     <ClInclude Include="framework.h" />

@@ -17,10 +17,7 @@ namespace mechLIB_CPPWrapper {
 
 		//acceleration
 		a,
-
-		//jerk
-		b,
-
+		
 		f,
 		none
 	};
