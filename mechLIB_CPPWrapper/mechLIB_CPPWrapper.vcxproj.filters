@@ -42,9 +42,6 @@
     <ClInclude Include="Derivatives.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="v3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DataPointCPP.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
