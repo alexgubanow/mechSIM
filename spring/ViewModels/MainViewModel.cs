@@ -42,7 +42,7 @@ namespace spring.ViewModels
         public int CurrT { get => _CurrT; set { _CurrT = value; Draw3d(value, SelDeriv); } }
 
         private int selDeriv;
-        public int SelDeriv { get => selDeriv; set { selDeriv = value; if (world != null) { DrawPoints(value); } } }
+        public int SelDeriv { get => selDeriv; set { selDeriv = value; if (IsArrayExist) { DrawPoints(value); } } }
 
         public Point3DCollection RopeCoords { get; set; }
         public ObservableCollection<Visual3D> Objs3d { get; set; }
@@ -178,12 +178,14 @@ namespace spring.ViewModels
 
         private void ShowResults(int Deriv)
         {
-            if (F != null && p != null && u != null && v != null && a != null)
+            if (IsArrayExist)
             {
                 DrawPoints(Deriv);
                 Draw3d(CurrT, Deriv);
             }
         }
+
+        private bool IsArrayExist => F != null && p != null && u != null && v != null && a != null;
 
         private void DrawPoints(int Deriv)
         {
@@ -288,53 +290,52 @@ namespace spring.ViewModels
 
         private void Draw3d(int t, int Deriv)
         {
-            if (world == null)
+            if (p != null)
             {
-                return;
-            }
-            Application.Current.Dispatcher.Invoke(delegate
-            {
-                Objs3d.Clear();
-                Load3d();
-                Objs3d.Add(new CubeVisual3D
+                Application.Current.Dispatcher.Invoke(delegate
                 {
-                    Center = new Point3D(p[0][t].X * 10E2,
-                                         p[0][t].Z * 10E2,
-                                         p[0][t].Y * 10E2),
-                    SideLength = .8,
-                    Fill = Brushes.Gray
-                });
-                Objs3d.Add(new CubeVisual3D
-                {
-                    Center = new Point3D(p[p.Length - 1][t].X * 10E2,
-                                         p[p.Length - 1][t].Z * 10E2,
-                                         p[p.Length - 1][t].Y * 10E2),
-                    SideLength = .8,
-                    Fill = Brushes.Gray
-                });
-                for (int node = 0; node < p.Length - 1; node++)
-                {
-                    Objs3d.Add(new LinesVisual3D
+                    Objs3d.Clear();
+                    Load3d();
+                    Objs3d.Add(new CubeVisual3D
                     {
-                        Points = { new Point3D(p[node][t].X * 10E2,
+                        Center = new Point3D(p[0][t].X * 10E2,
+                                             p[0][t].Z * 10E2,
+                                             p[0][t].Y * 10E2),
+                        SideLength = .8,
+                        Fill = Brushes.Gray
+                    });
+                    Objs3d.Add(new CubeVisual3D
+                    {
+                        Center = new Point3D(p[p.Length - 1][t].X * 10E2,
+                                             p[p.Length - 1][t].Z * 10E2,
+                                             p[p.Length - 1][t].Y * 10E2),
+                        SideLength = .8,
+                        Fill = Brushes.Gray
+                    });
+                    for (int node = 0; node < p.Length - 1; node++)
+                    {
+                        Objs3d.Add(new LinesVisual3D
+                        {
+                            Points = { new Point3D(p[node][t].X * 10E2,
                                                 p[node][t].Z * 10E2,
                                                 p[node][t].Y * 10E2),
                             new Point3D(p[node + 1][t].X * 10E2,
                                         p[node + 1][t].Z * 10E2,
                                         p[node + 1][t].Y * 10E2) },
-                        Thickness = 2,
-                        Color = Brushes.Blue.Color
-                    });
-                    Objs3d.Add(new SphereVisual3D
-                    {
-                        Center = new Point3D(p[node][t].X * 10E2,
-                                            p[node][t].Z * 10E2,
-                                            p[node][t].Y * 10E2),
-                        Radius = .3,
-                        Fill = Brushes.Black
-                    });
-                }
-            });
+                            Thickness = 2,
+                            Color = Brushes.Blue.Color
+                        });
+                        Objs3d.Add(new SphereVisual3D
+                        {
+                            Center = new Point3D(p[node][t].X * 10E2,
+                                                p[node][t].Z * 10E2,
+                                                p[node][t].Y * 10E2),
+                            Radius = .3,
+                            Fill = Brushes.Black
+                        });
+                    }
+                });
+            }
         }
     }
 }
