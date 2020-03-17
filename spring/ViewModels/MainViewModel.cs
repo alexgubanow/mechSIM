@@ -126,7 +126,9 @@ namespace spring.ViewModels
             F = null;
             p = u = v = a = null;
             string fileName = "";
+
             OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.DereferenceLinks = false;
             if (openFileDialog.ShowDialog() == true) { fileName = openFileDialog.FileName; }
 
             world = new mechLIB_CPPWrapper.Enviro();
@@ -144,7 +146,7 @@ namespace spring.ViewModels
                 int step = 1;
                 if (Props.Counts > (int)SystemParameters.PrimaryScreenWidth / 2)
                 {
-                    step = Props.Counts / (int)SystemParameters.PrimaryScreenWidth / 2;
+                    step = Props.Counts / ((int)SystemParameters.PrimaryScreenWidth / 2);
                 }
                 world.GetTimeArr(step, ref timeArr);
                 world.GetNodesF(step, ref F);
@@ -198,7 +200,7 @@ namespace spring.ViewModels
                 //}
                 for (int n = 0; n < F.Length; n++)
                 {
-                    plotData("node #" + n, ref F[n]);
+                    PlotData("node #" + n, F[n]);
                 }
             }
             else
@@ -208,25 +210,25 @@ namespace spring.ViewModels
                     case mechLIB_CPPWrapper.Derivatives.p:
                         for (int n = 0; n < p.Length; n++)
                         {
-                            plotData("node #" + n, ref p[n]);
+                            PlotData("node #" + n, p[n]);
                         }
                         break;
                     case mechLIB_CPPWrapper.Derivatives.u:
                         for (int n = 0; n < u.Length; n++)
                         {
-                            plotData("node #" + n, ref u[n]);
+                            PlotData("node #" + n, u[n]);
                         }
                         break;
                     case mechLIB_CPPWrapper.Derivatives.v:
                         for (int n = 0; n < v.Length; n++)
                         {
-                            plotData("node #" + n, ref v[n]);
+                            PlotData("node #" + n, v[n]);
                         }
                         break;
                     case mechLIB_CPPWrapper.Derivatives.a:
                         for (int n = 0; n < a.Length; n++)
                         {
-                            plotData("node #" + n, ref a[n]);
+                            PlotData("node #" + n, a[n]);
                         }
                         break;
                     case mechLIB_CPPWrapper.Derivatives.maxDerivatives:
@@ -235,9 +237,18 @@ namespace spring.ViewModels
                         throw new System.Exception();
                 }
             }
+            awePlotModelX.InvalidatePlot(true);
+            awePlotModelY.InvalidatePlot(true);
+            awePlotModelZ.InvalidatePlot(true);
         }
 
-        public List<DataPoint> getDataPointListX(float[] X, mechLIB_CPPWrapper.DataPointCPP[] Y)
+        private void PlotData(string title, mechLIB_CPPWrapper.DataPointCPP[] Y)
+        {
+            plotDataX(title, timeArr, Y);
+            plotDataY(title, timeArr, Y);
+            plotDataZ(title, timeArr, Y);
+        }
+        public void plotDataX(string title, float[] X, mechLIB_CPPWrapper.DataPointCPP[] Y)
         {
             List<DataPoint> tmp = new List<DataPoint>();
             tmp.AddRange(new DataPoint[X.Length]);
@@ -246,19 +257,24 @@ namespace spring.ViewModels
                 {
                     tmp[t] = new DataPoint(X[t], Y[t].X);
                 });
-            return tmp;
+            LineSeries aweLineSeries = new LineSeries { Title = title };
+            aweLineSeries.Points.AddRange(tmp);
+            awePlotModelX.Series.Add(aweLineSeries);
         }
-        public List<DataPoint> getDataPointListY(float[] X, mechLIB_CPPWrapper.DataPointCPP[] Y)
+        public void plotDataY(string title, float[] X, mechLIB_CPPWrapper.DataPointCPP[] Y)
         {
             List<DataPoint> tmp = new List<DataPoint>();
             tmp.AddRange(new DataPoint[X.Length]);
-            for (int t = 0; t < X.Length; t++)
-            {
-                tmp[t] = new DataPoint(X[t], Y[t].Y);
-            }
-            return tmp;
+            Parallel.For(0, X.Length,
+                t =>
+                {
+                    tmp[t] = new DataPoint(X[t], Y[t].Y);
+                });
+            LineSeries aweLineSeries = new LineSeries { Title = title };
+            aweLineSeries.Points.AddRange(tmp);
+            awePlotModelY.Series.Add(aweLineSeries);
         }
-        public List<DataPoint> getDataPointListZ(float[] X, mechLIB_CPPWrapper.DataPointCPP[] Y)
+        public void plotDataZ(string title, float[] X, mechLIB_CPPWrapper.DataPointCPP[] Y)
         {
             List<DataPoint> tmp = new List<DataPoint>();
             tmp.AddRange(new DataPoint[X.Length]);
@@ -267,30 +283,14 @@ namespace spring.ViewModels
                 {
                     tmp[t] = new DataPoint(X[t], Y[t].Z);
                 });
-            return tmp;
-        }
-        private void plotData(string title, ref mechLIB_CPPWrapper.DataPointCPP[] Y)
-        {
             LineSeries aweLineSeries = new LineSeries { Title = title };
-            List<DataPoint> data = getDataPointListX(timeArr, Y);
-            aweLineSeries.Points.AddRange(data);
-            awePlotModelX.Series.Add(aweLineSeries);
-            awePlotModelX.InvalidatePlot(true);
-            data = getDataPointListY(timeArr, Y);
-            aweLineSeries = new LineSeries { Title = title };
-            aweLineSeries.Points.AddRange(data);
-            awePlotModelY.Series.Add(aweLineSeries);
-            awePlotModelY.InvalidatePlot(true);
-            data = getDataPointListZ(timeArr, Y);
-            aweLineSeries = new LineSeries { Title = title };
-            aweLineSeries.Points.AddRange(data);
+            aweLineSeries.Points.AddRange(tmp);
             awePlotModelZ.Series.Add(aweLineSeries);
-            awePlotModelZ.InvalidatePlot(true);
         }
 
         private void Draw3d(int t, int Deriv)
         {
-            if (p != null)
+            if (p != null && p.Length > 0)
             {
                 Application.Current.Dispatcher.Invoke(delegate
                 {
