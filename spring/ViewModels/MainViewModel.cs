@@ -50,6 +50,18 @@ namespace spring.ViewModels
         public PlotModel awePlotModelX { get; set; }
         public PlotModel awePlotModelY { get; set; }
         public PlotModel awePlotModelZ { get; set; }
+        private bool _EnableConrols;
+        public bool EnableConrols
+        {
+            get => _EnableConrols;
+            set => SetProperty(ref _EnableConrols, value);
+        }
+        private int _EndT;
+        public int EndT
+        {
+            get => _EndT;
+            set => SetProperty(ref _EndT, value);
+        }
 
         Thread thrsim;
         public MainViewModel(IEventAggregator ea)
@@ -58,6 +70,7 @@ namespace spring.ViewModels
             Props = new props();
             selDeriv = 0;
             _CurrT = 0;
+            EndT = 1;
             Objs3d = new ObservableCollection<Visual3D>();
             awePlotModelX = new PlotModel { Title = "X axis" };
             awePlotModelY = new PlotModel { Title = "Y axis" };
@@ -65,9 +78,12 @@ namespace spring.ViewModels
             awePlotModelX.InvalidatePlot(true);
             awePlotModelY.InvalidatePlot(true);
             awePlotModelZ.InvalidatePlot(true);
+            EnableConrols = false;
+            _ea.GetEvent<GotResultsEvent>().Subscribe(() => EnableConrols = true );
             _ea.GetEvent<GotResultsEvent>().Subscribe(() => thrsim = null);
             _ea.GetEvent<GotResultsEvent>().Subscribe(() => ShowResults(SelDeriv));
             _ea.GetEvent<ComputeEvent>().Subscribe((var) => Compute_Click(var));
+            _ea.GetEvent<ComputeEvent>().Subscribe((var) => EnableConrols = false);
             _ea.GetEvent<ClearPlotsEvent>().Subscribe(() => ClearDataView());
             //Load3dEvent
             //_ea.GetEvent<Load3dEvent>().Subscribe(() => Load3d());
@@ -106,6 +122,7 @@ namespace spring.ViewModels
 
         private void Simulate()
         {
+            EndT = 1;
             F = null;
             p = u = v = a = null;
             string fileName = "";
@@ -113,28 +130,38 @@ namespace spring.ViewModels
             if (openFileDialog.ShowDialog() == true) { fileName = openFileDialog.FileName; }
 
             world = new mechLIB_CPPWrapper.Enviro();
-            world.CreateWorld(Props.DampRatio, Props.MaxU, Props.initDrop, Props.nodes, Props.E, Props.L,
-                Props.D, Props.Counts, Props.dt, Props.ro, (mechLIB_CPPWrapper.PhModels)Props.phMod, fileName);
-            world.Run();
-            timeArr = Array.Empty<float>();
-            F = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
-            p = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
-            u = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
-            v = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
-            a = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
-            int step = 1;
-            if (Props.Counts > (int)SystemParameters.PrimaryScreenWidth / 2)
+            try
             {
-                step = Props.Counts / (int)SystemParameters.PrimaryScreenWidth / 2;
+                world.CreateWorld(Props.DampRatio, Props.MaxU, Props.initDrop, Props.nodes, Props.E, Props.L,
+                    Props.D, Props.Counts, Props.dt, Props.ro, (mechLIB_CPPWrapper.PhModels)Props.phMod, fileName);
+                world.Run();
+                timeArr = Array.Empty<float>();
+                F = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
+                p = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
+                u = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
+                v = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
+                a = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
+                int step = 1;
+                if (Props.Counts > (int)SystemParameters.PrimaryScreenWidth / 2)
+                {
+                    step = Props.Counts / (int)SystemParameters.PrimaryScreenWidth / 2;
+                }
+                world.GetTimeArr(step, ref timeArr);
+                world.GetNodesF(step, ref F);
+                world.GetNodesP(step, ref p);
+                world.GetNodesU(step, ref u);
+                world.GetNodesV(step, ref v);
+                world.GetNodesA(step, ref a);
+                EndT = timeArr.Length - 1;
+                _ea.GetEvent<GotResultsEvent>().Publish();
             }
-            world.GetTimeArr(step, ref timeArr);
-            world.GetNodesF(step, ref F);
-            world.GetNodesP(step, ref p);
-            world.GetNodesU(step, ref u);
-            world.GetNodesV(step, ref v);
-            world.GetNodesA(step, ref a);
+            catch (Exception ex)
+            {
+                _ea.GetEvent<GotResultsEvent>().Publish();
+                MessageBox.Show(ex.Message);
+            }
             world.Destroy();
-            _ea.GetEvent<GotResultsEvent>().Publish();
+            world = null;
         }
         private void ClearDataView()
         {
@@ -223,11 +250,10 @@ namespace spring.ViewModels
         {
             List<DataPoint> tmp = new List<DataPoint>();
             tmp.AddRange(new DataPoint[X.Length]);
-            Parallel.For(0, X.Length,
-                t =>
-                {
-                    tmp.Add(new DataPoint(X[t], Y[t].Y));
-                });
+            for (int t = 0; t < X.Length; t++)
+            {
+                tmp[t] = new DataPoint(X[t], Y[t].Y);
+            }
             return tmp;
         }
         public List<DataPoint> getDataPointListZ(float[] X, mechLIB_CPPWrapper.DataPointCPP[] Y)
@@ -236,9 +262,9 @@ namespace spring.ViewModels
             tmp.AddRange(new DataPoint[X.Length]);
             Parallel.For(0, X.Length,
                 t =>
-                   {
-                       tmp.Add(new DataPoint(X[t], Y[t].Z));
-                   });
+                {
+                    tmp[t] = new DataPoint(X[t], Y[t].Z);
+                });
             return tmp;
         }
         private void plotData(string title, ref mechLIB_CPPWrapper.DataPointCPP[] Y)
@@ -270,44 +296,44 @@ namespace spring.ViewModels
             {
                 Objs3d.Clear();
                 Load3d();
-                //Objs3d.Add(new CubeVisual3D
-                //{
-                //    Center = new Point3D(NodesDerivs[0][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
-                //                         NodesDerivs[0][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
-                //                         NodesDerivs[0][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2),
-                //    SideLength = .8,
-                //    Fill = Brushes.Gray
-                //});
-                //Objs3d.Add(new CubeVisual3D
-                //{
-                //    Center = new Point3D(NodesDerivs[NodesDerivs.Length - 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
-                //                         NodesDerivs[NodesDerivs.Length - 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
-                //                         NodesDerivs[NodesDerivs.Length - 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2),
-                //    SideLength = .8,
-                //    Fill = Brushes.Gray
-                //});
-                //for (int node = 0; node < NodesDerivs.Length - 1; node++)
-                //{
-                //    Objs3d.Add(new LinesVisual3D
-                //    {
-                //        Points = { new Point3D(NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
-                //                                NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
-                //                                NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2),
-                //            new Point3D(NodesDerivs[node + 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
-                //                        NodesDerivs[node + 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
-                //                        NodesDerivs[node + 1][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2) },
-                //        Thickness = 2,
-                //        Color = Brushes.Blue.Color
-                //    });
-                //    Objs3d.Add(new SphereVisual3D
-                //    {
-                //        Center = new Point3D(NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][0] * 10E2,
-                //                            NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][2] * 10E2,
-                //                            NodesDerivs[node][(int)mechLIB_CPPWrapper.Derivatives.p][t][1] * 10E2),
-                //        Radius = .3,
-                //        Fill = Brushes.Black
-                //    });
-                //}
+                Objs3d.Add(new CubeVisual3D
+                {
+                    Center = new Point3D(p[0][t].X * 10E2,
+                                         p[0][t].Z * 10E2,
+                                         p[0][t].Y * 10E2),
+                    SideLength = .8,
+                    Fill = Brushes.Gray
+                });
+                Objs3d.Add(new CubeVisual3D
+                {
+                    Center = new Point3D(p[p.Length - 1][t].X * 10E2,
+                                         p[p.Length - 1][t].Z * 10E2,
+                                         p[p.Length - 1][t].Y * 10E2),
+                    SideLength = .8,
+                    Fill = Brushes.Gray
+                });
+                for (int node = 0; node < p.Length - 1; node++)
+                {
+                    Objs3d.Add(new LinesVisual3D
+                    {
+                        Points = { new Point3D(p[node][t].X * 10E2,
+                                                p[node][t].Z * 10E2,
+                                                p[node][t].Y * 10E2),
+                            new Point3D(p[node + 1][t].X * 10E2,
+                                        p[node + 1][t].Z * 10E2,
+                                        p[node + 1][t].Y * 10E2) },
+                        Thickness = 2,
+                        Color = Brushes.Blue.Color
+                    });
+                    Objs3d.Add(new SphereVisual3D
+                    {
+                        Center = new Point3D(p[node][t].X * 10E2,
+                                            p[node][t].Z * 10E2,
+                                            p[node][t].Y * 10E2),
+                        Radius = .3,
+                        Fill = Brushes.Black
+                    });
+                }
             });
         }
     }

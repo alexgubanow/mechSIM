@@ -10,6 +10,10 @@ namespace mechLIB_CPP
     class Enviro
     {
     private:
+        std::vector<float> pmxq;
+        std::vector<float> plxq;
+        std::vector<float> pmyq;
+        std::vector<float> plyq;
         std::vector<float> Re;
         std::vector<float> bloodV;
         std::vector<float> bloodP;
@@ -19,14 +23,10 @@ namespace mechLIB_CPP
         mechLIB_CPPWrapper::props_t phProps;
         Rope_t* rope;
         std::vector<float> time;
-        Enviro(mechLIB_CPPWrapper::props_t _phProps, std::string _loadFile);
+        Enviro(mechLIB_CPPWrapper::props_t _phProps, std::string &_loadFile);
         void GenerateLoad(mechLIB_CPPWrapper::C_t axis);
         ~Enviro()
         {
-            /*delete[] Re;
-            delete[] bloodV;
-            delete[] bloodP;
-            delete[] time;*/
             delete rope;
         }
         void Run();

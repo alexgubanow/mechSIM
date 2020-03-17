@@ -7,12 +7,14 @@ class matioWrap
 {
     mat_t* mat;
 public:
-    matioWrap(std::string MATFile)
+    matioWrap(std::string& MATFile)
     {
         mat = Mat_Open(MATFile.c_str(), MAT_ACC_RDONLY);
         if (!mat)
         {
-            throw std::exception("Fail to open file");
+            char errBuff[2048];
+            snprintf(errBuff, sizeof(errBuff), "Failed to open file: \"%s\"", MATFile.c_str());
+            throw std::exception(errBuff);
         }
     }
     ~matioWrap()

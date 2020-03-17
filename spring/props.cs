@@ -12,7 +12,6 @@ namespace spring
             D = 1E-3f;
             ro = 1040;
             Counts = 20000;
-            EndT = Counts - 1;
             dt = 1E-6f;
             nodes = 9;
             initDrop = 1E-08f;
@@ -31,12 +30,7 @@ namespace spring
         public float ro;
         public PhModels phMod;
         public PhModels PhMod { get => phMod; set => phMod = value; }
-        private int _EndT;
-        public int EndT
-        {
-            get => _EndT; 
-            set => SetProperty(ref _EndT, value);
-        }
+        
         public string DampRatiostr
         {
             get => DampRatio.ToString(); set
@@ -114,7 +108,6 @@ namespace spring
                 if (int.TryParse(value, out int tmp))
                 {
                     Counts = tmp;
-                    EndT = tmp - 1;
                 }
             }
         }

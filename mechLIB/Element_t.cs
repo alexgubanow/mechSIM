@@ -159,7 +159,7 @@ namespace mechLIB
         private void GetDragForce(int t, float Re, float v, float L, ref Vector3 force)
         {
             float Awet = 2 * (float)Math.PI * radiusPoint.Z * L;
-            float bloodViscosity = 3E-3f;
+            //float bloodViscosity = 3E-3f;
             float Be = 0.9f;
             float Cd = (Awet / A) * (Be / Re);
             float Fdrag = maf.hlf(1060 * maf.P2(v) * Cd * A);

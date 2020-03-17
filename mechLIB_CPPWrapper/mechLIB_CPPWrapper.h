@@ -2,7 +2,6 @@
 #include "props_t.h"
 #include "../mechLIB_CPP/enviro.h"
 #include <string>
-#include "v3.h"
 #include "Derivatives.h"
 #include "DataPointCPP.hpp"
 

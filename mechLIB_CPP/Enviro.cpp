@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "enviro.h"
+#include "Enviro.h"
 #include "matioWrap.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -16,44 +16,40 @@ namespace mechLIB_CPP
             time[i] = time[i - 1] + dt;
         }
     }
-    Enviro::Enviro(mechLIB_CPPWrapper::props_t _phProps, std::string _loadFile)
+    Enviro::Enviro(mechLIB_CPPWrapper::props_t _phProps, std::string &_loadFile) : loadFile(_loadFile), phProps(_phProps)
     {
-        phProps = _phProps;
         if (loadFile.size() > 0)
         {
             matioWrap* matioW = NULL;
-            try
-            {
-                matioW = new matioWrap(loadFile);
-            }
-            catch (const std::exception&)
-            {
-
-            }
+            matioW = new matioWrap(loadFile);
             if (matioW)
             {
-                /*matioW->readFloatArrFromMAT("pmxq", &time);
-                matioW->readFloatArrFromMAT("plxq", &time);
-                matioW->readFloatArrFromMAT("pmyq", &time);
-                matioW->readFloatArrFromMAT("plyq", &time);*/
+                matioW->readFloatArrFromMAT("pmxq", pmxq);
+                matioW->readFloatArrFromMAT("plxq", plxq);
+                matioW->readFloatArrFromMAT("pmyq", pmyq);
+                matioW->readFloatArrFromMAT("plyq", plyq);
                 matioW->readFloatArrFromMAT("tq", time);
                 matioW->readFloatArrFromMAT("req", Re);
                 matioW->readFloatArrFromMAT("bloodVq", bloodV);
                 matioW->readFloatArrFromMAT("abpq", bloodP);
+
                 rope = new Rope_t();
                 rope->init(&phProps);
-                //rope->SetupNodesPositions(&phProps, startCoord, endCoord);
+                rope->SetupNodesPositions(&phProps, DirectX::SimpleMath::Vector3(pmxq[0], pmyq[0], 0),
+                    DirectX::SimpleMath::Vector3(plxq[0], plyq[0], 0));
                 rope->EvalElements(&phProps);
                 delete matioW;
-                return;
             }
         }
-        allocateTime(phProps.dt, phProps.Counts);
-        rope = new Rope_t();
-        rope->init(&phProps);
-        rope->SetupNodesPositions(&phProps);
-        rope->EvalElements(&phProps);
-        GenerateLoad(mechLIB_CPPWrapper::C_t::x);
+        else
+        {
+            allocateTime(phProps.dt, phProps.Counts);
+            rope = new Rope_t();
+            rope->init(&phProps);
+            rope->SetupNodesPositions(&phProps);
+            rope->EvalElements(&phProps);
+            GenerateLoad(mechLIB_CPPWrapper::C_t::x);
+        }
     }
     void Enviro::GenerateLoad(mechLIB_CPPWrapper::C_t axis)
     {

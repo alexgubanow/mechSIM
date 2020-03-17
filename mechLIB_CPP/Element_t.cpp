@@ -75,7 +75,7 @@ void Element_t::GetPhysicParam(int t, float Re, float& m, float& c)
 			maf::P2(radiusPoint.z)) * 1060;		
 	}
 	float alpha = 0 - ((sqrtf(5) * log10f(props->DampRatio)) /
-		(sqrtf(maf::P2(log10f(props->DampRatio)) + maf::P2(M_PI))));
+		(sqrtf(maf::P2(log10f(props->DampRatio)) + maf::P2((float)M_PI))));
 	float k = (props->E * A) / len;
 	c = alpha * sqrtf(m * k);
 }

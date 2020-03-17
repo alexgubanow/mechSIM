@@ -83,6 +83,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -154,6 +156,7 @@
       <PreprocessorDefinitions>NDEBUG;MECHLIBCPP_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -167,7 +170,7 @@
     <ClInclude Include="coords.hpp" />
     <ClInclude Include="dcm_t.hpp" />
     <ClInclude Include="Element_t.h" />
-    <ClInclude Include="enviro.h" />
+    <ClInclude Include="Enviro.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="integr.h" />
     <ClInclude Include="maf.hpp" />

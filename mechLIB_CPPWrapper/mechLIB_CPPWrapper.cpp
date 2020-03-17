@@ -5,12 +5,13 @@
 #include <d3d11_1.h>
 #include <DirectXMath.h>
 #include "SimpleMath.h"
+#include <omp.h>
 
 mechLIB_CPPWrapper::Enviro::Enviro()
 {
 }
 
-void mechLIB_CPPWrapper::Enviro::CreateWorld(float DampRatio, float MaxU, float initDrop, int nodes, float E, float L, 
+void mechLIB_CPPWrapper::Enviro::CreateWorld(float DampRatio, float MaxU, float initDrop, int nodes, float E, float L,
 	float D, int Counts, float dt, float ro, mechLIB_CPPWrapper::PhModels phMod, System::String^ loadFile)
 {
 	props_t phProps;
@@ -25,7 +26,15 @@ void mechLIB_CPPWrapper::Enviro::CreateWorld(float DampRatio, float MaxU, float 
 	phProps.dt = dt;
 	phProps.ro = ro;
 	phProps.phMod = phMod;
-	world = new mechLIB_CPP::Enviro(phProps, msclr::interop::marshal_as<std::string>(loadFile));
+	std::string str = msclr::interop::marshal_as<std::string>(loadFile);
+	try
+	{
+		world = new mechLIB_CPP::Enviro(phProps, str);
+	}
+	catch (const std::exception& ex)
+	{
+		throw gcnew System::Exception(gcnew System::String(ex.what()));
+	}
 }
 
 void mechLIB_CPPWrapper::Enviro::Run()
@@ -43,7 +52,9 @@ void mechLIB_CPPWrapper::Enviro::GetNodesF(int step, array<array<mechLIB_CPPWrap
 		/*pin_ptr<float> pinned1 = &arr[n][0][0];
 		std::memcpy(pinned1, &world->rope->Nodes[n].F[0].x, sizeof(pinned1));*/
 		//#pragma omp parallel for
-		for (size_t t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
+		size_t t;
+		int tout;
+		for (t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
 		{
 			arr[n][tout] = gcnew mechLIB_CPPWrapper::DataPointCPP();
 			arr[n][tout]->X = world->rope->Nodes[n].F[t].x;
@@ -59,7 +70,9 @@ void mechLIB_CPPWrapper::Enviro::GetNodesA(int step, array<array<mechLIB_CPPWrap
 	for (int n = 0; n < world->rope->NodesSize; n++)
 	{
 		arr[n] = gcnew array<mechLIB_CPPWrapper::DataPointCPP^>(world->phProps.Counts / step);
-		for (size_t t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
+		size_t t;
+		int tout;
+		for (t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
 		{
 			arr[n][tout] = gcnew mechLIB_CPPWrapper::DataPointCPP();
 			arr[n][tout]->X = world->rope->Nodes[n].a[t].x;
@@ -75,7 +88,9 @@ void mechLIB_CPPWrapper::Enviro::GetNodesV(int step, array<array<mechLIB_CPPWrap
 	for (int n = 0; n < world->rope->NodesSize; n++)
 	{
 		arr[n] = gcnew array<mechLIB_CPPWrapper::DataPointCPP^>(world->phProps.Counts / step);
-		for (size_t t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
+		size_t t;
+		int tout;
+		for (t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
 		{
 			arr[n][tout] = gcnew mechLIB_CPPWrapper::DataPointCPP();
 			arr[n][tout]->X = world->rope->Nodes[n].v[t].x;
@@ -91,7 +106,9 @@ void mechLIB_CPPWrapper::Enviro::GetNodesU(int step, array<array<mechLIB_CPPWrap
 	for (int n = 0; n < world->rope->NodesSize; n++)
 	{
 		arr[n] = gcnew array<mechLIB_CPPWrapper::DataPointCPP^>(world->phProps.Counts / step);
-		for (size_t t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
+		size_t t;
+		int tout;
+		for (t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
 		{
 			arr[n][tout] = gcnew mechLIB_CPPWrapper::DataPointCPP();
 			arr[n][tout]->X = world->rope->Nodes[n].u[t].x;
@@ -107,7 +124,9 @@ void mechLIB_CPPWrapper::Enviro::GetNodesP(int step, array<array<mechLIB_CPPWrap
 	for (int n = 0; n < world->rope->NodesSize; n++)
 	{
 		arr[n] = gcnew array<mechLIB_CPPWrapper::DataPointCPP^>(world->phProps.Counts / step);
-		for (size_t t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
+		size_t t;
+		int tout;
+		for (t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
 		{
 			arr[n][tout] = gcnew mechLIB_CPPWrapper::DataPointCPP();
 			arr[n][tout]->X = world->rope->Nodes[n].p[t].x;
@@ -123,8 +142,9 @@ void mechLIB_CPPWrapper::Enviro::GetTimeArr(int step, array<float>^% arr)
 	pin_ptr<float> pinned1 = &arr[0];
 	std::memcpy(pinned1, &world->time[0], (world->phProps.Counts)*sizeof(world->time[0]));*/
 	arr = gcnew array<float>(world->phProps.Counts / step);
-#pragma omp parallel for
-	for (size_t t = 0, tout = 0; t < world->time.size() && tout < arr->Length; t += step, tout++)
+	size_t t;
+	int tout;
+	for (t = 0, tout = 0; t < world->time.size() && tout < arr->Length; t += step, tout++)
 	{
 		arr[tout] = world->time[t];
 	}
