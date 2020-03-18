@@ -32,13 +32,27 @@ namespace mechLIB_CPP
                 matioW->readFloatArrFromMAT("req", Re);
                 matioW->readFloatArrFromMAT("bloodVq", bloodV);
                 matioW->readFloatArrFromMAT("abpq", bloodP);
+                phProps.Counts = time.size();
 
                 rope = new Rope_t();
                 rope->init(&phProps);
                 rope->SetupNodesPositions(&phProps, DirectX::SimpleMath::Vector3(pmxq[0], pmyq[0], 0),
                     DirectX::SimpleMath::Vector3(plxq[0], plyq[0], 0));
                 rope->EvalElements(&phProps);
+                int lastN = phProps.nodes - 1;
+                for (int t = 0; t < phProps.Counts; t++)
+                {
+                    rope->Nodes[0].p[t].x = pmxq[t];
+                    rope->Nodes[0].p[t].y = pmyq[t];
+                    rope->Nodes[0].u[t].x = rope->Nodes[0].p[t].x - rope->Nodes[0].p[0].x;
 
+                    rope->Nodes[lastN].p[t].x = plxq[t];
+                    rope->Nodes[lastN].p[t].y = plyq[t];
+                    rope->Nodes[lastN].u[t].x = rope->Nodes[lastN].p[t].x - rope->Nodes[lastN].p[0].x;
+                }
+                //choose load nodes
+                rope->Nodes[0].LoadType = mechLIB_CPPWrapper::NodeLoad::u;
+                rope->Nodes[phProps.nodes - 1].LoadType = mechLIB_CPPWrapper::NodeLoad::u;
                 delete matioW;
             }
         }
