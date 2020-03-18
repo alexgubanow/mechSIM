@@ -38,6 +38,7 @@ namespace mechLIB_CPP
                 rope->SetupNodesPositions(&phProps, DirectX::SimpleMath::Vector3(pmxq[0], pmyq[0], 0),
                     DirectX::SimpleMath::Vector3(plxq[0], plyq[0], 0));
                 rope->EvalElements(&phProps);
+
                 delete matioW;
             }
         }

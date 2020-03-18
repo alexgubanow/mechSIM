@@ -30,12 +30,8 @@ public:
         matvar_t* matVar = Mat_VarRead(mat, (char*)varName);
         if (matVar)
         {
-            unsigned int xSize = matVar->nbytes / matVar->data_size;
             const float* xData = static_cast<const float*>(matVar->data);
-            for (unsigned int i = 0; i < xSize; ++i)
-            {
-                //std::cout << "\tx[" << i << "] = " << xData[i] << "\n";
-            }
+            pArr.insert(pArr.end(), &xData[0], &xData[matVar->nbytes / matVar->data_size]);
         }
         matVar = NULL;
     }
