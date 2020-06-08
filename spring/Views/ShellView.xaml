@@ -9,13 +9,15 @@
         Title="{Binding Title}" Height="600" Width="1024"
     Effect="{Binding Path=win_Effect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
     <DockPanel LastChildFill="True">
-        <Button DockPanel.Dock="Bottom" Content="{Binding Path=RunBtnTxt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Command="{Binding Compute}" Margin="5" />
         <Grid>
             <ContentControl prism:RegionManager.RegionName="MainViewRegion"/>
             <Rectangle Panel.ZIndex="1000" x:Name="overlayrect" Fill="DarkGray" Opacity=".5"
-                       Visibility="{Binding Path=overlayrect_Visibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                       Visibility="{Binding Path=overlay_Visibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <Controls:ProgressRing IsActive="True" Panel.ZIndex="1000" x:Name="overlayring" Foreground="White"
-                                   Visibility="{Binding Path=overlayring_Visibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                   Visibility="{Binding Path=overlay_Visibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Panel.ZIndex="1000" Content="STOP" Command="{Binding ComputeStopCommand}" Height="100" 
+                IsEnabled="{Binding IsRuninng}" FontSize="42" Background="Red" VerticalAlignment="Bottom" 
+                    Visibility="{Binding Path=overlay_Visibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
     </DockPanel>
     <!--<DockPanel LastChildFill="True">

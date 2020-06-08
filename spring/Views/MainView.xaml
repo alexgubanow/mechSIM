@@ -21,38 +21,44 @@
         </ObjectDataProvider>
     </UserControl.Resources>
     <DockPanel LastChildFill="True">
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5">
-            <ComboBox MinWidth="150" Margin="0,0,5,0" 
+        <StackPanel DockPanel.Dock="Top" Margin="5">
+            <StackPanel Orientation="Horizontal" >
+                <ComboBox MinWidth="150" Margin="0,0,5,0" 
                       ItemsSource="{Binding Source={mLib:EnumBindingSource {x:Type mLib:PhModels}}}"
                       SelectedValue="{Binding Path=Props.PhMod,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            <lcl:lblTxTbox LabelTxt="E, Pa:" BoxTxt="{Binding Path=Props.Estr,
+                <lcl:lblTxTbox LabelTxt="E, Pa:" BoxTxt="{Binding Path=Props.Estr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-            <lcl:lblTxTbox LabelTxt="ro, kg/m3:" BoxTxt="{Binding Path=Props.rostr,
+                <lcl:lblTxTbox LabelTxt="ro, kg/m3:" BoxTxt="{Binding Path=Props.rostr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-            <lcl:lblTxTbox LabelTxt="L, m:" BoxTxt="{Binding Path=Props.Lstr,
+                <lcl:lblTxTbox LabelTxt="L, m:" BoxTxt="{Binding Path=Props.Lstr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-            <lcl:lblTxTbox LabelTxt="nodes:" BoxTxt="{Binding Path=Props.nodesstr,
+                <lcl:lblTxTbox LabelTxt="nodes:" BoxTxt="{Binding Path=Props.nodesstr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-            <lcl:lblTxTbox LabelTxt="D, m:" BoxTxt="{Binding Path=Props.Dstr,
+                <lcl:lblTxTbox LabelTxt="D, m:" BoxTxt="{Binding Path=Props.Dstr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-            <lcl:lblTxTbox LabelTxt="Count:" BoxTxt="{Binding Path=Props.Countstr,
+                <lcl:lblTxTbox LabelTxt="Count:" BoxTxt="{Binding Path=Props.Countstr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-            <lcl:lblTxTbox LabelTxt="dt, s:" BoxTxt="{Binding Path=Props.dtstr,
+                <lcl:lblTxTbox LabelTxt="dt, s:" BoxTxt="{Binding Path=Props.dtstr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-            <lcl:lblTxTbox LabelTxt="Initial drop, m" BoxTxt="{Binding Path=Props.initDropstr,
+                <lcl:lblTxTbox LabelTxt="Initial drop, m" BoxTxt="{Binding Path=Props.initDropstr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-            <lcl:lblTxTbox LabelTxt="Max U, m" BoxTxt="{Binding Path=Props.MaxUstr,
+                <lcl:lblTxTbox LabelTxt="Max U, m" BoxTxt="{Binding Path=Props.MaxUstr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-            <lcl:lblTxTbox LabelTxt="DampRatio" BoxTxt="{Binding Path=Props.DampRatiostr,
+                <lcl:lblTxTbox LabelTxt="DampRatio" BoxTxt="{Binding Path=Props.DampRatiostr,
                     UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-            <ComboBox DockPanel.Dock="Top" SelectedIndex="{Binding Path=SelDeriv, Mode=TwoWay}" Margin="5,0,0,0">
-                <ComboBoxItem Content="Coordinates" />
-                <ComboBoxItem Content="Displacement" />
-                <ComboBoxItem Content="Velosity" />
-                <ComboBoxItem Content="Acceleration" />
-                <ComboBoxItem Content="Force" />
-            </ComboBox>
+                <ComboBox DockPanel.Dock="Top" SelectedIndex="{Binding Path=SelDeriv, Mode=TwoWay}" Margin="5,0,0,0">
+                    <ComboBoxItem Content="Coordinates" />
+                    <ComboBoxItem Content="Displacement" />
+                    <ComboBoxItem Content="Velosity" />
+                    <ComboBoxItem Content="Acceleration" />
+                    <ComboBoxItem Content="Force" />
+                </ComboBox>
+            </StackPanel>
+            <DockPanel LastChildFill="False">
+                <Button Content="Run Test" Command="{Binding ComputeTestCommand}" Margin="5" />
+                <Button Content="Run From file" Command="{Binding ComputeFileCommand}" Margin="5" />
+            </DockPanel>
         </StackPanel>
         <Slider DockPanel.Dock="Bottom" Height="22" Margin="5" Value="{Binding CurrT, Mode=TwoWay}"
                 Maximum="{Binding Path=EndT}" IsEnabled="{Binding EnableConrols}"

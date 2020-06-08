@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using OxyPlot;
 using OxyPlot.Series;
+using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using System;
@@ -53,7 +54,7 @@ namespace spring.ViewModels
         private bool _EnableConrols;
         public bool EnableConrols
         {
-            get => _EnableConrols;
+            get => !_isRunning;
             set => SetProperty(ref _EnableConrols, value);
         }
         private int _EndT;
@@ -63,10 +64,30 @@ namespace spring.ViewModels
             set => SetProperty(ref _EndT, value);
         }
 
+        private bool _isRunning;
+
+        public bool IsRunning
+        {
+            get => _isRunning;
+            set => SetProperty(ref _isRunning, value);
+        }
+
+        private DelegateCommand _ComputeTestCommand;
+        public DelegateCommand ComputeTestCommand => _ComputeTestCommand ?? (_ComputeTestCommand = new DelegateCommand(() => Compute("")));
+
+        private DelegateCommand _ComputeFileCommand;
+        public DelegateCommand ComputeFileCommand => _ComputeFileCommand ?? (_ComputeFileCommand = new DelegateCommand(() =>
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog { DereferenceLinks = false };
+            if (openFileDialog.ShowDialog() == true)
+            { Compute(openFileDialog.FileName); }
+        }));
+
         Thread thrsim;
         public MainViewModel(IEventAggregator ea)
         {
             _ea = ea;
+            IsRunning = false;
             Props = new props();
             selDeriv = 0;
             _CurrT = 0;
@@ -79,26 +100,26 @@ namespace spring.ViewModels
             awePlotModelY.InvalidatePlot(true);
             awePlotModelZ.InvalidatePlot(true);
             EnableConrols = false;
-            _ea.GetEvent<GotResultsEvent>().Subscribe(() => EnableConrols = true );
+            _ea.GetEvent<GotResultsEvent>().Subscribe(() => IsRunning = false);
+            _ea.GetEvent<GotResultsEvent>().Subscribe(() => EnableConrols = true);
             _ea.GetEvent<GotResultsEvent>().Subscribe(() => thrsim = null);
             _ea.GetEvent<GotResultsEvent>().Subscribe(() => ShowResults(SelDeriv));
-            _ea.GetEvent<ComputeEvent>().Subscribe((var) => Compute_Click(var));
-            _ea.GetEvent<ComputeEvent>().Subscribe((var) => EnableConrols = false);
-            _ea.GetEvent<ClearPlotsEvent>().Subscribe(() => ClearDataView());
-            //Load3dEvent
-            //_ea.GetEvent<Load3dEvent>().Subscribe(() => Load3d());
+            _ea.GetEvent<ComputeEvent>().Subscribe((var) => IsRunning = var);
+            _ea.GetEvent<ComputeEvent>().Subscribe((var) => EnableConrols = !var);
+            _ea.GetEvent<ComputeEvent>().Subscribe((var) => { if (!var) { ComputeStop(); } });
         }
 
-        private void Compute_Click(bool IsRunning)
+        private void Compute(string fileName)
         {
-            if (IsRunning && thrsim == null)
+            if (!IsRunning)
             {
-                _ea.GetEvent<ClearPlotsEvent>().Publish();
+                _ea.GetEvent<ComputeEvent>().Publish(true);
+                ClearDataView();
                 thrsim = new Thread(delegate ()
                 {
                     try
                     {
-                        Simulate();
+                        Simulate(fileName);
                     }
                     catch (Exception ex)
                     {
@@ -110,27 +131,27 @@ namespace spring.ViewModels
                 });
                 thrsim.Start();
             }
-
             else
+            {
+                MessageBox.Show("Wait till end of current calculation or STOP it");
+            }
+        }
+        private void ComputeStop()
+        {
+            if (IsRunning && thrsim != null)
             {
                 thrsim.Abort();
                 thrsim = null;
+                world.Destroy();
                 world = null;
-
             }
         }
 
-        private void Simulate()
+        private void Simulate(string fileName)
         {
             EndT = 1;
             F = null;
             p = u = v = a = null;
-            string fileName = "";
-
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.DereferenceLinks = false;
-            if (openFileDialog.ShowDialog() == true) { fileName = openFileDialog.FileName; }
-
             world = new mechLIB_CPPWrapper.Enviro();
             try
             {
