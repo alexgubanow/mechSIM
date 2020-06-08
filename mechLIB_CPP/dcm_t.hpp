@@ -33,14 +33,14 @@ public:
 		Zz = Xx * Yy - Yx * Xy;
 	}
 
-	inline void ToGlob(DirectX::SimpleMath::Vector3 Lp, DirectX::SimpleMath::Vector3& gA)
+	void ToGlob(DirectX::SimpleMath::Vector3 Lp, DirectX::SimpleMath::Vector3& gA)
 	{
 		gA.x = Xx * Lp.x + Xy * Lp.y + Xz * Lp.z;
 		gA.y = Yx * Lp.x + Yy * Lp.y + Yz * Lp.z;
 		gA.z = Zx * Lp.x + Zy * Lp.y + Zz * Lp.z;
 	}
 
-	inline void ToLoc(DirectX::SimpleMath::Vector3 Gp, DirectX::SimpleMath::Vector3& lA)
+	void ToLoc(DirectX::SimpleMath::Vector3 Gp, DirectX::SimpleMath::Vector3& lA)
 	{
 		lA.x = Xx * Gp.x + Yx * Gp.y + Zx * Gp.z;
 		lA.y = Xy * Gp.x + Yy * Gp.y + Zy * Gp.z;

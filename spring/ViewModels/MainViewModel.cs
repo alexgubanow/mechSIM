@@ -1,4 +1,5 @@
 ﻿using HelixToolkit.Wpf;
+using mechLIB_CPP;
 using Microsoft.Win32;
 using OxyPlot;
 using OxyPlot.Series;
@@ -8,8 +9,6 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Numerics;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -31,13 +30,13 @@ namespace spring.ViewModels
 
         private readonly IEventAggregator _ea;
         public props Props { get; set; }
-        private mechLIB_CPPWrapper.DataPointCPP[][] F;
-        private mechLIB_CPPWrapper.DataPointCPP[][] p;
-        private mechLIB_CPPWrapper.DataPointCPP[][] u;
-        private mechLIB_CPPWrapper.DataPointCPP[][] v;
-        private mechLIB_CPPWrapper.DataPointCPP[][] a;
+        private DataPointCPP[][] F;
+        private DataPointCPP[][] p;
+        private DataPointCPP[][] u;
+        private DataPointCPP[][] v;
+        private DataPointCPP[][] a;
         private float[] timeArr;
-        private mechLIB_CPPWrapper.Enviro world;
+        private EnviroWrapper world;
 
         private int _CurrT;
         public int CurrT { get => _CurrT; set { _CurrT = value; Draw3d(value, SelDeriv); } }
@@ -62,6 +61,13 @@ namespace spring.ViewModels
         {
             get => _EndT;
             set => SetProperty(ref _EndT, value);
+        }
+
+        private bool _NeedToSaveResults;
+        public bool NeedToSaveResults
+        {
+            get => _NeedToSaveResults;
+            set => SetProperty(ref _NeedToSaveResults, value);
         }
 
         private bool _isRunning;
@@ -152,18 +158,18 @@ namespace spring.ViewModels
             EndT = 1;
             F = null;
             p = u = v = a = null;
-            world = new mechLIB_CPPWrapper.Enviro();
+            world = new EnviroWrapper();
             try
             {
                 world.CreateWorld(Props.DampRatio, Props.MaxU, Props.initDrop, Props.nodes, Props.E, Props.L,
-                    Props.D, Props.Counts, Props.dt, Props.ro, (mechLIB_CPPWrapper.PhModels)Props.phMod, fileName);
-                world.Run();
+                    Props.D, Props.Counts, Props.dt, Props.ro, (PhModels)Props.phMod, fileName);
+                world.Run(NeedToSaveResults);
                 timeArr = Array.Empty<float>();
-                F = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
-                p = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
-                u = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
-                v = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
-                a = Array.Empty<mechLIB_CPPWrapper.DataPointCPP[]>();
+                F = Array.Empty<DataPointCPP[]>();
+                p = Array.Empty<DataPointCPP[]>();
+                u = Array.Empty<DataPointCPP[]>();
+                v = Array.Empty<DataPointCPP[]>();
+                a = Array.Empty<DataPointCPP[]>();
                 int step = 1;
                 if (Props.Counts > (int)SystemParameters.PrimaryScreenWidth / 2)
                 {
@@ -213,7 +219,7 @@ namespace spring.ViewModels
         private void DrawPoints(int Deriv)
         {
             ClearDataView();
-            if (Deriv == (int)mechLIB_CPPWrapper.NodeLoad.f)
+            if (Deriv == (int)NodeLoad.f)
             {
                 //foreach (var elem in world.rope.Elements)
                 //{
@@ -226,33 +232,33 @@ namespace spring.ViewModels
             }
             else
             {
-                switch ((mechLIB_CPPWrapper.Derivatives)Deriv)
+                switch ((Derivatives)Deriv)
                 {
-                    case mechLIB_CPPWrapper.Derivatives.p:
+                    case Derivatives.p:
                         for (int n = 0; n < p.Length; n++)
                         {
                             PlotData("node #" + n, p[n]);
                         }
                         break;
-                    case mechLIB_CPPWrapper.Derivatives.u:
+                    case Derivatives.u:
                         for (int n = 0; n < u.Length; n++)
                         {
                             PlotData("node #" + n, u[n]);
                         }
                         break;
-                    case mechLIB_CPPWrapper.Derivatives.v:
+                    case Derivatives.v:
                         for (int n = 0; n < v.Length; n++)
                         {
                             PlotData("node #" + n, v[n]);
                         }
                         break;
-                    case mechLIB_CPPWrapper.Derivatives.a:
+                    case Derivatives.a:
                         for (int n = 0; n < a.Length; n++)
                         {
                             PlotData("node #" + n, a[n]);
                         }
                         break;
-                    case mechLIB_CPPWrapper.Derivatives.maxDerivatives:
+                    case Derivatives.maxDerivatives:
                         throw new System.Exception();
                     default:
                         throw new System.Exception();
@@ -263,13 +269,13 @@ namespace spring.ViewModels
             awePlotModelZ.InvalidatePlot(true);
         }
 
-        private void PlotData(string title, mechLIB_CPPWrapper.DataPointCPP[] Y)
+        private void PlotData(string title, DataPointCPP[] Y)
         {
             plotDataX(title, timeArr, Y);
             plotDataY(title, timeArr, Y);
             plotDataZ(title, timeArr, Y);
         }
-        public void plotDataX(string title, float[] X, mechLIB_CPPWrapper.DataPointCPP[] Y)
+        public void plotDataX(string title, float[] X, DataPointCPP[] Y)
         {
             List<DataPoint> tmp = new List<DataPoint>();
             tmp.AddRange(new DataPoint[X.Length]);
@@ -282,7 +288,7 @@ namespace spring.ViewModels
             aweLineSeries.Points.AddRange(tmp);
             awePlotModelX.Series.Add(aweLineSeries);
         }
-        public void plotDataY(string title, float[] X, mechLIB_CPPWrapper.DataPointCPP[] Y)
+        public void plotDataY(string title, float[] X, DataPointCPP[] Y)
         {
             List<DataPoint> tmp = new List<DataPoint>();
             tmp.AddRange(new DataPoint[X.Length]);
@@ -295,7 +301,7 @@ namespace spring.ViewModels
             aweLineSeries.Points.AddRange(tmp);
             awePlotModelY.Series.Add(aweLineSeries);
         }
-        public void plotDataZ(string title, float[] X, mechLIB_CPPWrapper.DataPointCPP[] Y)
+        public void plotDataZ(string title, float[] X, DataPointCPP[] Y)
         {
             List<DataPoint> tmp = new List<DataPoint>();
             tmp.AddRange(new DataPoint[X.Length]);

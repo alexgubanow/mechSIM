@@ -7,14 +7,14 @@
 #include "maf.hpp"
 #include "coords.hpp"
 
-void Element_t::init(Node_t* _n1, Node_t* _n2, int Counts, mechLIB_CPPWrapper::props_t* _props)
+void Element_t::init(Node_t* _n1, Node_t* _n2, int Counts, mechLIB_CPP::props_t* _props)
 {
 	props = _props;
 	L = std::vector<float>(props->Counts);
 	F = std::vector<DirectX::SimpleMath::Vector3>(props->Counts);
 	n1 = _n1;
 	n2 = _n2;
-	radiusPoint.z = props->D;
+	radiusPoint.y = props->D;
 	A = (float)M_PI * maf::P2(props->D);
 	I = maf::P3(A) / 12.0f;
 }
@@ -25,13 +25,13 @@ void Element_t::CalcForce(int t, float Re, float bloodV, float bloodP)
 	//L[t] = 0;
 	switch (props->phMod)
 	{
-	case mechLIB_CPPWrapper::PhModels::hook:
+	case mechLIB_CPP::PhModels::hook:
 		L[t] = GetOwnLength(0);
 		break;
-	case mechLIB_CPPWrapper::PhModels::hookGeomNon:
+	case mechLIB_CPP::PhModels::hookGeomNon:
 		L[t] = GetOwnLength(t - 1);
 		break;
-	case mechLIB_CPPWrapper::PhModels::mooneyRiv:
+	case mechLIB_CPP::PhModels::mooneyRiv:
 		L[t] = GetOwnLength(t - 1);
 		break;
 	default:
@@ -55,7 +55,7 @@ void Element_t::CalcForce(int t, float Re, float bloodV, float bloodP)
 	//GetPressureForce(t, bloodP, L[t]);
 	//GetDragForce(t, Re, bloodV, L);
 
-	//force.Y += -1E-07f;
+	force.y += props->MaxU * 1E3;
 	DirectX::SimpleMath::Vector3 gforce;
 	dcm.ToGlob(force, gforce);
 	F[t] += gforce;
@@ -94,13 +94,13 @@ void Element_t::GetFn(int t, DirectX::SimpleMath::Vector3 deltaL, DirectX::Simpl
 {
 	switch (props->phMod)
 	{
-	case mechLIB_CPPWrapper::PhModels::hook:
+	case mechLIB_CPP::PhModels::hook:
 		calcHookFn(force, L[0], deltaL);
 		break;
-	case mechLIB_CPPWrapper::PhModels::hookGeomNon:
+	case mechLIB_CPP::PhModels::hookGeomNon:
 		calcHookFn(force, L[t], deltaL);
 		break;
-	case mechLIB_CPPWrapper::PhModels::mooneyRiv:
+	case mechLIB_CPP::PhModels::mooneyRiv:
 		calcMooneyRivlinFn(force, L[t], deltaL);
 		break;
 	default:

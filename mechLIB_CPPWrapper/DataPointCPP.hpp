@@ -1,6 +1,6 @@
 #pragma once
 
-namespace mechLIB_CPPWrapper {
+namespace mechLIB_CPP {
     public ref struct DataPointCPP
     {
     public:

@@ -4,7 +4,7 @@
 #include <execution>
 #include "maf.hpp"
 
-void Rope_t::init(mechLIB_CPPWrapper::props_t* props)
+void Rope_t::init(mechLIB_CPP::props_t* props)
 {
 
 	L = std::vector<float>(props->Counts);
@@ -15,28 +15,28 @@ void Rope_t::init(mechLIB_CPPWrapper::props_t* props)
 	Elements = std::vector<Element_t>(ElementsSize);
 }
 
-void Rope_t::SetupNodesPositions(mechLIB_CPPWrapper::props_t* props)
+void Rope_t::SetupNodesPositions(mechLIB_CPP::props_t* props)
 {
 	int lastNode = NodesSize - 1;
 	float dl = props->L / lastNode;
 	Nodes[0].init(props->Counts,
 		DirectX::SimpleMath::Vector3{ 0, props->initDrop * maf::P2((0 * dl) - (props->L - dl) / 2) + 1E-3f, 0 },
 		DirectX::SimpleMath::Vector3{ 0, props->initDrop * maf::P2((0 * dl) - (props->L - dl) / 2) + 1E-3f, props->D },
-		mechLIB_CPPWrapper::NodeFreedom::xyz, mechLIB_CPPWrapper::NodeLoad::none, std::vector<Element_t*>{ &Elements[0] });
+		mechLIB_CPP::NodeFreedom::xyz, mechLIB_CPP::NodeLoad::none, std::vector<Element_t*>{ &Elements[0] });
 	for (int i = 1; i < lastNode; i++)
 	{
 		Nodes[i].init(props->Counts,
 			DirectX::SimpleMath::Vector3{ i * dl, props->initDrop * maf::P2((i * dl) - (props->L - dl) / 2) + 1E-3f, 0 },
 			DirectX::SimpleMath::Vector3{ i * dl, props->initDrop * maf::P2((i * dl) - (props->L - dl) / 2) + 1E-3f, props->D },
-			mechLIB_CPPWrapper::NodeFreedom::xyz, mechLIB_CPPWrapper::NodeLoad::none, std::vector<Element_t*>{ &Elements[i - 1], &Elements[i] });
+			mechLIB_CPP::NodeFreedom::xyz, mechLIB_CPP::NodeLoad::none, std::vector<Element_t*>{ &Elements[i - 1], &Elements[i] });
 	}
 	Nodes[lastNode].init(props->Counts,
 		DirectX::SimpleMath::Vector3{ lastNode * dl, props->initDrop * maf::P2((lastNode * dl) - (props->L - dl) / 2) + 1E-3f, 0 },
 		DirectX::SimpleMath::Vector3{ lastNode * dl, props->initDrop * maf::P2((lastNode * dl) - (props->L - dl) / 2) + 1E-3f, props->D },
-		mechLIB_CPPWrapper::NodeFreedom::xyz, mechLIB_CPPWrapper::NodeLoad::none, std::vector<Element_t*>{ &Elements[lastNode - 1] });
+		mechLIB_CPP::NodeFreedom::xyz, mechLIB_CPP::NodeLoad::none, std::vector<Element_t*>{ &Elements[lastNode - 1] });
 }
 
-void Rope_t::SetupNodesPositions(mechLIB_CPPWrapper::props_t* props, DirectX::SimpleMath::Vector3 startCoord,
+void Rope_t::SetupNodesPositions(mechLIB_CPP::props_t* props, DirectX::SimpleMath::Vector3 startCoord,
 	DirectX::SimpleMath::Vector3 endCoord)
 {
 	int lastNode = NodesSize - 1;
@@ -45,7 +45,7 @@ void Rope_t::SetupNodesPositions(mechLIB_CPPWrapper::props_t* props, DirectX::Si
 	float sinA = endCoord.y / props->L;
 	Nodes[0].init(props->Counts, startCoord,
 		DirectX::SimpleMath::Vector3{ 0, props->initDrop * maf::P2((0 * dl) - (props->L - dl) / 2) + 1E-3f, props->D },
-		mechLIB_CPPWrapper::NodeFreedom::xyz, mechLIB_CPPWrapper::NodeLoad::none, std::vector<Element_t*>{ &Elements[0] });
+		mechLIB_CPP::NodeFreedom::xyz, mechLIB_CPP::NodeLoad::none, std::vector<Element_t*>{ &Elements[0] });
 	for (int i = 1; i < lastNode; i++)
 	{
 		DirectX::SimpleMath::Vector3 flatC( i * dl, 0, 0 );
@@ -56,14 +56,14 @@ void Rope_t::SetupNodesPositions(mechLIB_CPPWrapper::props_t* props, DirectX::Si
 		);
 		Nodes[i].init(props->Counts, coords, 
 			DirectX::SimpleMath::Vector3{ i * dl, props->initDrop * maf::P2((i * dl) - (props->L - dl) / 2) + 1E-3f, props->D }, 
-			mechLIB_CPPWrapper::NodeFreedom::xyz, mechLIB_CPPWrapper::NodeLoad::none, std::vector<Element_t*>{ &Elements[i - 1], & Elements[i] });
+			mechLIB_CPP::NodeFreedom::xyz, mechLIB_CPP::NodeLoad::none, std::vector<Element_t*>{ &Elements[i - 1], & Elements[i] });
 	}
 	Nodes[lastNode].init(props->Counts, endCoord, 
 		DirectX::SimpleMath::Vector3{ lastNode * dl, props->initDrop * maf::P2((lastNode * dl) - (props->L - dl) / 2) + 1E-3f, props->D },
-		mechLIB_CPPWrapper::NodeFreedom::xyz, mechLIB_CPPWrapper::NodeLoad::none, std::vector<Element_t*>{ &Elements[lastNode - 1] });
+		mechLIB_CPP::NodeFreedom::xyz, mechLIB_CPP::NodeLoad::none, std::vector<Element_t*>{ &Elements[lastNode - 1] });
 }
 
-void Rope_t::EvalElements(mechLIB_CPPWrapper::props_t* props)
+void Rope_t::EvalElements(mechLIB_CPP::props_t* props)
 {
 	for (int i = 0; i < ElementsSize; i++)
 	{

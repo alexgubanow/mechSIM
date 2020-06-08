@@ -1,7 +1,7 @@
 #pragma once
 #include "Rope_t.h"
-#include "../mechLIB_CPPWrapper/props_t.h"
-#include "../mechLIB_CPPWrapper/C_t.h"
+#include "props_t.h"
+#include "C_t.h"
 #include <string>
 #include <vector>
 
@@ -20,15 +20,15 @@ namespace mechLIB_CPP
         void allocateTime(float dt, int Counts);
         std::string loadFile;
     public:
-        mechLIB_CPPWrapper::props_t phProps;
+        props_t phProps;
         Rope_t* rope;
         std::vector<float> time;
-        Enviro(mechLIB_CPPWrapper::props_t _phProps, std::string &_loadFile);
-        void GenerateLoad(mechLIB_CPPWrapper::C_t axis);
+        Enviro(props_t _phProps, std::string &_loadFile);
+        void GenerateLoad(C_t axis);
         ~Enviro()
         {
             delete rope;
         }
-        void Run();
+        void Run(bool NeedToSaveResults);
     };
 }

@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "PhModels.h"
 
-namespace mechLIB_CPPWrapper {
+namespace mechLIB_CPP {
 
 	struct props_t
 	

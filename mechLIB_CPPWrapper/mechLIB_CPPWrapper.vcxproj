@@ -139,20 +139,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="C_t.h" />
     <ClInclude Include="DataPointCPP.hpp" />
     <ClInclude Include="Derivatives.h" />
-    <ClInclude Include="mechLIB_CPPWrapper.h" />
-    <ClInclude Include="NodeFreedom.h" />
-    <ClInclude Include="NodeLoad.h" />
+    <ClInclude Include="EnviroWrapper.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="PhModels.h" />
-    <ClInclude Include="props_t.h" />
     <ClInclude Include="Resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
-    <ClCompile Include="mechLIB_CPPWrapper.cpp" />
+    <ClCompile Include="EnviroWrapper.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

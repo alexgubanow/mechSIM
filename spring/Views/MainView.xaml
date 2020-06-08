@@ -55,10 +55,11 @@
                     <ComboBoxItem Content="Force" />
                 </ComboBox>
             </StackPanel>
-            <DockPanel LastChildFill="False">
+            <StackPanel Orientation="Horizontal">
                 <Button Content="Run Test" Command="{Binding ComputeTestCommand}" Margin="5" />
                 <Button Content="Run From file" Command="{Binding ComputeFileCommand}" Margin="5" />
-            </DockPanel>
+                <CheckBox Content="Write result to MAT" VerticalAlignment="Center" IsChecked="{Binding NeedToSaveResults}"/>
+            </StackPanel>
         </StackPanel>
         <Slider DockPanel.Dock="Bottom" Height="22" Margin="5" Value="{Binding CurrT, Mode=TwoWay}"
                 Maximum="{Binding Path=EndT}" IsEnabled="{Binding EnableConrols}"

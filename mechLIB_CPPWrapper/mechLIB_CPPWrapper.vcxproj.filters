@@ -21,28 +21,13 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mechLIB_CPPWrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="props_t.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PhModels.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C_t.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NodeFreedom.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NodeLoad.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Derivatives.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DataPointCPP.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnviroWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -53,7 +38,7 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mechLIB_CPPWrapper.cpp">
+    <ClCompile Include="EnviroWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

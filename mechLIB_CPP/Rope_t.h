@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <vector>
-#include "../mechLIB_CPPWrapper/props_t.h"
+#include "props_t.h"
 #include "Node_t.h"
 #include "Element_t.h"
 #include <d3d11_1.h>
@@ -24,10 +24,10 @@ public:
 	~Rope_t()
 	{
 	}
-	void init(mechLIB_CPPWrapper::props_t* props);
-	void SetupNodesPositions(mechLIB_CPPWrapper::props_t* props);
-	void SetupNodesPositions(mechLIB_CPPWrapper::props_t* props, DirectX::SimpleMath::Vector3 startCoord, DirectX::SimpleMath::Vector3 endCoord);
-	void EvalElements(mechLIB_CPPWrapper::props_t* props);
+	void init(mechLIB_CPP::props_t* props);
+	void SetupNodesPositions(mechLIB_CPP::props_t* props);
+	void SetupNodesPositions(mechLIB_CPP::props_t* props, DirectX::SimpleMath::Vector3 startCoord, DirectX::SimpleMath::Vector3 endCoord);
+	void EvalElements(mechLIB_CPP::props_t* props);
 	void StepOverElems(int t, float Re, float bloodV, float bloodP);
 	void StepOverNodes(int t, float Re, float dt);
 
