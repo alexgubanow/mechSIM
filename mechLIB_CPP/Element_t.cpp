@@ -55,7 +55,7 @@ void Element_t::CalcForce(int t, float Re, float bloodV, float bloodP)
 	//GetPressureForce(t, bloodP, L[t]);
 	//GetDragForce(t, Re, bloodV, L);
 
-	force.y += props->MaxU * 1E3;
+	force.y += props->MaxU * 1E3f;
 	DirectX::SimpleMath::Vector3 gforce;
 	dcm.ToGlob(force, gforce);
 	F[t] += gforce;

@@ -32,7 +32,7 @@ namespace mechLIB_CPP
 				matioW->readFloatArr("req", Re);
 				matioW->readFloatArr("bloodVq", bloodV);
 				matioW->readFloatArr("abpq", bloodP);
-				phProps.Counts = time.size();
+				phProps.Counts = (int)time.size();
 
 				rope = new Rope_t();
 				rope->init(&phProps);
