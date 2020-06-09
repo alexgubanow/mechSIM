@@ -11,20 +11,16 @@ bx = 0;
 by = 0.00100000005;
 bz = 0;
 
-lax = sqrt((ax-baseX)^2 + (ay-baseY)^2 + (az-baseZ)^2);
-lay =0;
-laz =0;
-lbx = 0;
-lby = sqrt((bx-baseX)^2 + (by-baseY)^2 + (bz-baseZ)^2);
-lbz = 0;
+la = sqrt((ax-baseX)^2 + (ay-baseY)^2 + (az-baseZ)^2);
+lb = sqrt((bx-baseX)^2 + (by-baseY)^2 + (bz-baseZ)^2);
 
-cosXa = ax / lax;
-cosYa = ay / lax;
-cosZa = az / lax;
+cosXa = ax / la;
+cosYa = ay / la;
+cosZa = az / la;
 
-cosXb = bx / lby;
-cosYb = by / lby;
-cosZb = bz / lby;
+cosXb = bx / lb;
+cosYb = by / lb;
+cosZb = bz / lb;
 
 cosXz = (cosYa * cosZb - cosZa * cosYb);
 cosYz = -(cosXa * cosZb - cosZa * cosXb);

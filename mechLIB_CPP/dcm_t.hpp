@@ -29,8 +29,12 @@ public:
 		Yy = radiusPoint.y / lby;
 		Zy = radiusPoint.z / lby;
 		Xz = Yx * Zy - Zx * Yy;
-		Yz = 0 - (Xx * Zy - Zx * Xy);
+		Yz = -Xx * Zy - Zx * Xy;
 		Zz = Xx * Yy - Yx * Xy;
+		if (Zz != 1)
+		{
+			throw "Calculated rotation matrix are wrong";
+		}
 	}
 
 	void ToGlob(DirectX::SimpleMath::Vector3 Lp, DirectX::SimpleMath::Vector3& gA)
