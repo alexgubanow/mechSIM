@@ -1,38 +1,37 @@
 clear all
 clc
-baseX = 0;
-baseY = 0;
-baseZ = 0;
-ax = -0.00312499981;
-ay = 0;
-az = 0;
 
-bx = 0;
-by = 0.00100000005;
-bz = 0;
+v = [14.2982 -47.9282 0];
+k = [19.1802 5.7016 0];
 
-la = sqrt((ax-baseX)^2 + (ay-baseY)^2 + (az-baseZ)^2);
-lb = sqrt((bx-baseX)^2 + (by-baseY)^2 + (bz-baseZ)^2);
+lv = norm(v);%length of vector v
+lk = norm(k);
 
-cosXa = ax / la;
-cosYa = ay / la;
-cosZa = az / la;
+cosx = (v./lv)';
+cosy = (k./lk)';
 
-cosXb = bx / lb;
-cosYb = by / lb;
-cosZb = bz / lb;
+cosz = [
+    cosx(2) * cosy(3) - cosx(3) * cosy(2)%cosXz
+    -(cosx(1) * cosy(3) - cosx(3) * cosy(1))%cosYz
+    cosx(1) * cosy(2) - cosx(2) * cosy(1)%cosZz
+    ];
 
-cosXz = (cosYa * cosZb - cosZa * cosYb);
-cosYz = -(cosXa * cosZb - cosZa * cosXb);
-cosZz = (cosXa * cosYb - cosYa * cosXb);
+rotM = [cosx cosy cosz];
 
-Tx = 50;
-Ty = 50;
-Tz = 0;
+T = [0 30 0];
 
-globX = cosXa * Tx + cosXb * Ty + cosXz * Tz
-globY = cosYa * Tx + cosYb * Ty + cosYz * Tz
-globZ = cosZa * Tx + cosZb * Ty + cosZz * Tz
+t = T.*rotM
+
+t = [28.7563 8.5483 0];
+
+T = t.*rotM'
+
+T= [sum(T(1,:)) sum(T(2,:)) sum(T(3,:))]
+
+
+% globX = cosXa * Tx + cosXb * Ty + cosXz * Tz
+% globY = cosYa * Tx + cosYb * Ty + cosYz * Tz
+% globZ = cosZa * Tx + cosZb * Ty + cosZz * Tz
 
 
 % locX = cosXa * globX + cosYa * globY + cosZa * globZ
