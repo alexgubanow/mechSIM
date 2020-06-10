@@ -21,9 +21,6 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="coords.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Element_t.h">
       <Filter>Header Files</Filter>
     </ClInclude>

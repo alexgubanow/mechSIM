@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "coords.hpp"
 #include <d3d11_1.h>
 #include <DirectXMath.h>
 #include "SimpleMath.h"
@@ -20,16 +19,18 @@ public:
 	float Zz; 
 	dcm_t(DirectX::SimpleMath::Vector3 endPoint, DirectX::SimpleMath::Vector3 radiusPoint)
 	{
-		float lax = crds::GetTotL(endPoint);
-		float lby = crds::GetTotL(radiusPoint);
-		Xx = endPoint.x / lax;
-		Yx = endPoint.y / lax;
-		Zx = endPoint.z / lax;
-		Xy = radiusPoint.x / lby;
-		Yy = radiusPoint.y / lby;
-		Zy = radiusPoint.z / lby;
+		float el = endPoint.Length();
+		float rl = radiusPoint.Length();
+		Xx = endPoint.x / el;
+		Yx = endPoint.y / el;
+		Zx = endPoint.z / el;
+
+		Xy = radiusPoint.x / rl;
+		Yy = radiusPoint.y / rl;
+		Zy = radiusPoint.z / rl;
+
 		Xz = Yx * Zy - Zx * Yy;
-		Yz = -Xx * Zy - Zx * Xy;
+		Yz = 0 - (Xx * Zy - Zx * Xy);
 		Zz = Xx * Yy - Yx * Xy;
 		if (Zz != 1)
 		{

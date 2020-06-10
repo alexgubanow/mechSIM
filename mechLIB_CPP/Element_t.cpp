@@ -5,7 +5,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "maf.hpp"
-#include "coords.hpp"
 
 void Element_t::init(Node_t* _n1, Node_t* _n2, int Counts, mechLIB_CPP::props_t* _props)
 {
@@ -82,7 +81,7 @@ void Element_t::GetPhysicParam(int t, float Re, float& m, float& c)
 
 float Element_t::GetOwnLength(int t)
 {
-	float len = crds::GetTotL(n1->p[t], n2->p[t]);
+	float len = DirectX::SimpleMath::Vector3::Distance(n1->p[t], n2->p[t]);
 	if (len == 0)
 	{
 		throw std::exception("Calculated length of element can't be eaqul to zero");

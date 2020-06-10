@@ -167,7 +167,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="coords.hpp" />
     <ClInclude Include="C_t.h" />
     <ClInclude Include="dcm_t.hpp" />
     <ClInclude Include="Element_t.h" />
