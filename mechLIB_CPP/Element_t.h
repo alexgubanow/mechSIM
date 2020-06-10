@@ -22,12 +22,13 @@ public:
 	Element_t() : props(nullptr), A(0), I(0), n1(0), n2(0), L(0), F(0), radiusPoint() { }
 	~Element_t() { }
 	void init(Node_t* _n1, Node_t* _n2, int Counts, mechLIB_CPP::props_t* _props);
-	void CalcForce(int t, float Re, float bloodV, float bloodP);
-	void GetPhysicParam(int t, float Re, float& m, float& c);
-	float GetOwnLength(int t);
-	void GetFn(int t, DirectX::SimpleMath::Vector3 deltaL, DirectX::SimpleMath::Vector3& force);
+	void CalcForce(size_t t, float Re, float bloodV, float bloodP);
+	void GetForceForNode(size_t t, Node_t* baseP, DirectX::SimpleMath::Vector3& force);
+	void GetPhysicParam(size_t t, float Re, float& m, float& c);
+	float GetOwnLength(size_t t);
+	void GetFn(size_t t, DirectX::SimpleMath::Vector3 deltaL, DirectX::SimpleMath::Vector3& force);
 	void calcHookFn(DirectX::SimpleMath::Vector3& Fn, float oldL, DirectX::SimpleMath::Vector3 deltaL);
 	void calcMooneyRivlinFn(DirectX::SimpleMath::Vector3& Fn, float oldL, DirectX::SimpleMath::Vector3 deltaL);
-	void GetPressureForce(int t, float bloodP, float L);
-	void GetDragForce(int t, float Re, float v, float L, DirectX::SimpleMath::Vector3& force);
+	void GetPressureForce(size_t t, float bloodP, float L);
+	void GetDragForce(size_t t, float Re, float v, float L, DirectX::SimpleMath::Vector3& force);
 };

@@ -18,7 +18,7 @@ void Element_t::init(Node_t* _n1, Node_t* _n2, int Counts, mechLIB_CPP::props_t*
 	I = maf::P3(A) / 12.0f;
 }
 
-void Element_t::CalcForce(int t, float Re, float bloodV, float bloodP)
+void Element_t::CalcForce(size_t t, float Re, float bloodV, float bloodP)
 {
 	//getting length of link by measure between coords
 	//L[t] = 0;
@@ -36,31 +36,35 @@ void Element_t::CalcForce(int t, float Re, float bloodV, float bloodP)
 	default:
 		throw std::exception("unexpected behavior");
 	}
-	//getting position of link according base point
-	DirectX::SimpleMath::Vector3 LinkPos = 
-		n1->p[t - 1] - n2->p[t - 1];
-	//getting DCM for this link
-	dcm_t dcm(LinkPos, radiusPoint);
-	//convert base point Ux to local coords
-	DirectX::SimpleMath::Vector3 lBpUx;
-	dcm.ToLoc(n1->u[t - 1], lBpUx);
-	//convert n point Ux to local coords
-	DirectX::SimpleMath::Vector3 lNpUx;
-	dcm.ToLoc(n2->u[t - 1], lNpUx);
-	//store delta of expansion
-	DirectX::SimpleMath::Vector3 deltaL = lBpUx - lNpUx;
-	DirectX::SimpleMath::Vector3 force;
-	GetFn(t, deltaL, force);
+	GetFn(t, n1->u[t - 1] - n2->u[t - 1], F[t]);
 	//GetPressureForce(t, bloodP, L[t]);
 	//GetDragForce(t, Re, bloodV, L);
 
-	force.y += props->MaxU * 1E3f;
-	DirectX::SimpleMath::Vector3 gforce;
+	F[t].y += props->MaxU * 1E3f;
+	/*DirectX::SimpleMath::Vector3 gforce;
 	dcm.ToGlob(force, gforce);
-	F[t] += gforce;
+	F[t] += gforce;*/
 }
 
-void Element_t::GetPhysicParam(int t, float Re, float& m, float& c)
+void Element_t::GetForceForNode(size_t t, Node_t* baseP, DirectX::SimpleMath::Vector3& force)
+{
+	//getting position of link according base point
+	DirectX::SimpleMath::Vector3 LinkPos;
+	if (n1 == baseP)
+	{
+		LinkPos = n1->p[t - 1] - n2->p[t - 1];
+	}
+	else
+	{
+		LinkPos = n2->p[t - 1] - n1->p[t - 1];
+	}
+	//getting DCM for this link
+	dcm_t dcm(LinkPos, radiusPoint);
+	//convert local force to global according base point
+	dcm.ToGlob(F[t], force);
+}
+
+void Element_t::GetPhysicParam(size_t t, float Re, float& m, float& c)
 {
 	float len = GetOwnLength(t);
 	m += props->ro * A * len;
@@ -79,7 +83,7 @@ void Element_t::GetPhysicParam(int t, float Re, float& m, float& c)
 	c = alpha * sqrtf(m * k);
 }
 
-float Element_t::GetOwnLength(int t)
+float Element_t::GetOwnLength(size_t t)
 {
 	float len = DirectX::SimpleMath::Vector3::Distance(n1->p[t], n2->p[t]);
 	if (len == 0)
@@ -89,7 +93,7 @@ float Element_t::GetOwnLength(int t)
 	return len;
 }
 
-void Element_t::GetFn(int t, DirectX::SimpleMath::Vector3 deltaL, DirectX::SimpleMath::Vector3& force)
+void Element_t::GetFn(size_t t, DirectX::SimpleMath::Vector3 deltaL, DirectX::SimpleMath::Vector3& force)
 {
 	switch (props->phMod)
 	{
@@ -122,13 +126,13 @@ void Element_t::calcMooneyRivlinFn(DirectX::SimpleMath::Vector3& Fn, float oldL,
 	Fn.x = 0 - (A * sigma);
 }
 
-void Element_t::GetPressureForce(int t, float bloodP, float L)
+void Element_t::GetPressureForce(size_t t, float bloodP, float L)
 {
 	//float Fpress = bloodP * radiusPoint.z * 2 * L;
 	//F[t].y = -1E-08f;
 }
 
-void Element_t::GetDragForce(int t, float Re, float v, float L, DirectX::SimpleMath::Vector3& force)
+void Element_t::GetDragForce(size_t t, float Re, float v, float L, DirectX::SimpleMath::Vector3& force)
 {
 	/*float Awet = 2 * (float)M_PI * radiusPoint.z * L;
 	float bloodViscosity = 3E-3f;

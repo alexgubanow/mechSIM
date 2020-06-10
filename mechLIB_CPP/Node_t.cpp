@@ -13,8 +13,8 @@ Node_t::~Node_t()
 	/*delete[] deriv;
 	delete[] F;*/
 }
-void Node_t::init(int tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::SimpleMath::Vector3 _radiusPoint,
-	mechLIB_CPP::NodeFreedom _freedom, mechLIB_CPP::NodeLoad _LoadType, std::vector<Element_t *> _Neigs)
+void Node_t::init(size_t tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::SimpleMath::Vector3 _radiusPoint,
+	mechLIB_CPP::NodeFreedom _freedom, mechLIB_CPP::NodeLoad _LoadType, std::vector<Element_t*> _Neigs)
 {
 	freedom = _freedom;
 	LoadType = _LoadType;
@@ -27,7 +27,7 @@ void Node_t::init(int tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::Sim
 	p[0] = coords;
 	radiusPoint = _radiusPoint;
 }
-void Node_t::CalcAccel(int t, float m)
+void Node_t::CalcAccel(size_t t, float m)
 {
 	if (LoadType != mechLIB_CPP::NodeLoad::p)
 	{
@@ -37,7 +37,7 @@ void Node_t::CalcAccel(int t, float m)
 	}
 
 }
-void Node_t::GetForces(int t, float m, float c)
+void Node_t::GetForces(size_t t, float m, float c)
 {
 	//gravity force
 	F[t].y += m * _g;
@@ -51,7 +51,7 @@ void Node_t::GetForces(int t, float m, float c)
 		F[t] += element->F[t];
 	}
 }
-void Node_t::GetPhysicParam(int t, float Re, float& m, float& c)
+void Node_t::GetPhysicParam(size_t t, float Re, float& m, float& c)
 {
 	for (auto element : Neigs)
 	{
@@ -68,7 +68,7 @@ void Node_t::GetPhysicParam(int t, float Re, float& m, float& c)
 		throw "Calculated mass of node can't be eaqul to zero";
 	}
 }
-void Node_t::Integrate(int now, int before, float dt)
+void Node_t::Integrate(size_t now, size_t before, float dt)
 {
 	Integr::EulerExpl(LoadType, p[now], u[now], v[now], a[now], p[before], u[before], v[before], a[before], p[0], dt);
 }

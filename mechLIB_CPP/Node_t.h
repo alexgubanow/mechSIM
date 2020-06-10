@@ -22,12 +22,12 @@ public:
 	DirectX::SimpleMath::Vector3 radiusPoint;
 	Node_t();
 	~Node_t();
-	void init(int tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::SimpleMath::Vector3 _radiusPoint,
+	void init(size_t tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::SimpleMath::Vector3 _radiusPoint,
 		mechLIB_CPP::NodeFreedom _freedom, mechLIB_CPP::NodeLoad _LoadType, std::vector<Element_t *> _Neigs);
-	void CalcAccel(int t, float m);
-	void GetForces(int t, float m, float c);
-	void GetPhysicParam(int t, float Re, float& m, float& c);
-	void Integrate(int now, int before, float dt);
+	void CalcAccel(size_t t, float m);
+	void GetForces(size_t t, float m, float c);
+	void GetPhysicParam(size_t t, float Re, float& m, float& c);
+	void Integrate(size_t now, size_t before, float dt);
 	//float w = 300;
    //float n = 1f;
 };
