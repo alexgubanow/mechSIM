@@ -5,7 +5,7 @@
 #include "integr.h"
 #include "Rope_t.h"
 
-Node_t::Node_t() : freedom(), LoadType(), p(0), u(0), v(0), a(0), F(0), Neigs(0), radiusPoint()
+Node_t::Node_t() : freedom(), LoadType(), p(0), u(0), v(0), a(0), F(0), Neigs(0)
 {
 }
 Node_t::~Node_t()
@@ -13,7 +13,7 @@ Node_t::~Node_t()
 	/*delete[] deriv;
 	delete[] F;*/
 }
-void Node_t::init(size_t tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::SimpleMath::Vector3 _radiusPoint,
+void Node_t::init(size_t tCounts, DirectX::SimpleMath::Vector3 coords,
 	mechLIB_CPP::NodeFreedom _freedom, mechLIB_CPP::NodeLoad _LoadType, std::vector<Element_t*> _Neigs)
 {
 	freedom = _freedom;
@@ -25,7 +25,6 @@ void Node_t::init(size_t tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::
 	v = std::vector<DirectX::SimpleMath::Vector3>(tCounts);
 	a = std::vector<DirectX::SimpleMath::Vector3>(tCounts);
 	p[0] = coords;
-	radiusPoint = _radiusPoint;
 }
 void Node_t::CalcAccel(size_t t, float m)
 {

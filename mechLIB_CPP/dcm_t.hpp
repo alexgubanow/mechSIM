@@ -34,7 +34,7 @@ public:
 		Zz = Xx * Yy - Yx * Xy;
 		if (Zz != 1)
 		{
-			throw "Calculated rotation matrix are wrong";
+			//throw new std::string("Calculated rotation matrix are wrong");
 		}
 	}
 
@@ -50,5 +50,22 @@ public:
 		lA.x = Xx * Gp.x + Yx * Gp.y + Zx * Gp.z;
 		lA.y = Xy * Gp.x + Yy * Gp.y + Zy * Gp.z;
 		lA.z = Xz * Gp.x + Yz * Gp.y + Zz * Gp.z;
+	}
+	DirectX::SimpleMath::Vector3 ToGlob(DirectX::SimpleMath::Vector3 Lp)
+	{
+		DirectX::SimpleMath::Vector3 gA;
+		gA.x = Xx * Lp.x + Xy * Lp.y + Xz * Lp.z;
+		gA.y = Yx * Lp.x + Yy * Lp.y + Yz * Lp.z;
+		gA.z = Zx * Lp.x + Zy * Lp.y + Zz * Lp.z;
+		return gA;
+	}
+
+	DirectX::SimpleMath::Vector3 ToLoc(DirectX::SimpleMath::Vector3 Gp)
+	{
+		DirectX::SimpleMath::Vector3 lA;
+		lA.x = Xx * Gp.x + Yx * Gp.y + Zx * Gp.z;
+		lA.y = Xy * Gp.x + Yy * Gp.y + Zy * Gp.z;
+		lA.z = Xz * Gp.x + Yz * Gp.y + Zz * Gp.z;
+		return lA;
 	}
 };

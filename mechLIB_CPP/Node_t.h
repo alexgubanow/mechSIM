@@ -18,12 +18,10 @@ public:
 	std::vector<DirectX::SimpleMath::Vector3> a;
 	std::vector<DirectX::SimpleMath::Vector3> F;
 	std::vector<Element_t*> Neigs;
-	//int ID;
-	DirectX::SimpleMath::Vector3 radiusPoint;
 	Node_t();
 	~Node_t();
-	void init(size_t tCounts, DirectX::SimpleMath::Vector3 coords, DirectX::SimpleMath::Vector3 _radiusPoint,
-		mechLIB_CPP::NodeFreedom _freedom, mechLIB_CPP::NodeLoad _LoadType, std::vector<Element_t *> _Neigs);
+	void init(size_t tCounts, DirectX::SimpleMath::Vector3 coords, mechLIB_CPP::NodeFreedom _freedom, 
+		mechLIB_CPP::NodeLoad _LoadType, std::vector<Element_t*> _Neigs);
 	void CalcAccel(size_t t, float m);
 	void GetForces(size_t t, float m, float c);
 	void GetPhysicParam(size_t t, float Re, float& m, float& c);
