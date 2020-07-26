@@ -67,3 +67,12 @@ void Rope_t::StepOverNodes(size_t t, float Re, float dt)
 		Nodes[i].Integrate(t, t - 1, dt);
 	}
 }
+
+void Rope_t::EvalRadiusPoints(size_t t)
+{
+	for (size_t i = 0; i < ElementsSize; i++)
+	{
+		Elements[i].rP1[t].y =  Elements[i].rP1[0].y;
+		Elements[i].rP2[t].y = Elements[i].rP2[0].y;
+	}
+}

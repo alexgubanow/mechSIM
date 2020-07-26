@@ -95,6 +95,7 @@ namespace mechLIB_CPP
 		for (size_t t = 1; t < phProps.Counts; t++)
 		{
 			rope->StepOverNodes(t, Re[t - 1], phProps.dt);
+			rope->EvalRadiusPoints(t);
 			for (int i = 0; i < rope->ElementsSize; i++)
 			{
 				rope->L[t] += rope->Elements[i].L[t];

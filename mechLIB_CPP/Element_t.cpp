@@ -13,8 +13,10 @@ void Element_t::init(Node_t* _n1, Node_t* _n2, mechLIB_CPP::props_t* _props)
 	F = std::vector<DirectX::SimpleMath::Vector3>(props->Counts);
 	n1 = _n1;
 	n2 = _n2;
-	radiusPoint = std::vector<DirectX::SimpleMath::Vector3>(props->Counts);
-	radiusPoint[0] = DirectX::SimpleMath::Vector3( 0, props->D, 0);
+	rP1 = std::vector<DirectX::SimpleMath::Vector3>(props->Counts);
+	rP2 = std::vector<DirectX::SimpleMath::Vector3>(props->Counts);
+	rP1[0] = DirectX::SimpleMath::Vector3(0, n1->p[0].y + props->D, 0);
+	rP2[0] = DirectX::SimpleMath::Vector3(0, n2->p[0].y + props->D, 0);
 	A = (float)M_PI * maf::P2(props->D);
 	I = maf::P3(A) / 12.0f;
 }
@@ -37,10 +39,12 @@ void Element_t::CalcForce(Node_t* baseNode, size_t t, float Re, float bloodV, fl
 	default:
 		throw "unexpected behavior";
 	}
+	DirectX::SimpleMath::Vector3 radiusPoint = rP1[t - 1];
 	Node_t* oppositeNode = n1;
 	if (oppositeNode == baseNode)
 	{
 		oppositeNode = n2;
+		radiusPoint = rP2[t - 1];
 	}
 	//absolute link in glob coord
 	DirectX::SimpleMath::Vector3 absoluteCoords(
@@ -49,13 +53,11 @@ void Element_t::CalcForce(Node_t* baseNode, size_t t, float Re, float bloodV, fl
 		oppositeNode->p[t - 1].z - baseNode->p[t - 1].z);
 
 	//getting DCM for this link
-	dcm_t dcm(absoluteCoords, radiusPoint[t - 1]);
-	radiusPoint[t] = radiusPoint[t - 1];
+	dcm_t dcm(absoluteCoords, radiusPoint);
 	DirectX::SimpleMath::Vector3 force;
 	GetFn(t, dcm.ToLoc(baseNode->u[t - 1]) - dcm.ToLoc(oppositeNode->u[t - 1]), force);
 	//GetPressureForce(t, bloodP, L[t]);
 	//GetDragForce(t, Re, bloodV, L);
-
 	force.y += props->MaxU * 1E3f;
 	dcm.ToGlob(force, F[t]);
 }
@@ -76,11 +78,11 @@ void Element_t::GetPhysicParam(size_t t, float Re, float& m, float& c)
 	if (Re > 0)
 	{
 		//calc h of fluid on rod
-		float thFluid = (radiusPoint[t - 1].z * 2) / sqrtf(Re);
+		float thFluid = (rP1[t - 1].z * 2) / sqrtf(Re);
 		//calc mass of fluid on rod
 		//add mass of this fluid to mass of rod
-		m += (float)M_PI * len * (maf::P2(radiusPoint[t - 1].z + thFluid) -
-			maf::P2(radiusPoint[t - 1].z)) * 1060;
+		m += (float)M_PI * len * (maf::P2(rP1[t - 1].z + thFluid) -
+			maf::P2(rP1[t - 1].z)) * 1060;
 	}
 	float alpha = 0 - ((sqrtf(5) * log10f(props->DampRatio)) /
 		(sqrtf(maf::P2(log10f(props->DampRatio)) + maf::P2((float)M_PI))));
