@@ -9,7 +9,7 @@ namespace mechLIB_CPP {
 		float DampRatio;
 		float MaxU;
 		float initDrop;
-		int nodes;
+		size_t nodes;
 		float E;
 		float L;
 		float D;

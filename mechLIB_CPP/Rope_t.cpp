@@ -23,7 +23,7 @@ void Rope_t::SetupNodesPositions(mechLIB_CPP::props_t* props)
 void Rope_t::SetupNodesPositions(mechLIB_CPP::props_t* props, DirectX::SimpleMath::Vector3 startCoord,
 	DirectX::SimpleMath::Vector3 endCoord)
 {
-	int lastNode = NodesSize - 1;
+	size_t lastNode = NodesSize - 1;
 	float dl = props->L / lastNode;
 	float cosA = endCoord.x / props->L;
 	float sinA = endCoord.y / props->L;
@@ -56,7 +56,7 @@ void Rope_t::EvalElements(mechLIB_CPP::props_t* props)
 	}
 }
 
-void Rope_t::StepOverElems(int t, float Re, float bloodV, float bloodP)
+void Rope_t::StepOverElems(size_t t, float Re, float bloodV, float bloodP)
 {
 //#pragma omp parallel for
 	for (int i = 0; i < ElementsSize; i++)
@@ -65,7 +65,7 @@ void Rope_t::StepOverElems(int t, float Re, float bloodV, float bloodP)
 	}
 }
 
-void Rope_t::StepOverNodes(int t, float Re, float dt)
+void Rope_t::StepOverNodes(size_t t, float Re, float dt)
 {
 //#pragma omp parallel for
 	for (int i = 0; i < NodesSize; i++)

@@ -44,7 +44,7 @@ void mechLIB_CPP::EnviroWrapper::Run(bool NeedToSaveResults)
 
 void mechLIB_CPP::EnviroWrapper::GetNodesF(int step, array<array<mechLIB_CPP::DataPointCPP^>^>^% arr)
 {
-	arr = gcnew array<array<mechLIB_CPP::DataPointCPP^>^>(world->rope->NodesSize);
+	arr = gcnew array<array<mechLIB_CPP::DataPointCPP^>^>((int)world->rope->NodesSize);
 #pragma omp parallel for
 	for (int n = 0; n < world->rope->NodesSize; n++)
 	{
@@ -65,7 +65,7 @@ void mechLIB_CPP::EnviroWrapper::GetNodesF(int step, array<array<mechLIB_CPP::Da
 }
 void mechLIB_CPP::EnviroWrapper::GetNodesA(int step, array<array<mechLIB_CPP::DataPointCPP^>^>^% arr)
 {
-	arr = gcnew array<array<mechLIB_CPP::DataPointCPP^>^>(world->rope->NodesSize);
+	arr = gcnew array<array<mechLIB_CPP::DataPointCPP^>^>((int)world->rope->NodesSize);
 #pragma omp parallel for
 	for (int n = 0; n < world->rope->NodesSize; n++)
 	{
@@ -83,7 +83,7 @@ void mechLIB_CPP::EnviroWrapper::GetNodesA(int step, array<array<mechLIB_CPP::Da
 }
 void mechLIB_CPP::EnviroWrapper::GetNodesV(int step, array<array<mechLIB_CPP::DataPointCPP^>^>^% arr)
 {
-	arr = gcnew array<array<mechLIB_CPP::DataPointCPP^>^>(world->rope->NodesSize);
+	arr = gcnew array<array<mechLIB_CPP::DataPointCPP^>^>((int)world->rope->NodesSize);
 #pragma omp parallel for
 	for (int n = 0; n < world->rope->NodesSize; n++)
 	{
@@ -101,7 +101,7 @@ void mechLIB_CPP::EnviroWrapper::GetNodesV(int step, array<array<mechLIB_CPP::Da
 }
 void mechLIB_CPP::EnviroWrapper::GetNodesU(int step, array<array<mechLIB_CPP::DataPointCPP^>^>^% arr)
 {
-	arr = gcnew array<array<mechLIB_CPP::DataPointCPP^>^>(world->rope->NodesSize);
+	arr = gcnew array<array<mechLIB_CPP::DataPointCPP^>^>((int)world->rope->NodesSize);
 #pragma omp parallel for
 	for (int n = 0; n < world->rope->NodesSize; n++)
 	{
@@ -119,7 +119,7 @@ void mechLIB_CPP::EnviroWrapper::GetNodesU(int step, array<array<mechLIB_CPP::Da
 }
 void mechLIB_CPP::EnviroWrapper::GetNodesP(int step, array<array<mechLIB_CPP::DataPointCPP^>^>^% arr)
 {
-	arr = gcnew array<array<mechLIB_CPP::DataPointCPP^>^>(world->rope->NodesSize);
+	arr = gcnew array<array<mechLIB_CPP::DataPointCPP^>^>((int)world->rope->NodesSize);
 #pragma omp parallel for
 	for (int n = 0; n < world->rope->NodesSize; n++)
 	{

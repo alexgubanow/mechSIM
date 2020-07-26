@@ -14,9 +14,9 @@ class Rope_t
 {
 public:
 	std::vector<Node_t> Nodes;
-	int NodesSize;
+	size_t NodesSize;
 	std::vector<Element_t> Elements;
-	int ElementsSize;
+	size_t ElementsSize;
 	std::vector<float> L;
 	Rope_t() : Nodes(0), NodesSize(0), Elements(0), ElementsSize(0), L(0)
 	{
@@ -28,7 +28,7 @@ public:
 	void SetupNodesPositions(mechLIB_CPP::props_t* props);
 	void SetupNodesPositions(mechLIB_CPP::props_t* props, DirectX::SimpleMath::Vector3 startCoord, DirectX::SimpleMath::Vector3 endCoord);
 	void EvalElements(mechLIB_CPP::props_t* props);
-	void StepOverElems(int t, float Re, float bloodV, float bloodP);
-	void StepOverNodes(int t, float Re, float dt);
+	void StepOverElems(size_t t, float Re, float bloodV, float bloodP);
+	void StepOverNodes(size_t t, float Re, float dt);
 
 };

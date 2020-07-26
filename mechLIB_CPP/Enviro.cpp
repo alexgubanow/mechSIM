@@ -11,12 +11,12 @@ namespace mechLIB_CPP
 	{
 		time = std::vector<float>(Counts);
 		//time = new float[Counts];
-		for (int i = 1; i < Counts; i++)
+		for (size_t i = 1; i < Counts; i++)
 		{
 			time[i] = time[i - 1] + dt;
 		}
 	}
-	Enviro::Enviro(props_t _phProps, std::string& _loadFile) : loadFile(_loadFile), phProps(_phProps)
+	Enviro::Enviro(props_t _phProps, std::string& _loadFile) : loadFile(_loadFile), phProps(_phProps), rope(nullptr)
 	{
 		if (loadFile.size() > 0)
 		{
@@ -39,7 +39,7 @@ namespace mechLIB_CPP
 				rope->SetupNodesPositions(&phProps, DirectX::SimpleMath::Vector3(pmxq[0], pmyq[0], 0),
 					DirectX::SimpleMath::Vector3(plxq[0], plyq[0], 0));
 				rope->EvalElements(&phProps);
-				int lastN = phProps.nodes - 1;
+				size_t lastN = phProps.nodes - 1;
 				for (int t = 0; t < phProps.Counts; t++)
 				{
 					rope->Nodes[0].p[t].x = pmxq[t];
@@ -68,8 +68,8 @@ namespace mechLIB_CPP
 	}
 	void Enviro::GenerateLoad(C_t axis)
 	{
-		int lastN = phProps.nodes - 1;
-		int midN = lastN / 2;
+		size_t lastN = phProps.nodes - 1;
+		size_t midN = lastN / 2;
 		Re = std::vector<float>(phProps.Counts);
 		bloodV = std::vector<float>(phProps.Counts);
 		bloodP = std::vector<float>(phProps.Counts);
@@ -92,7 +92,7 @@ namespace mechLIB_CPP
 	}
 	void Enviro::Run(bool NeedToSaveResults)
 	{
-		for (int t = 1; t < phProps.Counts; t++)
+		for (size_t t = 1; t < phProps.Counts; t++)
 		{
 			rope->StepOverElems(t, Re[t - 1], bloodV[t - 1], bloodP[t - 1]);
 			rope->StepOverNodes(t, Re[t - 1], phProps.dt);
