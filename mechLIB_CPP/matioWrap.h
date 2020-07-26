@@ -14,7 +14,7 @@ public:
         {
             char errBuff[2048];
             snprintf(errBuff, sizeof(errBuff), "Failed to open file: \"%s\"", MATFile.c_str());
-            throw std::exception(errBuff);
+            throw (const char*)errBuff;
         }
     }
     ~matioWrap()

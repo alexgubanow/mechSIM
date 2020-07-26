@@ -9,6 +9,7 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -123,17 +124,7 @@ namespace spring.ViewModels
                 ClearDataView();
                 thrsim = new Thread(delegate ()
                 {
-                    try
-                    {
-                        Simulate(fileName);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message);
-                        world.Destroy();
-                        world = null;
-                        _ea.GetEvent<GotResultsEvent>().Publish();
-                    }
+                    Simulate(fileName);
                 });
                 thrsim.Start();
             }
@@ -182,15 +173,20 @@ namespace spring.ViewModels
                 world.GetNodesV(step, ref v);
                 world.GetNodesA(step, ref a);
                 EndT = timeArr.Length - 1;
-                _ea.GetEvent<GotResultsEvent>().Publish();
             }
-            catch (Exception ex)
+            catch (RuntimeWrappedException e)
+            {
+                if (e.WrappedException is string s)
+                {
+                    MessageBox.Show(s);
+                }
+            }
+            finally
             {
                 _ea.GetEvent<GotResultsEvent>().Publish();
-                MessageBox.Show(ex.Message);
+                world.Destroy();
+                world = null;
             }
-            world.Destroy();
-            world = null;
         }
         private void ClearDataView()
         {

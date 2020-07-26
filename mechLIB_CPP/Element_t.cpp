@@ -35,7 +35,7 @@ void Element_t::CalcForce(size_t t, float Re, float bloodV, float bloodP)
 		L[t] = GetOwnLength(t - 1);
 		break;
 	default:
-		throw std::exception("unexpected behavior");
+		throw "unexpected behavior";
 	}
 	//getting DCM for this link
 	dcm_t dcm(n2->p[t - 1], radiusPoint[t - 1]);
@@ -81,7 +81,7 @@ float Element_t::GetOwnLength(size_t t)
 	float len = DirectX::SimpleMath::Vector3::Distance(n1->p[t], n2->p[t]);
 	if (len == 0)
 	{
-		throw std::exception("Calculated length of element can't be eaqul to zero");
+		throw "Calculated length of element can't be eaqul to zero";
 	}
 	return len;
 }
@@ -100,7 +100,7 @@ void Element_t::GetFn(size_t t, DirectX::SimpleMath::Vector3 deltaL, DirectX::Si
 		calcMooneyRivlinFn(force, L[t], deltaL);
 		break;
 	default:
-		throw std::exception("unexpected behavior");
+		throw "unexpected behavior";
 	}
 }
 

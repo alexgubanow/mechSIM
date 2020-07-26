@@ -31,15 +31,22 @@ void mechLIB_CPP::EnviroWrapper::CreateWorld(float DampRatio, float MaxU, float 
 	{
 		world = new mechLIB_CPP::Enviro(phProps, str);
 	}
-	catch (const std::exception& ex)
+	catch (const char* ex)
 	{
-		throw gcnew System::Exception(gcnew System::String(ex.what()));
+		throw gcnew System::String(ex);
 	}
 }
 
 void mechLIB_CPP::EnviroWrapper::Run(bool NeedToSaveResults)
 {
-	world->Run(NeedToSaveResults);
+	try
+	{
+		world->Run(NeedToSaveResults);
+	}
+	catch (const char *ex)
+	{
+		throw gcnew System::String(ex);
+	}
 }
 
 void mechLIB_CPP::EnviroWrapper::GetNodesF(int step, array<array<mechLIB_CPP::DataPointCPP^>^>^% arr)

@@ -16,7 +16,9 @@ public:
 
 	float Xz;
 	float Yz;
-	float Zz; 
+	float Zz;
+	dcm_t() : Xx(0), Yx(0), Zx(0), Xy(0), Yy(0), Zy(0), Xz(0), Yz(0), Zz(0) {}
+
 	dcm_t(DirectX::SimpleMath::Vector3 endPoint, DirectX::SimpleMath::Vector3 radiusPoint)
 	{
 		float el = endPoint.Length();
@@ -34,7 +36,7 @@ public:
 		Zz = Xx * Yy - Yx * Xy;
 		if (Zz != 1)
 		{
-			//throw new std::string("Calculated rotation matrix are wrong");
+			throw "Calculated rotation matrix are wrong";
 		}
 	}
 
