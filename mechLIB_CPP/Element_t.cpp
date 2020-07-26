@@ -6,7 +6,7 @@
 #include <math.h>
 #include "maf.hpp"
 
-void Element_t::init(Node_t* _n1, Node_t* _n2, DirectX::SimpleMath::Vector3 Dpoint, int Counts, mechLIB_CPP::props_t* _props)
+void Element_t::init(Node_t* _n1, Node_t* _n2, mechLIB_CPP::props_t* _props)
 {
 	props = _props;
 	L = std::vector<float>(props->Counts);
@@ -14,12 +14,12 @@ void Element_t::init(Node_t* _n1, Node_t* _n2, DirectX::SimpleMath::Vector3 Dpoi
 	n1 = _n1;
 	n2 = _n2;
 	radiusPoint = std::vector<DirectX::SimpleMath::Vector3>(props->Counts);
-	radiusPoint[0] = Dpoint;
+	radiusPoint[0] = DirectX::SimpleMath::Vector3( 0, props->D, 0);
 	A = (float)M_PI * maf::P2(props->D);
 	I = maf::P3(A) / 12.0f;
 }
 
-void Element_t::CalcForce(size_t t, float Re, float bloodV, float bloodP)
+void Element_t::CalcForce(Node_t* baseNode, size_t t, float Re, float bloodV, float bloodP)
 {
 	//getting length of link by measure between coords
 	//L[t] = 0;
@@ -37,10 +37,22 @@ void Element_t::CalcForce(size_t t, float Re, float bloodV, float bloodP)
 	default:
 		throw "unexpected behavior";
 	}
+	Node_t* oppositeNode = n1;
+	if (oppositeNode == baseNode)
+	{
+		oppositeNode = n2;
+	}
+	//absolute link in glob coord
+	DirectX::SimpleMath::Vector3 absoluteCoords(
+		oppositeNode->p[t - 1].x - baseNode->p[t - 1].x,
+		oppositeNode->p[t - 1].y - baseNode->p[t - 1].y,
+		oppositeNode->p[t - 1].z - baseNode->p[t - 1].z);
+
 	//getting DCM for this link
-	dcm_t dcm(n2->p[t - 1], radiusPoint[t - 1]);
+	dcm_t dcm(absoluteCoords, radiusPoint[t - 1]);
+	radiusPoint[t] = radiusPoint[t - 1];
 	DirectX::SimpleMath::Vector3 force;
-	GetFn(t, dcm.ToLoc(n1->u[t - 1]) - dcm.ToLoc(n2->u[t - 1]), force);
+	GetFn(t, dcm.ToLoc(baseNode->u[t - 1]) - dcm.ToLoc(oppositeNode->u[t - 1]), force);
 	//GetPressureForce(t, bloodP, L[t]);
 	//GetDragForce(t, Re, bloodV, L);
 

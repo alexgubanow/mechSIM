@@ -48,27 +48,15 @@ void Rope_t::EvalElements(mechLIB_CPP::props_t* props)
 {
 	for (size_t i = 0; i < ElementsSize; i++)
 	{
-		Elements[i].init(&Nodes[i], &Nodes[i + 1],
-			DirectX::SimpleMath::Vector3{
-				Nodes[i].p[0].x ,Nodes[i].p[0].y + props->D,Nodes[i].p[0].z
-			}, props->Counts, props);
+		Elements[i].init(&Nodes[i], &Nodes[i + 1], props);
 		Elements[i].L[0] = Elements[i].GetOwnLength(0);
-	}
-}
-
-void Rope_t::StepOverElems(size_t t, float Re, float bloodV, float bloodP)
-{
-//#pragma omp parallel for
-	for (int i = 0; i < ElementsSize; i++)
-	{
-		Elements[i].CalcForce(t, Re, bloodV, bloodP);
 	}
 }
 
 void Rope_t::StepOverNodes(size_t t, float Re, float dt)
 {
 //#pragma omp parallel for
-	for (int i = 0; i < NodesSize; i++)
+	for (size_t i = 0; i < NodesSize; i++)
 	{
 		float m = 0;
 		float c = 0;

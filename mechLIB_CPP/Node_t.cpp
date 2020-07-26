@@ -47,6 +47,7 @@ void Node_t::GetForces(size_t t, float m, float c)
 	for (auto element : Neigs)
 	{
 		//push it to this force pull
+		element->CalcForce(this, t, 0, 0, 0);
 		F[t] += element->F[t];
 	}
 }

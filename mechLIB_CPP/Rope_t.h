@@ -28,7 +28,6 @@ public:
 	void SetupNodesPositions(mechLIB_CPP::props_t* props);
 	void SetupNodesPositions(mechLIB_CPP::props_t* props, DirectX::SimpleMath::Vector3 startCoord, DirectX::SimpleMath::Vector3 endCoord);
 	void EvalElements(mechLIB_CPP::props_t* props);
-	void StepOverElems(size_t t, float Re, float bloodV, float bloodP);
 	void StepOverNodes(size_t t, float Re, float dt);
 
 };

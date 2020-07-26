@@ -94,7 +94,6 @@ namespace mechLIB_CPP
 	{
 		for (size_t t = 1; t < phProps.Counts; t++)
 		{
-			rope->StepOverElems(t, Re[t - 1], bloodV[t - 1], bloodP[t - 1]);
 			rope->StepOverNodes(t, Re[t - 1], phProps.dt);
 			for (int i = 0; i < rope->ElementsSize; i++)
 			{
