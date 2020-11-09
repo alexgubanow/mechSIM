@@ -35,10 +35,6 @@ public:
 		Xz = Yx * Zy - Zx * Yy;
 		Yz = 0 - (Xx * Zy - Zx * Xy);
 		Zz = Xx * Yy - Yx * Xy;
-		/*if (Zz != 1 && Zz != -1)
-		{
-			throw "Calculated rotation matrix are wrong";
-		}*/
 	}
 
 	bool IsZzEqualOne() { return Zz == 1 || Zz == -1; }
