@@ -89,10 +89,6 @@ public:
 		x.Cross(y, z);
 		matrix = Matrix(x, y, z);
 		matrixT = matrix.Transpose();
-		if (z.z != 1 && z.z != -1)
-		{
-			throw "Calculated rotation matrix are wrong";
-		}
 	}
 	bool IsZzEqualOne() { return matrix._33 == 1 || matrix._33 == -1; }
 
