@@ -2,7 +2,6 @@
 #include <d3d11_1.h>
 #include <DirectXMath.h>
 #include "SimpleMath.h"
-using namespace DirectX::SimpleMath;
 
 class dcm_tLEGACY
 {
@@ -20,7 +19,7 @@ class dcm_tLEGACY
 public:
 	dcm_tLEGACY() : Xx(0), Yx(0), Zx(0), Xy(0), Yy(0), Zy(0), Xz(0), Yz(0), Zz(0) {}
 
-	dcm_tLEGACY(Vector3 endPoint, Vector3 radiusPoint)
+	dcm_tLEGACY(DirectX::SimpleMath::Vector3 endPoint, DirectX::SimpleMath::Vector3 radiusPoint)
 	{
 		float el = endPoint.Length();
 		float rl = radiusPoint.Length();
@@ -39,31 +38,31 @@ public:
 
 	bool IsZzEqualOne() { return Zz == 1 || Zz == -1; }
 
-	void ToGlob(Vector3 Lp, Vector3& gA)
+	void ToGlob(DirectX::SimpleMath::Vector3 Lp, DirectX::SimpleMath::Vector3& gA)
 	{
 		gA.x = Xx * Lp.x + Xy * Lp.y + Xz * Lp.z;
 		gA.y = Yx * Lp.x + Yy * Lp.y + Yz * Lp.z;
 		gA.z = Zx * Lp.x + Zy * Lp.y + Zz * Lp.z;
 	}
 
-	void ToLoc(Vector3 Gp, Vector3& lA)
+	void ToLoc(DirectX::SimpleMath::Vector3 Gp, DirectX::SimpleMath::Vector3& lA)
 	{
 		lA.x = Xx * Gp.x + Yx * Gp.y + Zx * Gp.z;
 		lA.y = Xy * Gp.x + Yy * Gp.y + Zy * Gp.z;
 		lA.z = Xz * Gp.x + Yz * Gp.y + Zz * Gp.z;
 	}
-	Vector3 ToGlob(Vector3 Lp)
+	DirectX::SimpleMath::Vector3 ToGlob(DirectX::SimpleMath::Vector3 Lp)
 	{
-		Vector3 gA;
+		DirectX::SimpleMath::Vector3 gA;
 		gA.x = Xx * Lp.x + Xy * Lp.y + Xz * Lp.z;
 		gA.y = Yx * Lp.x + Yy * Lp.y + Yz * Lp.z;
 		gA.z = Zx * Lp.x + Zy * Lp.y + Zz * Lp.z;
 		return gA;
 	}
 
-	Vector3 ToLoc(Vector3 Gp)
+	DirectX::SimpleMath::Vector3 ToLoc(DirectX::SimpleMath::Vector3 Gp)
 	{
-		Vector3 lA;
+		DirectX::SimpleMath::Vector3 lA;
 		lA.x = Xx * Gp.x + Yx * Gp.y + Zx * Gp.z;
 		lA.y = Xy * Gp.x + Yy * Gp.y + Zy * Gp.z;
 		lA.z = Xz * Gp.x + Yz * Gp.y + Zz * Gp.z;
@@ -72,38 +71,38 @@ public:
 };
 class dcm_t
 {
-	Matrix matrix;
-	Matrix matrixT;
+	DirectX::SimpleMath::Matrix matrix;
+	DirectX::SimpleMath::Matrix matrixT;
 public:
 	dcm_t() {}
 
-	dcm_t(const Vector3& endPoint, const Vector3& radiusPoint)
+	dcm_t(const DirectX::SimpleMath::Vector3& endPoint, const DirectX::SimpleMath::Vector3& radiusPoint)
 	{
-		Vector3 x, y, z;
+		DirectX::SimpleMath::Vector3 x, y, z;
 		endPoint.Normalize(x);
 		radiusPoint.Normalize(y);
 		x.Cross(y, z);
-		matrix = Matrix(x, y, z);
+		matrix = DirectX::SimpleMath::Matrix(x, y, z);
 		matrixT = matrix.Transpose();
 	}
 	bool IsZzEqualOne() { return matrix._33 == 1 || matrix._33 == -1; }
 
-	void ToGlob(const Vector3& src, Vector3& dst)
+	void ToGlob(const DirectX::SimpleMath::Vector3& src, DirectX::SimpleMath::Vector3& dst)
 	{
-		Vector3::Transform(src, matrix, dst);
+		DirectX::SimpleMath::Vector3::Transform(src, matrix, dst);
 	}
 
-	void ToLoc(const Vector3& src, Vector3& dst)
+	void ToLoc(const DirectX::SimpleMath::Vector3& src, DirectX::SimpleMath::Vector3& dst)
 	{
-		Vector3::Transform(src, matrixT, dst);
+		DirectX::SimpleMath::Vector3::Transform(src, matrixT, dst);
 	}
-	Vector3 ToGlob(const Vector3& src)
+	DirectX::SimpleMath::Vector3 ToGlob(const DirectX::SimpleMath::Vector3& src)
 	{
-		return Vector3::Transform(src, matrix);
+		return DirectX::SimpleMath::Vector3::Transform(src, matrix);
 	}
 
-	Vector3 ToLoc(const Vector3& src)
+	DirectX::SimpleMath::Vector3 ToLoc(const DirectX::SimpleMath::Vector3& src)
 	{
-		return Vector3::Transform(src, matrixT);
+		return DirectX::SimpleMath::Vector3::Transform(src, matrixT);
 	}
 };

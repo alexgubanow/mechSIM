@@ -72,7 +72,6 @@ namespace spring.ViewModels
         }
 
         private bool _isRunning;
-
         public bool IsRunning
         {
             get => _isRunning;
@@ -155,6 +154,16 @@ namespace spring.ViewModels
                 world.CreateWorld(Props.DampRatio, Props.MaxU, Props.initDrop, Props.nodes, Props.E, Props.L,
                     Props.D, Props.Counts, Props.dt, Props.ro, (PhModels)Props.phMod, fileName);
                 world.Run(NeedToSaveResults);
+            }
+            catch (RuntimeWrappedException e)
+            {
+                if (e.WrappedException is string s)
+                {
+                    MessageBox.Show(s);
+                }
+            }
+            try
+            {
                 timeArr = Array.Empty<float>();
                 F = Array.Empty<DataPointCPP[]>();
                 p = Array.Empty<DataPointCPP[]>();
@@ -173,6 +182,7 @@ namespace spring.ViewModels
                 world.GetNodesV(step, ref v);
                 world.GetNodesA(step, ref a);
                 EndT = timeArr.Length - 1;
+                _ea.GetEvent<GotResultsEvent>().Publish();
             }
             catch (RuntimeWrappedException e)
             {
@@ -180,12 +190,6 @@ namespace spring.ViewModels
                 {
                     MessageBox.Show(s);
                 }
-            }
-            finally
-            {
-                _ea.GetEvent<GotResultsEvent>().Publish();
-                world.Destroy();
-                world = null;
             }
         }
         private void ClearDataView()

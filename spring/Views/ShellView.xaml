@@ -16,58 +16,8 @@
             <Controls:ProgressRing IsActive="True" Panel.ZIndex="1000" x:Name="overlayring" Foreground="White"
                                    Visibility="{Binding Path=overlay_Visibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <Button Panel.ZIndex="1000" Content="STOP" Command="{Binding ComputeStopCommand}" Height="100" 
-                IsEnabled="{Binding IsRuninng}" FontSize="42" Background="Red" VerticalAlignment="Bottom" 
+                FontSize="42" Background="Red" VerticalAlignment="Bottom" 
                     Visibility="{Binding Path=overlay_Visibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
     </DockPanel>
-    <!--<DockPanel LastChildFill="True">
-        <StatusBar DockPanel.Dock="Bottom">
-            <StatusBarItem>
-                <TextBlock Text="{Binding AdapterT}"/>
-            </StatusBarItem>
-            <StatusBarItem>
-                <TextBlock Text="{Binding ConStatT}"/>
-            </StatusBarItem>
-            <StatusBarItem>
-                <TextBlock Text="{Binding StatusT}"/>
-            </StatusBarItem>
-            <StatusBarItem>
-                <TextBlock Text="{Binding CountsT, StringFormat={}Counts: {0}}"/>
-            </StatusBarItem>
-            <StatusBarItem>
-                <TextBlock Text="{Binding DutValT, StringFormat={}DUT: {0}}"/>
-            </StatusBarItem>
-            <StatusBarItem>
-                <TextBlock Text="{Binding RefValT, StringFormat={}Reference: {0}}"/>
-            </StatusBarItem>
-            <StatusBarItem>
-                <TextBlock Text="{Binding DiffValT, StringFormat={}Difference: {0}}"/>
-            </StatusBarItem>
-        </StatusBar>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" ></RowDefinition>
-                <RowDefinition Height="38" ></RowDefinition>
-            </Grid.RowDefinitions>
-            <TabControl Grid.Row="0">
-                <TabItem Header="Main">
-                    <ContentControl prism:RegionManager.RegionName="MainViewRegion"/>
-                </TabItem>
-                <TabItem Header="Data">
-                    <ContentControl prism:RegionManager.RegionName="DataGrViewRegion"/>
-                </TabItem>
-                <TabItem Header="Settings">
-                    <ContentControl prism:RegionManager.RegionName="SettingsViewRegion"/>
-                </TabItem>
-            </TabControl>
-            <StackPanel Grid.Row="1" Orientation="Horizontal">
-                <Button Margin="5,5,0,5" Content="{Binding ConnectButtonText}" Command="{Binding ConnSwitch}"/>
-                <Button Margin="5,5,0,5" Content="Reset" Command="{Binding ResetMes}" IsEnabled="{Binding IsEn}"/>
-                <Button Margin="5,5,0,5" Content="{Binding StartStopButtonText}"
-                        Command="{Binding StartStopMes}" IsEnabled="{Binding IsEn}"/>
-                <Button Margin="5,5,0,5" Content="Save data as TXT" Command="{Binding SaveAsTxt}"/>
-                <Button Margin="5,5,0,5" Content="Export report as PDF" Command="{Binding SaveAsPdf}"/>
-            </StackPanel>
-        </Grid>
-    </DockPanel>-->
 </controls:MetroWindow>
