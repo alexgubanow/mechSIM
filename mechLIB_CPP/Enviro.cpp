@@ -77,17 +77,21 @@ namespace mechLIB_CPP
 		float maxLoad = ((phProps.E * A) / phProps.L / phProps.nodes) * phProps.MaxU;
 		float freq = 1 / (phProps.Counts * phProps.dt);
 		rope->Nodes[0].LoadType = NodeLoad::p;
-		//rope->Nodes[midN].LoadType = NodeLoad::p;
-		rope->Nodes[lastN].LoadType = NodeLoad::u;
+		//rope->Nodes[midN].LoadType = NodeLoad::u;
+		rope->Nodes[lastN].LoadType = NodeLoad::p;
 		for (int t = 0; t < phProps.Counts; t++)
 		{
 			rope->Nodes[0].p[t] = rope->Nodes[0].p[0];
-			rope->Nodes[lastN].p[t] = rope->Nodes[lastN].p[0];
-			/*rope->Nodes[midN].p[t] = rope->Nodes[midN].p[0];
-			rope->Nodes[midN].p[t].y = rope->Nodes[midN].p[0].y + (-phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq / 4));*/
+			/*rope->Nodes[0].p[t].x = (phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq / 2)) + rope->Nodes[0].p[0].x;
+			rope->Nodes[0].u[t] = rope->Nodes[0].p[t] - rope->Nodes[0].p[0];*/
 
-			rope->Nodes[lastN].p[t].x = (phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq / 2)) + rope->Nodes[lastN].p[0].x;
-			rope->Nodes[lastN].u[t] = rope->Nodes[lastN].p[t] - rope->Nodes[lastN].p[0];
+			/*rope->Nodes[midN].p[t] = rope->Nodes[midN].p[0];
+			rope->Nodes[midN].p[t].y = (rope->Nodes[midN].p[0].y + (-phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq)));
+			rope->Nodes[midN].u[t] = rope->Nodes[midN].p[t] - rope->Nodes[midN].p[0];*/
+
+			rope->Nodes[lastN].p[t] = rope->Nodes[lastN].p[0];
+			/*rope->Nodes[lastN].p[t].x = 0 - ((phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq / 2)) + rope->Nodes[lastN].p[0].x);
+			rope->Nodes[lastN].u[t] = rope->Nodes[lastN].p[t] - rope->Nodes[lastN].p[0];*/
 		}
 	}
 	void Enviro::Run(bool NeedToSaveResults)
@@ -95,7 +99,6 @@ namespace mechLIB_CPP
 		for (size_t t = 1; t < phProps.Counts; t++)
 		{
 			rope->StepOverNodes(t, Re[t - 1], phProps.dt);
-			rope->EvalRadiusPoints(t);
 			for (int i = 0; i < rope->ElementsSize; i++)
 			{
 				rope->L[t] += rope->Elements[i].L[t];
