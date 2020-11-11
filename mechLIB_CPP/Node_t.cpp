@@ -4,6 +4,9 @@
 #include "dcm_t.hpp"
 #include "integr.h"
 #include "Rope_t.h"
+#include "omp.h"
+
+using namespace DirectX::SimpleMath;
 
 Node_t::Node_t() : freedom(), LoadType(), p(0), u(0), v(0), a(0), F(0), Neigs(0)
 {
@@ -13,17 +16,17 @@ Node_t::~Node_t()
 	/*delete[] deriv;
 	delete[] F;*/
 }
-void Node_t::init(size_t tCounts, DirectX::SimpleMath::Vector3 coords,
+void Node_t::init(size_t tCounts, Vector3 coords,
 	mechLIB_CPP::NodeFreedom _freedom, mechLIB_CPP::NodeLoad _LoadType, std::vector<Element_t*> _Neigs)
 {
 	freedom = _freedom;
 	LoadType = _LoadType;
 	Neigs = _Neigs;
-	F = std::vector<DirectX::SimpleMath::Vector3>(tCounts);
-	p = std::vector<DirectX::SimpleMath::Vector3>(tCounts);
-	u = std::vector<DirectX::SimpleMath::Vector3>(tCounts);
-	v = std::vector<DirectX::SimpleMath::Vector3>(tCounts);
-	a = std::vector<DirectX::SimpleMath::Vector3>(tCounts);
+	F = std::vector<Vector3>(tCounts);
+	p = std::vector<Vector3>(tCounts);
+	u = std::vector<Vector3>(tCounts);
+	v = std::vector<Vector3>(tCounts);
+	a = std::vector<Vector3>(tCounts);
 	p[0] = coords;
 }
 void Node_t::CalcAccel(size_t t, float m)
@@ -44,12 +47,19 @@ void Node_t::GetForces(size_t t, float m, float c)
 	F[t].x += 0 - (c * v[t - 1].x);
 	F[t].y += 0 - (c * v[t - 1].y);
 	/*getting element forces*/
+	float x = 0.0, y = 0.0, z = 0.0;
 	for (auto element : Neigs)
 	{
 		//push it to this force pull
 		element->CalcForce(this, t, 0, 0, 0);
-		F[t] += element->F[t];
+		x += element->F[t].x;
+		y += element->F[t].y;
+		z += element->F[t].z;
+		//F[t] += element->F[t];
 	}
+	F[t].x += x;
+	F[t].y += y;
+	F[t].z += z;
 }
 void Node_t::GetPhysicParam(size_t t, float Re, float& m, float& c)
 {
