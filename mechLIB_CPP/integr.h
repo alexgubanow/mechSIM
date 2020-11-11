@@ -1,19 +1,20 @@
 ﻿#pragma once
 #include "maf.hpp"
+#include "NodeLoad.h"
 
 class Integr
 {
 
 private:
-	const float v1 = 1 / 12;
-	const float v2 = 5 / 12;
-	const float v3 = 1;
-	const float v4 = 1;
+	const float v1 = 1.0f / 12.0f;
+	const float v2 = 5.0f / 12.0f;
+	const float v3 = 1.0f;
+	const float v4 = 1.0f;
 public:
     static void EulerExpl(mechLIB_CPP::NodeLoad &nodeLoad, DirectX::SimpleMath::Vector3& now_p, 
         DirectX::SimpleMath::Vector3& now_u, DirectX::SimpleMath::Vector3& now_v,
-        DirectX::SimpleMath::Vector3& now_a, DirectX::SimpleMath::Vector3& before_p, DirectX::SimpleMath::Vector3& before_u, 
-        DirectX::SimpleMath::Vector3& before_v, DirectX::SimpleMath::Vector3& before_a, DirectX::SimpleMath::Vector3&zero_p, float dt)
+        DirectX::SimpleMath::Vector3& now_a, const DirectX::SimpleMath::Vector3& before_p, const DirectX::SimpleMath::Vector3& before_u,
+        const DirectX::SimpleMath::Vector3& before_v, const  DirectX::SimpleMath::Vector3& before_a, const DirectX::SimpleMath::Vector3&zero_p, float dt)
     {
         now_v.x = before_v.x + before_a.x * dt;
         now_v.y = before_v.y + before_a.y * dt;

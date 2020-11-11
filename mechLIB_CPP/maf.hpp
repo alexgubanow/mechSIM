@@ -1,7 +1,7 @@
 ﻿#pragma once
-constexpr auto _g = -9.80666f;
-constexpr auto hlf = 1 / 2;
-constexpr auto sxt = 1 / 6;
+constexpr float _g = -9.80666f;
+constexpr float hlf = 1.0f / 2.0f;
+constexpr float sxt = 1.0f / 6.0f;
 class maf
 {
 public:

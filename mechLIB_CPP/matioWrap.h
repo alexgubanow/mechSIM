@@ -7,7 +7,7 @@ class matioWrap
 {
     mat_t* mat;
 public:
-    matioWrap(std::string& MATFile)
+    matioWrap(const std::string& MATFile)
     {
         mat = Mat_Open(MATFile.c_str(), MAT_ACC_RDONLY);
         if (!mat)

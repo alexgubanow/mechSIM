@@ -16,7 +16,7 @@ namespace mechLIB_CPP
 			time[i] = time[i - 1] + dt;
 		}
 	}
-	Enviro::Enviro(props_t _phProps, std::string& _loadFile) : loadFile(_loadFile), phProps(_phProps), rope(nullptr)
+	Enviro::Enviro(props_t _phProps, const std::string& _loadFile) : loadFile(_loadFile), phProps(_phProps), rope(nullptr)
 	{
 		if (loadFile.size() > 0)
 		{

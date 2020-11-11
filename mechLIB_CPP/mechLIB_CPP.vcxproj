@@ -187,7 +187,6 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Element_t.cpp" />
     <ClCompile Include="Enviro.cpp" />
-    <ClCompile Include="matioWrap.cpp" />
     <ClCompile Include="Node_t.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

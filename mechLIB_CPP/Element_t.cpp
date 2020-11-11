@@ -43,12 +43,6 @@ void Element_t::CalcForce(Node_t* baseNode, size_t t, float Re, float bloodV, fl
 	}
 	//getting DCM for this link
 	dcm_t dcm(oppositeNode->p[t - 1] - baseNode->p[t - 1], oppositeNode->p[t - 1].Cross(baseNode->p[t - 1]));
-	/*if (!dcm.IsZzEqualOne())
-	{
-		char err[1024];
-		snprintf(err, sizeof(err), "dcm is not correct, time step is %lld", t);
-		throw err;
-	}*/
 	Vector3 forceInLocal;
 	GetFn(t, dcm.ToLoc(baseNode->u[t - 1]) - dcm.ToLoc(oppositeNode->u[t - 1]), forceInLocal);
 	//GetPressureForce(t, bloodP, L[t]);
@@ -95,7 +89,7 @@ float Element_t::GetOwnLength(size_t t)
 	return len;
 }
 
-void Element_t::GetFn(size_t t, Vector3 deltaL, Vector3& force)
+void Element_t::GetFn(size_t t, const Vector3& deltaL, Vector3& force)
 {
 	switch (props->phMod)
 	{
@@ -113,19 +107,19 @@ void Element_t::GetFn(size_t t, Vector3 deltaL, Vector3& force)
 	}
 }
 
-void Element_t::calcHookFn(Vector3& Fn, float oldL, Vector3 deltaL)
+void Element_t::calcHookFn(Vector3& Fn, float oldL, const Vector3& deltaL)
 {
 	Fn.x = 0 - (props->E * A / oldL * deltaL.x);
 	//Fn[(int)C.y] = 12f * E * I / maf.P3(oldL2) * oldUy2;
 }
 
-void Element_t::calcMooneyRivlinFn(Vector3& Fn, float oldL, Vector3 deltaL)
+void Element_t::calcMooneyRivlinFn(Vector3& Fn, float oldL, const Vector3& deltaL)
 {
 	float lamdax = (deltaL.x / oldL) + 1;
 	const float C10 = 22956961.3f;
 	const float C01 = -23512872.8f;
 	float sigma = 2 * C10 * (lamdax - (1 / maf::P2(lamdax))) + 2 * C01 * (1 - (1 / maf::P3(lamdax)));
-	Fn.x = 0 - (A * sigma);
+	Fn.x = A * sigma;
 }
 
 void Element_t::GetPressureForce(size_t t, float bloodP, float L)

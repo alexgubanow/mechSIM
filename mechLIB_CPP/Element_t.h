@@ -25,9 +25,9 @@ public:
 	void GetForceForNode(size_t t, Node_t* baseP, DirectX::SimpleMath::Vector3& force);
 	void GetPhysicParam(size_t t, float Re, float& m, float& c);
 	float GetOwnLength(size_t t);
-	void GetFn(size_t t, DirectX::SimpleMath::Vector3 deltaL, DirectX::SimpleMath::Vector3& force);
-	void calcHookFn(DirectX::SimpleMath::Vector3& Fn, float oldL, DirectX::SimpleMath::Vector3 deltaL);
-	void calcMooneyRivlinFn(DirectX::SimpleMath::Vector3& Fn, float oldL, DirectX::SimpleMath::Vector3 deltaL);
+	void GetFn(size_t t, const DirectX::SimpleMath::Vector3& deltaL, DirectX::SimpleMath::Vector3& force);
+	void calcHookFn(DirectX::SimpleMath::Vector3& Fn, float oldL, const DirectX::SimpleMath::Vector3& deltaL);
+	void calcMooneyRivlinFn(DirectX::SimpleMath::Vector3& Fn, float oldL, const DirectX::SimpleMath::Vector3& deltaL);
 	void GetPressureForce(size_t t, float bloodP, float L);
 	void GetDragForce(size_t t, float Re, float v, float L, DirectX::SimpleMath::Vector3& force);
 };
