@@ -1,13 +1,14 @@
-#include "pch.h"
 #include "Rope_t.h"
 #include "Element_t.h"
 #include "dcm_t.hpp"
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "maf.hpp"
-using namespace DirectX::SimpleMath;
 
-void Element_t::init(Node_t* _n1, Node_t* _n2, mechLIB_CPP::ModelPropertiesNative* _props)
+using namespace DirectX::SimpleMath;
+using namespace mechLIB;
+
+void Element_t::init(Node_t* _n1, Node_t* _n2, ModelPropertiesNative* _props)
 {
 	modelProperties = _props;
 	L = std::vector<float>(modelProperties->Counts);
@@ -24,13 +25,13 @@ void Element_t::CalcForce(Node_t* baseNode, size_t t, float Re, float bloodV, fl
 	//L[t] = 0;
 	switch (modelProperties->PhysicalModel)
 	{
-	case mechLIB_CPP::PhysicalModelEnum::hook:
+	case PhysicalModelEnum::hook:
 		L[t] = GetOwnLength(0);
 		break;
-	case mechLIB_CPP::PhysicalModelEnum::hookGeomNon:
+	case PhysicalModelEnum::hookGeomNon:
 		L[t] = GetOwnLength(t - 1);
 		break;
-	case mechLIB_CPP::PhysicalModelEnum::mooneyRiv:
+	case PhysicalModelEnum::mooneyRiv:
 		L[t] = GetOwnLength(t - 1);
 		break;
 	default:
@@ -93,13 +94,13 @@ void Element_t::GetFn(size_t t, const Vector3& deltaL, Vector3& force)
 {
 	switch (modelProperties->PhysicalModel)
 	{
-	case mechLIB_CPP::PhysicalModelEnum::hook:
+	case PhysicalModelEnum::hook:
 		calcHookFn(force, L[0], deltaL);
 		break;
-	case mechLIB_CPP::PhysicalModelEnum::hookGeomNon:
+	case PhysicalModelEnum::hookGeomNon:
 		calcHookFn(force, L[t], deltaL);
 		break;
-	case mechLIB_CPP::PhysicalModelEnum::mooneyRiv:
+	case PhysicalModelEnum::mooneyRiv:
 		calcMooneyRivlinFn(force, L[t], deltaL);
 		break;
 	default:

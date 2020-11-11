@@ -1,5 +1,5 @@
 ﻿using HelixToolkit.Wpf;
-using mechLIB_CPP;
+using mechLIB;
 using Microsoft.Win32;
 using OxyPlot;
 using OxyPlot.Series;

@@ -1,5 +1,5 @@
 #pragma once
-namespace mechLIB_CPP {
+namespace mechLIB {
 
 #if (_MANAGED == 1) || (_M_CEE == 1)
 	public
@@ -21,4 +21,3 @@ namespace mechLIB_CPP {
 	};
 
 }
-

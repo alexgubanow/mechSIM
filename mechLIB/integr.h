@@ -11,7 +11,7 @@ private:
 	const float v3 = 1.0f;
 	const float v4 = 1.0f;
 public:
-    static void EulerExpl(mechLIB_CPP::NodeLoad &nodeLoad, DirectX::SimpleMath::Vector3& now_p, 
+    static void EulerExpl(NodeLoad &nodeLoad, DirectX::SimpleMath::Vector3& now_p, 
         DirectX::SimpleMath::Vector3& now_u, DirectX::SimpleMath::Vector3& now_v,
         DirectX::SimpleMath::Vector3& now_a, const DirectX::SimpleMath::Vector3& before_p, const DirectX::SimpleMath::Vector3& before_u,
         const DirectX::SimpleMath::Vector3& before_v, const  DirectX::SimpleMath::Vector3& before_a, const DirectX::SimpleMath::Vector3&zero_p, float dt)
@@ -20,17 +20,17 @@ public:
         now_v.y = before_v.y + before_a.y * dt;
         switch (nodeLoad)
         {
-        case mechLIB_CPP::NodeLoad::p:
+        case NodeLoad::p:
             break;
-        case mechLIB_CPP::NodeLoad::u:
+        case NodeLoad::u:
             break;
-        case mechLIB_CPP::NodeLoad::v:
+        case NodeLoad::v:
             break;
-        case mechLIB_CPP::NodeLoad::a:
+        case NodeLoad::a:
             break;
-        case mechLIB_CPP::NodeLoad::f:
+        case NodeLoad::f:
             break;
-        case mechLIB_CPP::NodeLoad::none:
+        case NodeLoad::none:
             now_u.x = now_v.x * dt;
             now_u.y = now_v.y * dt;
             now_p.x = zero_p.x + now_u.x;

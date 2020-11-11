@@ -10,8 +10,8 @@ class Element_t;
 class Node_t
 {
 public:
-	mechLIB_CPP::NodeFreedom freedom;
-	mechLIB_CPP::NodeLoad LoadType;
+	NodeFreedom freedom;
+	NodeLoad LoadType;
 	std::vector<DirectX::SimpleMath::Vector3> p;
 	std::vector<DirectX::SimpleMath::Vector3> u;
 	std::vector<DirectX::SimpleMath::Vector3> v;
@@ -20,8 +20,8 @@ public:
 	std::vector<Element_t*> Neigs;
 	Node_t();
 	~Node_t();
-	void init(size_t tCounts, DirectX::SimpleMath::Vector3 coords, mechLIB_CPP::NodeFreedom _freedom, 
-		mechLIB_CPP::NodeLoad _LoadType, std::vector<Element_t*> _Neigs);
+	void init(size_t tCounts, DirectX::SimpleMath::Vector3 coords, NodeFreedom _freedom, 
+		NodeLoad _LoadType, std::vector<Element_t*> _Neigs);
 	void CalcAccel(size_t t, float m);
 	void GetForces(size_t t, float m, float c);
 	void GetPhysicParam(size_t t, float Re, float& m, float& c);

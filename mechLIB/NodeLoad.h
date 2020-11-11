@@ -1,26 +1,21 @@
 ﻿#pragma once
-namespace mechLIB_CPP {
-
 #if (_MANAGED == 1) || (_M_CEE == 1)
-	public
+public
 #endif
-		enum class NodeLoad
-	{
-		//coordinates
-		p,
+enum class NodeLoad
+{
+	//coordinates
+	p,
 
-		//displacement
-		u,
+	//displacement
+	u,
 
-		//velocity
-		v,
+	//velocity
+	v,
 
-		//acceleration
-		a,
-		
-		f,
-		none
-	};
+	//acceleration
+	a,
 
-}
-
+	f,
+	none
+};

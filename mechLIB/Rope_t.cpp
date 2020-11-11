@@ -1,10 +1,7 @@
-#include "pch.h"
 #include "Rope_t.h"
-#include <algorithm>    // std::for_each
-#include <execution>
 #include "maf.hpp"
 
-void Rope_t::init(mechLIB_CPP::ModelPropertiesNative* props)
+void Rope_t::init(ModelPropertiesNative* props)
 {
 
 	L = std::vector<float>(props->Counts);
@@ -15,12 +12,12 @@ void Rope_t::init(mechLIB_CPP::ModelPropertiesNative* props)
 	Elements = std::vector<Element_t>(ElementsSize);
 }
 
-void Rope_t::SetupNodesPositions(mechLIB_CPP::ModelPropertiesNative* props)
+void Rope_t::SetupNodesPositions(ModelPropertiesNative* props)
 {
 	SetupNodesPositions(props, DirectX::SimpleMath::Vector3{ 0,0,0 }, DirectX::SimpleMath::Vector3{ props->L,0,0 });
 }
 
-void Rope_t::SetupNodesPositions(mechLIB_CPP::ModelPropertiesNative* props, DirectX::SimpleMath::Vector3 startCoord,
+void Rope_t::SetupNodesPositions(ModelPropertiesNative* props, DirectX::SimpleMath::Vector3 startCoord,
 	DirectX::SimpleMath::Vector3 endCoord)
 {
 	size_t lastNode = NodesSize - 1;
@@ -28,7 +25,7 @@ void Rope_t::SetupNodesPositions(mechLIB_CPP::ModelPropertiesNative* props, Dire
 	float cosA = endCoord.x / props->L;
 	float sinA = endCoord.y / props->L;
 	Nodes[0].init(props->Counts, startCoord,
-		mechLIB_CPP::NodeFreedom::xyz, mechLIB_CPP::NodeLoad::none, std::vector<Element_t*>{ &Elements[0] });
+		NodeFreedom::xyz, NodeLoad::none, std::vector<Element_t*>{ &Elements[0] });
 	for (size_t i = 1; i < lastNode; i++)
 	{
 		DirectX::SimpleMath::Vector3 flatC(i * dl, 0, 0);
@@ -38,13 +35,13 @@ void Rope_t::SetupNodesPositions(mechLIB_CPP::ModelPropertiesNative* props, Dire
 			(flatC.x - startCoord.x) * sinA + (flatC.y - startCoord.y) * cosA + startCoord.y, 0
 		);
 		Nodes[i].init(props->Counts, coords,
-			mechLIB_CPP::NodeFreedom::xyz, mechLIB_CPP::NodeLoad::none, std::vector<Element_t*>{ &Elements[i - 1], & Elements[i] });
+			NodeFreedom::xyz, NodeLoad::none, std::vector<Element_t*>{ &Elements[i - 1], & Elements[i] });
 	}
 	Nodes[lastNode].init(props->Counts, endCoord,
-		mechLIB_CPP::NodeFreedom::xyz, mechLIB_CPP::NodeLoad::none, std::vector<Element_t*>{ &Elements[lastNode - 1] });
+		NodeFreedom::xyz, NodeLoad::none, std::vector<Element_t*>{ &Elements[lastNode - 1] });
 }
 
-void Rope_t::EvalElements(mechLIB_CPP::ModelPropertiesNative* props)
+void Rope_t::EvalElements(ModelPropertiesNative* props)
 {
 	for (size_t i = 0; i < ElementsSize; i++)
 	{

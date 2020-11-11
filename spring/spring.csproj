@@ -116,7 +116,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="EnumBindingSourceExtension.cs" />
-    <Compile Include="EnumDescriptionTypeConverter.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="ViewModels\Load.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
@@ -201,7 +200,7 @@
   <ItemGroup>
     <ProjectReference Include="..\mechLIBWrapper\mechLIBWrapper.vcxproj">
       <Project>{4815e532-7484-489d-a88c-c8199c337c48}</Project>
-      <Name>mechLIB_CPPWrapper</Name>
+      <Name>mechLIBWrapper</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

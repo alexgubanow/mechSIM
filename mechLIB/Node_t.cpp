@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "Node_t.h"
 #include "maf.hpp"
 #include "dcm_t.hpp"
@@ -17,7 +16,7 @@ Node_t::~Node_t()
 	delete[] F;*/
 }
 void Node_t::init(size_t tCounts, Vector3 coords,
-	mechLIB_CPP::NodeFreedom _freedom, mechLIB_CPP::NodeLoad _LoadType, std::vector<Element_t*> _Neigs)
+	NodeFreedom _freedom, NodeLoad _LoadType, std::vector<Element_t*> _Neigs)
 {
 	freedom = _freedom;
 	LoadType = _LoadType;
@@ -31,7 +30,7 @@ void Node_t::init(size_t tCounts, Vector3 coords,
 }
 void Node_t::CalcAccel(size_t t, float m)
 {
-	if (LoadType != mechLIB_CPP::NodeLoad::p)
+	if (LoadType != NodeLoad::p)
 	{
 		a[t].x = F[t].x / m;
 		a[t].y = F[t].y / m;

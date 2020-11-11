@@ -1,20 +1,18 @@
 #pragma once
 
-namespace mechLIB_CPP {
-    public ref struct DataPointCPP
-    {
-    public:
-        //
-        // Summary:
-        //     Gets the X-coordinate of the point.
-        double X;
-        //
-        // Summary:
-        //     Gets the Y-coordinate of the point.
-        double Y;
-        //
-        // Summary:
-        //     Gets the Z-coordinate of the point.
-        double Z;
-    };
-}
+public ref struct DataPointCPP
+{
+public:
+    //
+    // Summary:
+    //     Gets the X-coordinate of the point.
+    double X;
+    //
+    // Summary:
+    //     Gets the Y-coordinate of the point.
+    double Y;
+    //
+    // Summary:
+    //     Gets the Z-coordinate of the point.
+    double Z;
+};
