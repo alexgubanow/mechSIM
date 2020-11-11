@@ -9,14 +9,14 @@
              xmlns:oxy="http://oxyplot.org/wpf"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:lcl="clr-namespace:spring"
-             xmlns:mLib="clr-namespace:mechLIB;assembly=mechLIB"
+             xmlns:mLib="clr-namespace:mechLIB_CPP;assembly=mechLIB_CPPWrapper"
              xmlns:h="http://helix-toolkit.org/wpf"
              mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="800">
     <UserControl.Resources>
         <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues"
                         ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="mLib:PhModels"/>
+                <x:Type TypeName="mLib:PhysicalModelEnum"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </UserControl.Resources>
@@ -24,30 +24,49 @@
         <StackPanel DockPanel.Dock="Top" Margin="5">
             <StackPanel Orientation="Horizontal" >
                 <ComboBox MinWidth="150" Margin="0,0,5,0" 
-                      ItemsSource="{Binding Source={mLib:EnumBindingSource {x:Type mLib:PhModels}}}"
-                      SelectedValue="{Binding Path=Props.PhMod,
-                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                <lcl:lblTxTbox LabelTxt="E, Pa:" BoxTxt="{Binding Path=Props.Estr,
-                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                <lcl:lblTxTbox LabelTxt="ro, kg/m3:" BoxTxt="{Binding Path=Props.rostr,
-                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-                <lcl:lblTxTbox LabelTxt="L, m:" BoxTxt="{Binding Path=Props.Lstr,
-                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-                <lcl:lblTxTbox LabelTxt="nodes:" BoxTxt="{Binding Path=Props.nodesstr,
-                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-                <lcl:lblTxTbox LabelTxt="D, m:" BoxTxt="{Binding Path=Props.Dstr,
-                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-                <lcl:lblTxTbox LabelTxt="Count:" BoxTxt="{Binding Path=Props.Countstr,
-                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-                <lcl:lblTxTbox LabelTxt="dt, s:" BoxTxt="{Binding Path=Props.dtstr,
-                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-                <lcl:lblTxTbox LabelTxt="Initial drop, m" BoxTxt="{Binding Path=Props.initDropstr,
-                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-                <lcl:lblTxTbox LabelTxt="Max U, m" BoxTxt="{Binding Path=Props.MaxUstr,
-                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-                <lcl:lblTxTbox LabelTxt="DampRatio" BoxTxt="{Binding Path=Props.DampRatiostr,
-                    UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5,0,0,0" />
-                <ComboBox DockPanel.Dock="Top" SelectedIndex="{Binding Path=SelDeriv, Mode=TwoWay}" Margin="5,0,0,0">
+                      ItemsSource="{Binding Source={lcl:EnumBindingSource {x:Type mLib:PhysicalModelEnum}}}"
+                      SelectedValue="{Binding PhysicalModel}"/>
+                <StackPanel Margin="5,0,0,0">
+                    <Label Content="E, Pa:" HorizontalAlignment="Left"/>
+                    <TextBox Text="{Binding E}"/>
+                </StackPanel>
+                <StackPanel Margin="5,0,0,0">
+                    <Label Content="ro, kg/m3:" HorizontalAlignment="Left"/>
+                    <TextBox Text="{Binding ro}"/>
+                </StackPanel>
+                <StackPanel Margin="5,0,0,0">
+                    <Label Content="L, m:" HorizontalAlignment="Left"/>
+                    <TextBox Text="{Binding L}"/>
+                </StackPanel>
+                <StackPanel Margin="5,0,0,0">
+                    <Label Content="nodes:" HorizontalAlignment="Left"/>
+                    <TextBox Text="{Binding nodes}"/>
+                </StackPanel>
+                <StackPanel Margin="5,0,0,0">
+                    <Label Content="D, m:" HorizontalAlignment="Left"/>
+                    <TextBox Text="{Binding D}"/>
+                </StackPanel>
+                <StackPanel Margin="5,0,0,0">
+                    <Label Content="Time steps:" HorizontalAlignment="Left"/>
+                    <TextBox Text="{Binding Counts}"/>
+                </StackPanel>
+                <StackPanel Margin="5,0,0,0">
+                    <Label Content="dt, s:" HorizontalAlignment="Left"/>
+                    <TextBox Text="{Binding dt}"/>
+                </StackPanel>
+                <StackPanel Margin="5,0,0,0">
+                    <Label Content="Initial drop, m:" HorizontalAlignment="Left"/>
+                    <TextBox Text="{Binding initDrop}"/>
+                </StackPanel>
+                <StackPanel Margin="5,0,0,0">
+                    <Label Content="Max U, m:" HorizontalAlignment="Left"/>
+                    <TextBox Text="{Binding MaxU}"/>
+                </StackPanel>
+                <StackPanel Margin="5,0,0,0">
+                    <Label Content="Damping ratio:" HorizontalAlignment="Left"/>
+                    <TextBox Text="{Binding DampRatio}"/>
+                </StackPanel>
+                <ComboBox DockPanel.Dock="Top" SelectedIndex="{Binding SelDeriv}" Margin="5,0,0,0">
                     <ComboBoxItem Content="Coordinates" />
                     <ComboBoxItem Content="Displacement" />
                     <ComboBoxItem Content="Velosity" />

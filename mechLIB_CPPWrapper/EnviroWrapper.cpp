@@ -11,25 +11,13 @@ mechLIB_CPP::EnviroWrapper::EnviroWrapper()
 {
 }
 
-void mechLIB_CPP::EnviroWrapper::CreateWorld(float DampRatio, float MaxU, float initDrop, int nodes, float E, float L,
-	float D, int Counts, float dt, float ro, mechLIB_CPP::PhModels phMod, System::String^ loadFile)
+void mechLIB_CPP::EnviroWrapper::CreateWorld(ModelProperties^ _props, System::String^ loadFile)
 {
-	props_t phProps;
-	phProps.DampRatio = DampRatio;
-	phProps.MaxU = MaxU;
-	phProps.initDrop = initDrop;
-	phProps.nodes = nodes;
-	phProps.E = E;
-	phProps.L = L;
-	phProps.D = D;
-	phProps.Counts = Counts;
-	phProps.dt = dt;
-	phProps.ro = ro;
-	phProps.phMod = phMod;
 	std::string str = msclr::interop::marshal_as<std::string>(loadFile);
+	ModelPropertiesNative props = _props->getNative();
 	try
 	{
-		world = new mechLIB_CPP::Enviro(phProps, str);
+		world = new mechLIB_CPP::Enviro(props, str);
 	}
 	catch (const char* ex)
 	{

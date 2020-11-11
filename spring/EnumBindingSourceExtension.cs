@@ -1,7 +1,7 @@
 ﻿using System.Windows.Markup;
 using System;
 
-namespace mechLIB
+namespace spring
 {
     public class EnumBindingSourceExtension : MarkupExtension
     {

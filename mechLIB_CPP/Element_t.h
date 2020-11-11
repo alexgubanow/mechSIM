@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "props_t.h"
+#include "../mechLIB_CPPWrapper/ModelProperties.h"
 #include <d3d11_1.h>
 #include <DirectXMath.h>
 #include "SimpleMath.h"
@@ -10,7 +10,7 @@ class Element_t
 {
 
 private:
-	mechLIB_CPP::props_t* props;
+	mechLIB_CPP::ModelPropertiesNative* modelProperties;
 	float A;
 	float I;
 public:
@@ -18,9 +18,9 @@ public:
 	Node_t* n2;
 	std::vector<float> L;
 	std::vector<DirectX::SimpleMath::Vector3> F;
-	Element_t() : props(nullptr), A(0), I(0), n1(0), n2(0), L(0), F(0) { }
+	Element_t() : modelProperties(nullptr), A(0), I(0), n1(0), n2(0), L(0), F(0) { }
 	~Element_t() { }
-	void init(Node_t* _n1, Node_t* _n2, mechLIB_CPP::props_t* _props);
+	void init(Node_t* _n1, Node_t* _n2, mechLIB_CPP::ModelPropertiesNative* _props);
 	void CalcForce(Node_t* baseNode, size_t t, float Re, float bloodV, float bloodP);
 	void GetForceForNode(size_t t, Node_t* baseP, DirectX::SimpleMath::Vector3& force);
 	void GetPhysicParam(size_t t, float Re, float& m, float& c);

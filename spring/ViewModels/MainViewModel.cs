@@ -9,6 +9,7 @@ using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +31,19 @@ namespace spring.ViewModels
     {
 
         private readonly IEventAggregator _ea;
-        public props Props { get; set; }
+        private ModelProperties _ModelProperties = new ModelProperties()
+        {
+            E = 6E6f,
+            L = 25E-3f,
+            D = 1E-3f,
+            ro = 1040,
+            Counts = 20000,
+            dt = 1E-6f,
+            nodes = 9,
+            initDrop = 1E-08f,
+            MaxU = 2E-3f,
+            DampRatio = 0.9f
+        };
         private DataPointCPP[][] F;
         private DataPointCPP[][] p;
         private DataPointCPP[][] u;
@@ -51,6 +64,61 @@ namespace spring.ViewModels
         public PlotModel awePlotModelX { get; set; }
         public PlotModel awePlotModelY { get; set; }
         public PlotModel awePlotModelZ { get; set; }
+        public float DampRatio
+        {
+            get => _ModelProperties.DampRatio;
+            set => SetProperty(ref _ModelProperties.DampRatio, value);
+        }
+        public float MaxU
+        {
+            get => _ModelProperties.MaxU;
+            set => SetProperty(ref _ModelProperties.MaxU, value);
+        }
+        public float initDrop
+        {
+            get => _ModelProperties.initDrop;
+            set => SetProperty(ref _ModelProperties.initDrop, value);
+        }
+        public ulong nodes
+        {
+            get => _ModelProperties.nodes;
+            set => SetProperty(ref _ModelProperties.nodes, value);
+        }
+        public float E
+        {
+            get => _ModelProperties.E;
+            set => SetProperty(ref _ModelProperties.E, value);
+        }
+        public float L
+        {
+            get => _ModelProperties.L;
+            set => SetProperty(ref _ModelProperties.L, value);
+        }
+        public float D
+        {
+            get => _ModelProperties.D;
+            set => SetProperty(ref _ModelProperties.D, value);
+        }
+        public int Counts
+        {
+            get => _ModelProperties.Counts;
+            set => SetProperty(ref _ModelProperties.Counts, value);
+        }
+        public float dt
+        {
+            get => _ModelProperties.dt;
+            set => SetProperty(ref _ModelProperties.dt, value);
+        }
+        public float ro
+        {
+            get => _ModelProperties.ro;
+            set => SetProperty(ref _ModelProperties.ro, value);
+        }
+        public PhysicalModelEnum PhysicalModel
+        {
+            get => _ModelProperties.PhysicalModel;
+            set => SetProperty(ref _ModelProperties.PhysicalModel, value);
+        }
         private bool _EnableConrols;
         public bool EnableConrols
         {
@@ -94,7 +162,6 @@ namespace spring.ViewModels
         {
             _ea = ea;
             IsRunning = false;
-            Props = new props();
             selDeriv = 0;
             _CurrT = 0;
             EndT = 1;
@@ -138,8 +205,7 @@ namespace spring.ViewModels
             {
                 thrsim.Abort();
                 thrsim = null;
-                world.Destroy();
-                world = null;
+                world.Dispose();
             }
         }
 
@@ -151,8 +217,7 @@ namespace spring.ViewModels
             world = new EnviroWrapper();
             try
             {
-                world.CreateWorld(Props.DampRatio, Props.MaxU, Props.initDrop, Props.nodes, Props.E, Props.L,
-                    Props.D, Props.Counts, Props.dt, Props.ro, (PhModels)Props.phMod, fileName);
+                world.CreateWorld(_ModelProperties, fileName);
                 world.Run(NeedToSaveResults);
             }
             catch (RuntimeWrappedException e)
@@ -171,9 +236,9 @@ namespace spring.ViewModels
                 v = Array.Empty<DataPointCPP[]>();
                 a = Array.Empty<DataPointCPP[]>();
                 int step = 1;
-                if (Props.Counts > (int)SystemParameters.PrimaryScreenWidth / 2)
+                if (_ModelProperties.Counts > (int)SystemParameters.PrimaryScreenWidth / 2)
                 {
-                    step = Props.Counts / ((int)SystemParameters.PrimaryScreenWidth / 2);
+                    step = _ModelProperties.Counts / ((int)SystemParameters.PrimaryScreenWidth / 2);
                 }
                 world.GetTimeArr(step, ref timeArr);
                 world.GetNodesF(step, ref F);
@@ -193,8 +258,7 @@ namespace spring.ViewModels
             }
             if (world != null)
             {
-                world.Destroy();
-                world = null;
+                world.Dispose();
             }
         }
         private void ClearDataView()

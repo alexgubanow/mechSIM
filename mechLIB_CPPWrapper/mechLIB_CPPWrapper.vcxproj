@@ -144,6 +144,8 @@
     <ClInclude Include="Derivatives.h" />
     <ClInclude Include="EnviroWrapper.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="PhysicalModelEnum.h" />
+    <ClInclude Include="ModelProperties.h" />
     <ClInclude Include="Resource.h" />
   </ItemGroup>
   <ItemGroup>

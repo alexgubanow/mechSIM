@@ -179,8 +179,6 @@
     <ClInclude Include="NodeLoad.h" />
     <ClInclude Include="Node_t.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="PhModels.h" />
-    <ClInclude Include="props_t.h" />
     <ClInclude Include="Rope_t.h" />
   </ItemGroup>
   <ItemGroup>

@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Reflection;
 
-namespace mechLIB
+namespace spring
 {
     public class EnumDescriptionTypeConverter : EnumConverter
     {

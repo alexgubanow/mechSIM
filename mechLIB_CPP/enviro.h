@@ -1,6 +1,6 @@
 #pragma once
 #include "Rope_t.h"
-#include "props_t.h"
+#include "../mechLIB_CPPWrapper/ModelProperties.h"
 #include "C_t.h"
 #include <string>
 #include <vector>
@@ -20,10 +20,10 @@ namespace mechLIB_CPP
 		void allocateTime(float dt, int Counts);
 		std::string loadFile;
 	public:
-		props_t phProps;
+		ModelPropertiesNative phProps;
 		Rope_t* rope;
 		std::vector<float> time;
-		Enviro(props_t _phProps, const std::string& _loadFile);
+		Enviro(ModelPropertiesNative _phProps, const std::string& _loadFile);
 		void GenerateLoad(C_t axis);
 		~Enviro()
 		{

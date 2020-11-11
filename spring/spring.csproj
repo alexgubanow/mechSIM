@@ -115,14 +115,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="EnumBindingSourceExtension.cs" />
+    <Compile Include="EnumDescriptionTypeConverter.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="ViewModels\Load.cs" />
-    <Compile Include="props.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
-    <Compile Include="lblTxTbox.xaml.cs">
-      <DependentUpon>lblTxTbox.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
@@ -133,10 +131,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="lblTxTbox.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\MainView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -205,10 +199,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\mechLIB\mechLIB.csproj">
-      <Project>{CFFCE4E0-6054-4728-8BEC-3DA1E996B6B4}</Project>
-      <Name>mechLIB</Name>
-    </ProjectReference>
     <ProjectReference Include="..\mechLIB_CPPWrapper\mechLIB_CPPWrapper.vcxproj">
       <Project>{4815e532-7484-489d-a88c-c8199c337c48}</Project>
       <Name>mechLIB_CPPWrapper</Name>

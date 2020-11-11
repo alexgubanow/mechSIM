@@ -7,14 +7,14 @@
 #include "maf.hpp"
 using namespace DirectX::SimpleMath;
 
-void Element_t::init(Node_t* _n1, Node_t* _n2, mechLIB_CPP::props_t* _props)
+void Element_t::init(Node_t* _n1, Node_t* _n2, mechLIB_CPP::ModelPropertiesNative* _props)
 {
-	props = _props;
-	L = std::vector<float>(props->Counts);
-	F = std::vector<Vector3>(props->Counts);
+	modelProperties = _props;
+	L = std::vector<float>(modelProperties->Counts);
+	F = std::vector<Vector3>(modelProperties->Counts);
 	n1 = _n1;
 	n2 = _n2;
-	A = (float)M_PI * maf::P2(props->D);
+	A = (float)M_PI * maf::P2(modelProperties->D);
 	I = maf::P3(A) / 12.0f;
 }
 
@@ -22,15 +22,15 @@ void Element_t::CalcForce(Node_t* baseNode, size_t t, float Re, float bloodV, fl
 {
 	//getting length of link by measure between coords
 	//L[t] = 0;
-	switch (props->phMod)
+	switch (modelProperties->PhysicalModel)
 	{
-	case mechLIB_CPP::PhModels::hook:
+	case mechLIB_CPP::PhysicalModelEnum::hook:
 		L[t] = GetOwnLength(0);
 		break;
-	case mechLIB_CPP::PhModels::hookGeomNon:
+	case mechLIB_CPP::PhysicalModelEnum::hookGeomNon:
 		L[t] = GetOwnLength(t - 1);
 		break;
-	case mechLIB_CPP::PhModels::mooneyRiv:
+	case mechLIB_CPP::PhysicalModelEnum::mooneyRiv:
 		L[t] = GetOwnLength(t - 1);
 		break;
 	default:
@@ -47,7 +47,7 @@ void Element_t::CalcForce(Node_t* baseNode, size_t t, float Re, float bloodV, fl
 	GetFn(t, dcm.ToLoc(baseNode->u[t - 1]) - dcm.ToLoc(oppositeNode->u[t - 1]), forceInLocal);
 	//GetPressureForce(t, bloodP, L[t]);
 	//GetDragForce(t, Re, bloodV, L);
-	forceInLocal.z += -(props->MaxU);
+	forceInLocal.z += -(modelProperties->MaxU);
 	dcm.ToGlob(forceInLocal, F[t]);
 }
 
@@ -63,7 +63,7 @@ void Element_t::GetForceForNode(size_t t, Node_t* baseP, Vector3& force)
 void Element_t::GetPhysicParam(size_t t, float Re, float& m, float& c)
 {
 	float len = GetOwnLength(t);
-	m += props->ro * A * len;
+	m += modelProperties->ro * A * len;
 	//if (Re > 0)
 	//{
 	//	//calc h of fluid on rod
@@ -73,9 +73,9 @@ void Element_t::GetPhysicParam(size_t t, float Re, float& m, float& c)
 	//	m += (float)M_PI * len * (maf::P2(rP1[t - 1].z + thFluid) -
 	//		maf::P2(rP1[t - 1].z)) * 1060;
 	//}
-	float alpha = 0 - ((sqrtf(5) * log10f(props->DampRatio)) /
-		(sqrtf(maf::P2(log10f(props->DampRatio)) + maf::P2((float)M_PI))));
-	float k = (props->E * A) / len;
+	float alpha = 0 - ((sqrtf(5) * log10f(modelProperties->DampRatio)) /
+		(sqrtf(maf::P2(log10f(modelProperties->DampRatio)) + maf::P2((float)M_PI))));
+	float k = (modelProperties->E * A) / len;
 	c = alpha * sqrtf(m * k);
 }
 
@@ -91,15 +91,15 @@ float Element_t::GetOwnLength(size_t t)
 
 void Element_t::GetFn(size_t t, const Vector3& deltaL, Vector3& force)
 {
-	switch (props->phMod)
+	switch (modelProperties->PhysicalModel)
 	{
-	case mechLIB_CPP::PhModels::hook:
+	case mechLIB_CPP::PhysicalModelEnum::hook:
 		calcHookFn(force, L[0], deltaL);
 		break;
-	case mechLIB_CPP::PhModels::hookGeomNon:
+	case mechLIB_CPP::PhysicalModelEnum::hookGeomNon:
 		calcHookFn(force, L[t], deltaL);
 		break;
-	case mechLIB_CPP::PhModels::mooneyRiv:
+	case mechLIB_CPP::PhysicalModelEnum::mooneyRiv:
 		calcMooneyRivlinFn(force, L[t], deltaL);
 		break;
 	default:
@@ -109,7 +109,7 @@ void Element_t::GetFn(size_t t, const Vector3& deltaL, Vector3& force)
 
 void Element_t::calcHookFn(Vector3& Fn, float oldL, const Vector3& deltaL)
 {
-	Fn.x = 0 - (props->E * A / oldL * deltaL.x);
+	Fn.x = 0 - (modelProperties->E * A / oldL * deltaL.x);
 	//Fn[(int)C.y] = 12f * E * I / maf.P3(oldL2) * oldUy2;
 }
 

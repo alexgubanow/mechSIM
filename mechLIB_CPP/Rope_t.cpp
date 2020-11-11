@@ -4,7 +4,7 @@
 #include <execution>
 #include "maf.hpp"
 
-void Rope_t::init(mechLIB_CPP::props_t* props)
+void Rope_t::init(mechLIB_CPP::ModelPropertiesNative* props)
 {
 
 	L = std::vector<float>(props->Counts);
@@ -15,12 +15,12 @@ void Rope_t::init(mechLIB_CPP::props_t* props)
 	Elements = std::vector<Element_t>(ElementsSize);
 }
 
-void Rope_t::SetupNodesPositions(mechLIB_CPP::props_t* props)
+void Rope_t::SetupNodesPositions(mechLIB_CPP::ModelPropertiesNative* props)
 {
 	SetupNodesPositions(props, DirectX::SimpleMath::Vector3{ 0,0,0 }, DirectX::SimpleMath::Vector3{ props->L,0,0 });
 }
 
-void Rope_t::SetupNodesPositions(mechLIB_CPP::props_t* props, DirectX::SimpleMath::Vector3 startCoord,
+void Rope_t::SetupNodesPositions(mechLIB_CPP::ModelPropertiesNative* props, DirectX::SimpleMath::Vector3 startCoord,
 	DirectX::SimpleMath::Vector3 endCoord)
 {
 	size_t lastNode = NodesSize - 1;
@@ -44,7 +44,7 @@ void Rope_t::SetupNodesPositions(mechLIB_CPP::props_t* props, DirectX::SimpleMat
 		mechLIB_CPP::NodeFreedom::xyz, mechLIB_CPP::NodeLoad::none, std::vector<Element_t*>{ &Elements[lastNode - 1] });
 }
 
-void Rope_t::EvalElements(mechLIB_CPP::props_t* props)
+void Rope_t::EvalElements(mechLIB_CPP::ModelPropertiesNative* props)
 {
 	for (size_t i = 0; i < ElementsSize; i++)
 	{

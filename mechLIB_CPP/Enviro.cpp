@@ -16,7 +16,7 @@ namespace mechLIB_CPP
 			time[i] = time[i - 1] + dt;
 		}
 	}
-	Enviro::Enviro(props_t _phProps, const std::string& _loadFile) : loadFile(_loadFile), phProps(_phProps), rope(nullptr)
+	Enviro::Enviro(ModelPropertiesNative _phProps, const std::string& _loadFile) : loadFile(_loadFile), phProps(_phProps), rope(nullptr)
 	{
 		if (loadFile.size() > 0)
 		{
@@ -107,15 +107,15 @@ namespace mechLIB_CPP
 		if (NeedToSaveResults)
 		{
 			std::string varName = "L";
-			switch (phProps.phMod)
+			switch (phProps.PhysicalModel)
 			{
-			case PhModels::hook:
+			case PhysicalModelEnum::hook:
 				varName += "hook";
 				break;
-			case PhModels::hookGeomNon:
+			case PhysicalModelEnum::hookGeomNon:
 				varName += "hookGeomNon";
 				break;
-			case PhModels::mooneyRiv:
+			case PhysicalModelEnum::mooneyRiv:
 				varName += "mooneyRiv";
 				break;
 			default:
