@@ -199,7 +199,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\mechLIB_CPPWrapper\mechLIB_CPPWrapper.vcxproj">
+    <ProjectReference Include="..\mechLIBWrapper\mechLIBWrapper.vcxproj">
       <Project>{4815e532-7484-489d-a88c-c8199c337c48}</Project>
       <Name>mechLIB_CPPWrapper</Name>
     </ProjectReference>

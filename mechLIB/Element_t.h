@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "../mechLIB_CPPWrapper/ModelProperties.h"
+#include "../mechLIBWrapper/ModelProperties.h"
 #include <d3d11_1.h>
 #include <DirectXMath.h>
 #include "SimpleMath.h"

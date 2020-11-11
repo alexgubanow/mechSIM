@@ -5,11 +5,11 @@ VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spring", "spring\spring.csproj", "{64C6FC95-0C5D-4A0C-A636-CB89B588E579}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mechLIB_CPP", "mechLIB_CPP\mechLIB_CPP.vcxproj", "{1C0DE564-5465-44EC-A52E-6B993B2360B2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mechLIB", "mechLIB\mechLIB.vcxproj", "{1C0DE564-5465-44EC-A52E-6B993B2360B2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mechLIB_CPPWrapper", "mechLIB_CPPWrapper\mechLIB_CPPWrapper.vcxproj", "{4815E532-7484-489D-A88C-C8199C337C48}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mechLIBWrapper", "mechLIBWrapper\mechLIBWrapper.vcxproj", "{4815E532-7484-489D-A88C-C8199C337C48}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mechLIB_CPPtests", "mechLIB_CPPtests\mechLIB_CPPtests.vcxproj", "{F872F4E1-077B-4F45-844D-96F50B7DB5E3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mechLIBtests", "mechLIBtests\mechLIBtests.vcxproj", "{F872F4E1-077B-4F45-844D-96F50B7DB5E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

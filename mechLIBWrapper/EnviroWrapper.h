@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "ModelProperties.h"
-#include "../mechLIB_CPP/enviro.h"
+#include "../mechLIB/enviro.h"
 #include "Derivatives.h"
 #include "DataPointCPP.hpp"
 

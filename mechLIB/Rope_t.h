@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <vector>
-#include "../mechLIB_CPPWrapper/ModelProperties.h"
+#include "../mechLIBWrapper/ModelProperties.h"
 #include "Node_t.h"
 #include "Element_t.h"
 #include <d3d11_1.h>

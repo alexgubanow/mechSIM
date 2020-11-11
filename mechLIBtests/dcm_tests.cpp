@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "CppUnitTest.h"
-#include "../mechLIB_CPP/dcm_t.hpp"
+#include "../mechLIB/dcm_t.hpp"
 #include <iostream>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

@@ -1,6 +1,6 @@
 #pragma once
 #include "Rope_t.h"
-#include "../mechLIB_CPPWrapper/ModelProperties.h"
+#include "../mechLIBWrapper/ModelProperties.h"
 #include "C_t.h"
 #include <string>
 #include <vector>
