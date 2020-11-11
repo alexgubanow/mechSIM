@@ -32,7 +32,7 @@ public:
 		Zy = radiusPoint.z / rl;
 
 		Xz = Yx * Zy - Zx * Yy;
-		Yz = 0 - (Xx * Zy - Zx * Xy);
+		Yz = Zx * Xy - Xx * Zy;
 		Zz = Xx * Yy - Yx * Xy;
 	}
 
@@ -82,7 +82,11 @@ public:
 		endPoint.Normalize(x);
 		radiusPoint.Normalize(y);
 		x.Cross(y, z);
-		matrix = DirectX::SimpleMath::Matrix(x, y, z);
+		matrix = DirectX::SimpleMath::Matrix(
+			x.x, x.y, x.z, 0,
+			y.x, y.y, y.z, 0,
+			z.x, z.y, z.z, 0,
+			0,   0,   0,   1);
 		matrixT = matrix.Transpose();
 	}
 	bool IsZzEqualOne() { return matrix._33 == 1 || matrix._33 == -1; }
