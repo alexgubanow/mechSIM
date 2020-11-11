@@ -191,6 +191,11 @@ namespace spring.ViewModels
                     MessageBox.Show(s);
                 }
             }
+            if (world != null)
+            {
+                world.Destroy();
+                world = null;
+            }
         }
         private void ClearDataView()
         {
