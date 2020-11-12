@@ -7,78 +7,54 @@ public ref class EnumDescriptionTypeConverter : EnumConverter
 public:
 	EnumDescriptionTypeConverter(System::Type^ _type) :EnumConverter(_type)
 	{
-	};
+	}
+
+	bool CanConvertFrom(ITypeDescriptorContext^ context, System::Type^ sourceType) override
+	{
+		return sourceType == System::String::typeid || TypeDescriptor::GetConverter(System::Enum::typeid)->CanConvertFrom(context, sourceType);
+	}
+
+	Object^ ConvertFrom(ITypeDescriptorContext^ context, CultureInfo^ culture, Object^ value) override
+	{
+		if (value->GetType() == System::String::typeid)
+			return GetEnumValue(EnumType, (System::String^)value);
+		if (value->GetType() == System::Enum::typeid)
+			return GetEnumDescription((System::Enum^)value);
+		return EnumConverter::ConvertFrom(context, culture, value);
+	}
+
 	Object^ ConvertTo(ITypeDescriptorContext^ context, CultureInfo^ culture, Object^ value, System::Type^ destinationType) override
 	{
-		if (destinationType->FullName == "System.String")
-		{
-			if (value != nullptr)
-			{
-				auto fi = value->GetType()->GetField(value->ToString());
-				if (fi != nullptr)
-				{
-					auto attributes = (array<Object^>^)fi->GetCustomAttributes(DescriptionAttribute::typeid, false);
-					if (attributes->Length > 0)
-					{
-						auto descr = (DescriptionAttribute^)attributes[0];
-						return ((!System::String::IsNullOrEmpty(descr->Description))) ? descr->Description : value->ToString();
-					}
-				}
-			}
-
-			return System::String::Empty;
-		}
-
-		return EnumConverter::ConvertTo(context, culture, value, destinationType);
+		return value->GetType()->IsEnum && destinationType == System::String::typeid
+			? GetEnumDescription((System::Enum^)value)
+			: (value->GetType() == System::String::typeid && destinationType == System::String::typeid
+				? GetEnumDescription(EnumType, (System::String^)value)
+				: EnumConverter::ConvertTo(context, culture, value, destinationType));
 	}
-	/*bool CanConvertFrom(ITypeDescriptorContext^ context, Type sourceType)
+
+	static System::String^ GetEnumDescription(System::Enum^ value)
 	{
-		return sourceType == typeof(String) || TypeDescriptor.GetConverter(typeof(Enum)).CanConvertFrom(context, sourceType);
-	}*/
+		return GetEnumDescription(value->GetType(), value->ToString());
+	}
 
-	//object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
-	//{
-	//	if (value is string _str)
-	//		return GetEnumValue(EnumType, _str);
-	//	if (value is Enum _enum)
-	//		return GetEnumDescription(_enum);
-	//	return base.ConvertFrom(context, culture, value);
-	//}
+	static System::String^ GetEnumDescription(System::Type^ value, System::String^ name)
+	{
+		auto fieldInfo = value->GetField(name);
+		auto attributes = (array<DescriptionAttribute^>^)fieldInfo->GetCustomAttributes(DescriptionAttribute::typeid, false);
+		return (attributes->Length > 0) ? attributes[0]->Description : name;
+	}
 
-	//object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
-	//{
-	//	return value is Enum _enum && destinationType == typeof(string)
-	//		? GetEnumDescription(_enum)
-	//		: (value is string _str && destinationType == typeof(string)
-	//			? GetEnumDescription(EnumType, _str)
-	//			: base.ConvertTo(context, culture, value, destinationType));
-	//}
-
-	//static string GetEnumDescription(Enum value)
-	//{
-	//	var fieldInfo = value.GetType().GetField(value.ToString());
-	//	var attributes = (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
-	//	return (attributes.Length > 0) ? attributes[0].Description : value.ToString();
-	//}
-
-	//static string GetEnumDescription(Type value, string name)
-	//{
-	//	var fieldInfo = value.GetField(name);
-	//	var attributes = (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
-	//	return (attributes.Length > 0) ? attributes[0].Description : name;
-	//}
-
-	//static object GetEnumValue(Type value, string description)
-	//{
-	//	var fields = value.GetFields();
-	//	foreach(var fieldInfo in fields)
-	//	{
-	//		var attributes = (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
-	//		if (attributes.Length > 0 && attributes[0].Description == description)
-	//			return fieldInfo.GetValue(fieldInfo.Name);
-	//		if (fieldInfo.Name == description)
-	//			return fieldInfo.GetValue(fieldInfo.Name);
-	//	}
-	//	return description;
-	//}
+	static Object^ GetEnumValue(System::Type^ value, System::String^ description)
+	{
+		auto fields = value->GetFields();
+		for each (auto fieldInfo in fields)
+		{
+			auto attributes = (array<DescriptionAttribute^>^)fieldInfo->GetCustomAttributes(DescriptionAttribute::typeid, false);
+			if (attributes->Length > 0 && attributes[0]->Description == description)
+				return fieldInfo->GetValue(fieldInfo->Name);
+			if (fieldInfo->Name == description)
+				return fieldInfo->GetValue(fieldInfo->Name);
+		}
+		return description;
+	}
 };

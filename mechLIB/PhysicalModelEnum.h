@@ -14,15 +14,15 @@ namespace mechLIB {
 		enum class PhysicalModelEnum
 	{
 #if (_MANAGED == 1) || (_M_CEE == 1)
-		[Description("Linear Hook model")]
+		[Description("Linear Hook")]
 #endif
 	hook,
 #if (_MANAGED == 1) || (_M_CEE == 1)
-		[Description("Hook model, nonlin geometry")]
+		[Description("Nonlinear Hook")]
 #endif
 	hookGeomNon,
 #if (_MANAGED == 1) || (_M_CEE == 1)
-		[Description("Mooney-Rivlin model")]
+		[Description("Mooney-Rivlin")]
 #endif
 	mooneyRiv,
 		maxModel

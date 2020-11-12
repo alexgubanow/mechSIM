@@ -37,12 +37,12 @@ namespace spring.ViewModels
             L = 25E-3f,
             D = 1E-3f,
             ro = 1040,
-            Counts = 20000,
+            Counts = 100000,
             dt = 1E-6f,
             nodes = 9,
             initDrop = 1E-08f,
-            MaxU = 2E-3f,
-            DampRatio = 0.9f
+            MaxU = 2E-2f,
+            DampRatio = 1
         };
         private DataPointCPP[][] F;
         private DataPointCPP[][] p;
