@@ -1,17 +1,18 @@
-﻿using DotNetDoctor.csmatio.io;
-using DotNetDoctor.csmatio.types;
-using HelixToolkit.Wpf;
+﻿using HelixToolkit.Wpf;
 using mechLIB;
 using Microsoft.Win32;
 using OxyPlot;
 using OxyPlot.Series;
+using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Numerics;
+using System.Net.NetworkInformation;
+using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
@@ -28,15 +29,34 @@ namespace spring.ViewModels
 
     public class MainViewModel : BindableBase
     {
+
         private readonly IEventAggregator _ea;
-        public props Props { get; set; }
-        private Enviro world;
+        private ModelProperties _ModelProperties = new ModelProperties()
+        {
+            E = 6E6f,
+            L = 25E-3f,
+            D = 1E-3f,
+            ro = 1040,
+            Counts = 100000,
+            dt = 1E-6f,
+            nodes = 9,
+            initDrop = 1E-08f,
+            MaxU = 2E-2f,
+            DampRatio = 1
+        };
+        private DataPointCPP[][] F;
+        private DataPointCPP[][] p;
+        private DataPointCPP[][] u;
+        private DataPointCPP[][] v;
+        private DataPointCPP[][] a;
+        private float[] timeArr;
+        private EnviroWrapper world;
 
         private int _CurrT;
         public int CurrT { get => _CurrT; set { _CurrT = value; Draw3d(value, SelDeriv); } }
 
         private int selDeriv;
-        public int SelDeriv { get => selDeriv; set { selDeriv = value; if (world != null) { DrawPoints(value); } } }
+        public int SelDeriv { get => selDeriv; set { selDeriv = value; if (IsArrayExist) { DrawPoints(value); } } }
 
         public Point3DCollection RopeCoords { get; set; }
         public ObservableCollection<Visual3D> Objs3d { get; set; }
@@ -44,14 +64,107 @@ namespace spring.ViewModels
         public PlotModel awePlotModelX { get; set; }
         public PlotModel awePlotModelY { get; set; }
         public PlotModel awePlotModelZ { get; set; }
+        public float DampRatio
+        {
+            get => _ModelProperties.DampRatio;
+            set => SetProperty(ref _ModelProperties.DampRatio, value);
+        }
+        public float MaxU
+        {
+            get => _ModelProperties.MaxU;
+            set => SetProperty(ref _ModelProperties.MaxU, value);
+        }
+        public float initDrop
+        {
+            get => _ModelProperties.initDrop;
+            set => SetProperty(ref _ModelProperties.initDrop, value);
+        }
+        public ulong nodes
+        {
+            get => _ModelProperties.nodes;
+            set => SetProperty(ref _ModelProperties.nodes, value);
+        }
+        public float E
+        {
+            get => _ModelProperties.E;
+            set => SetProperty(ref _ModelProperties.E, value);
+        }
+        public float L
+        {
+            get => _ModelProperties.L;
+            set => SetProperty(ref _ModelProperties.L, value);
+        }
+        public float D
+        {
+            get => _ModelProperties.D;
+            set => SetProperty(ref _ModelProperties.D, value);
+        }
+        public int Counts
+        {
+            get => _ModelProperties.Counts;
+            set => SetProperty(ref _ModelProperties.Counts, value);
+        }
+        public float dt
+        {
+            get => _ModelProperties.dt;
+            set => SetProperty(ref _ModelProperties.dt, value);
+        }
+        public float ro
+        {
+            get => _ModelProperties.ro;
+            set => SetProperty(ref _ModelProperties.ro, value);
+        }
+        public PhysicalModelEnum PhysicalModel
+        {
+            get => _ModelProperties.PhysicalModel;
+            set => SetProperty(ref _ModelProperties.PhysicalModel, value);
+        }
+        private bool _EnableConrols;
+        public bool EnableConrols
+        {
+            get => !_isRunning;
+            set => SetProperty(ref _EnableConrols, value);
+        }
+        private int _EndT;
+        public int EndT
+        {
+            get => _EndT;
+            set => SetProperty(ref _EndT, value);
+        }
+
+        private bool _NeedToSaveResults;
+        public bool NeedToSaveResults
+        {
+            get => _NeedToSaveResults;
+            set => SetProperty(ref _NeedToSaveResults, value);
+        }
+
+        private bool _isRunning;
+        public bool IsRunning
+        {
+            get => _isRunning;
+            set => SetProperty(ref _isRunning, value);
+        }
+
+        private DelegateCommand _ComputeTestCommand;
+        public DelegateCommand ComputeTestCommand => _ComputeTestCommand ?? (_ComputeTestCommand = new DelegateCommand(() => Compute("")));
+
+        private DelegateCommand _ComputeFileCommand;
+        public DelegateCommand ComputeFileCommand => _ComputeFileCommand ?? (_ComputeFileCommand = new DelegateCommand(() =>
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog { DereferenceLinks = false };
+            if (openFileDialog.ShowDialog() == true)
+            { Compute(openFileDialog.FileName); }
+        }));
 
         Thread thrsim;
         public MainViewModel(IEventAggregator ea)
         {
             _ea = ea;
-            Props = new props();
+            IsRunning = false;
             selDeriv = 0;
             _CurrT = 0;
+            EndT = 1;
             Objs3d = new ObservableCollection<Visual3D>();
             awePlotModelX = new PlotModel { Title = "X axis" };
             awePlotModelY = new PlotModel { Title = "Y axis" };
@@ -59,61 +172,93 @@ namespace spring.ViewModels
             awePlotModelX.InvalidatePlot(true);
             awePlotModelY.InvalidatePlot(true);
             awePlotModelZ.InvalidatePlot(true);
+            EnableConrols = false;
+            _ea.GetEvent<GotResultsEvent>().Subscribe(() => IsRunning = false);
+            _ea.GetEvent<GotResultsEvent>().Subscribe(() => EnableConrols = true);
             _ea.GetEvent<GotResultsEvent>().Subscribe(() => thrsim = null);
             _ea.GetEvent<GotResultsEvent>().Subscribe(() => ShowResults(SelDeriv));
-            _ea.GetEvent<ComputeEvent>().Subscribe((var) => Compute_Click(var));
-            _ea.GetEvent<ClearPlotsEvent>().Subscribe(() => ClearDataView());
-            //Load3dEvent
-            //_ea.GetEvent<Load3dEvent>().Subscribe(() => Load3d());
+            _ea.GetEvent<ComputeEvent>().Subscribe((var) => IsRunning = var);
+            _ea.GetEvent<ComputeEvent>().Subscribe((var) => EnableConrols = !var);
+            _ea.GetEvent<ComputeEvent>().Subscribe((var) => { if (!var) { ComputeStop(); } });
         }
 
-        private void Compute_Click(bool IsRunning)
+        private void Compute(string fileName)
         {
-            if (IsRunning && thrsim == null)
+            if (!IsRunning)
             {
-                _ea.GetEvent<ClearPlotsEvent>().Publish();
-                world = new Enviro();
+                _ea.GetEvent<ComputeEvent>().Publish(true);
+                ClearDataView();
                 thrsim = new Thread(delegate ()
-                { Simulate(); });
+                {
+                    Simulate(fileName);
+                });
                 thrsim.Start();
             }
-
             else
+            {
+                MessageBox.Show("Wait till end of current calculation or STOP it");
+            }
+        }
+        private void ComputeStop()
+        {
+            if (IsRunning && thrsim != null)
             {
                 thrsim.Abort();
                 thrsim = null;
-                world = null;
-
+                world.Dispose();
             }
         }
 
-        private void Simulate()
+        private void Simulate(string fileName)
         {
-            string fileName = "";
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            if (openFileDialog.ShowDialog() == true) { fileName = openFileDialog.FileName; }
-            world.PrepRun(Props.store, fileName);
-            Props.store.Counts = world.time.Length;
-            world.Run();
-            //ShowResults(SelDeriv);
-            _ea.GetEvent<GotResultsEvent>().Publish();
-            if (openFileDialog.SafeFileName.Length > 0)
+            EndT = 1;
+            F = null;
+            p = u = v = a = null;
+            world = new EnviroWrapper();
+            try
             {
-                MLSingle mlDoubleArray = new MLSingle("L" + Props.PhMod + openFileDialog.SafeFileName.Replace(".mat", ""), world.rope.L, Props.store.Counts);
-                List<MLArray> mlList = new List<MLArray>
-            {
-                mlDoubleArray
-            };
-                _ = new MatFileWriter(openFileDialog.FileName.Replace(openFileDialog.SafeFileName, "") + "L" + Props.PhMod + openFileDialog.SafeFileName, mlList, true);
+                world.CreateWorld(_ModelProperties, fileName);
+                world.Run(NeedToSaveResults);
             }
-            else
+            catch (RuntimeWrappedException e)
             {
-                MLSingle mlDoubleArray = new MLSingle("L" + Props.PhMod, world.rope.L, Props.store.Counts);
-                List<MLArray> mlList = new List<MLArray>
+                if (e.WrappedException is string s)
+                {
+                    MessageBox.Show(s);
+                }
+            }
+            try
             {
-                mlDoubleArray
-            };
-                _ = new MatFileWriter("L" + Props.PhMod + ".mat", mlList, true);
+                timeArr = Array.Empty<float>();
+                F = Array.Empty<DataPointCPP[]>();
+                p = Array.Empty<DataPointCPP[]>();
+                u = Array.Empty<DataPointCPP[]>();
+                v = Array.Empty<DataPointCPP[]>();
+                a = Array.Empty<DataPointCPP[]>();
+                int step = 1;
+                if (_ModelProperties.Counts > (int)SystemParameters.PrimaryScreenWidth / 2)
+                {
+                    step = _ModelProperties.Counts / ((int)SystemParameters.PrimaryScreenWidth / 2);
+                }
+                world.GetTimeArr(step, ref timeArr);
+                world.GetNodesF(step, ref F);
+                world.GetNodesP(step, ref p);
+                world.GetNodesU(step, ref u);
+                world.GetNodesV(step, ref v);
+                world.GetNodesA(step, ref a);
+                EndT = timeArr.Length - 1;
+                _ea.GetEvent<GotResultsEvent>().Publish();
+            }
+            catch (RuntimeWrappedException e)
+            {
+                if (e.WrappedException is string s)
+                {
+                    MessageBox.Show(s);
+                }
+            }
+            if (world != null)
+            {
+                world.Dispose();
             }
         }
         private void ClearDataView()
@@ -126,224 +271,167 @@ namespace spring.ViewModels
 
         private void Load3d()
         {
-            //Rect3D BoundingBox = new Rect3D(0, 0, 0, 100, 100, 100);
             Objs3d.Add(new DefaultLights());
-
-            //double bbSize = Math.Max(Math.Max(BoundingBox.SizeX, BoundingBox.SizeY), BoundingBox.SizeZ);
-
-            //Objs3d.Add(new GridLinesVisual3D
-            //{
-            //    Center = new Point3D(0, 0, 0),
-            //    Length = BoundingBox.SizeX,
-            //    Width = BoundingBox.SizeY,
-            //    MinorDistance = 3,
-            //    MajorDistance = bbSize,
-            //    Thickness = bbSize / 1000,
-            //    Fill = Brushes.Gray
-            //});
         }
 
         private void ShowResults(int Deriv)
         {
-            if (world.rope.Nodes != null)
+            if (IsArrayExist)
             {
                 DrawPoints(Deriv);
                 Draw3d(CurrT, Deriv);
             }
         }
 
+        private bool IsArrayExist => F != null && p != null && u != null && v != null && a != null;
+
         private void DrawPoints(int Deriv)
         {
             ClearDataView();
-            if ((NodeLoad)Deriv == NodeLoad.f)
+            if (Deriv == (int)NodeLoad.f)
             {
-                foreach (var elem in world.rope.Elements)
+                //foreach (var elem in world.rope.Elements)
+                //{
+                //    plotData("elem #" + elem.ID, elem.F);
+                //}
+                for (int n = 0; n < F.Length; n++)
                 {
-                    plotData("elem #" + elem.ID, elem.F);
-                }
-                foreach (var node in world.rope.Nodes)
-                {
-                    plotData("node #" + node.ID, node.F);
+                    PlotData("node #" + n, F[n]);
                 }
             }
             else
             {
-                foreach (var node in world.rope.Nodes)
+                switch ((Derivatives)Deriv)
                 {
-                    plotData("node #" + node.ID, ExtractArray(node.deriv, (N_t)Deriv));
-                    //plotData("An node #" + node.ID, ExtractArray(node.derivAn, (N_t)Deriv));
-                }
-            }
-        }
-
-        public List<DataPoint> getDataPointList(float[] X, Vector3[] Y, C_t axis, int step)
-        {
-            List<DataPoint> tmp = new List<DataPoint>();
-            for (int t = 0; t < X.Length; t += step)
-            {
-                switch (axis)
-                {
-                    case C_t.x:
-                        tmp.Add(new DataPoint(X[t], Y[t].X));
+                    case Derivatives.p:
+                        for (int n = 0; n < p.Length; n++)
+                        {
+                            PlotData("node #" + n, p[n]);
+                        }
                         break;
-                    case C_t.y:
-                        tmp.Add(new DataPoint(X[t], Y[t].Y));
+                    case Derivatives.u:
+                        for (int n = 0; n < u.Length; n++)
+                        {
+                            PlotData("node #" + n, u[n]);
+                        }
                         break;
-                    case C_t.z:
-                        tmp.Add(new DataPoint(X[t], Y[t].Z));
+                    case Derivatives.v:
+                        for (int n = 0; n < v.Length; n++)
+                        {
+                            PlotData("node #" + n, v[n]);
+                        }
                         break;
+                    case Derivatives.a:
+                        for (int n = 0; n < a.Length; n++)
+                        {
+                            PlotData("node #" + n, a[n]);
+                        }
+                        break;
+                    case Derivatives.maxDerivatives:
+                        throw new System.Exception();
                     default:
                         throw new System.Exception();
                 }
             }
-            return tmp;
-        }
-
-        private Vector3[] ExtractArray(deriv_t[] derivs, N_t deriv)
-        {
-            Vector3[] tmp = new Vector3[world.time.Length];
-            for (int t = 0; t < world.time.Length; t++)
-            {
-                tmp[t] = derivs[t].GetByN(deriv);
-            }
-            return tmp;
-        }
-
-        private void plotData(string title, Vector3[] Y)
-        {
-            int step = 1;
-            int maxPlotPx = (int)SystemParameters.PrimaryScreenWidth / 2;
-
-            if (Y.Length > maxPlotPx)
-            {
-                step = Y.Length / maxPlotPx;
-            }
-
-            List<DataPoint> data = getDataPointList(world.time, Y, C_t.x, step);
-            LineSeries aweLineSeries = new LineSeries { Title = title };
-            aweLineSeries.Points.AddRange(data);
-            awePlotModelX.Series.Add(aweLineSeries);
             awePlotModelX.InvalidatePlot(true);
-            data = getDataPointList(world.time, Y, C_t.y, step);
-            aweLineSeries = new LineSeries { Title = title };
-            aweLineSeries.Points.AddRange(data);
-            awePlotModelY.Series.Add(aweLineSeries);
             awePlotModelY.InvalidatePlot(true);
-            data = getDataPointList(world.time, Y, C_t.z, step);
-            aweLineSeries = new LineSeries { Title = title };
-            aweLineSeries.Points.AddRange(data);
-            awePlotModelZ.Series.Add(aweLineSeries);
             awePlotModelZ.InvalidatePlot(true);
+        }
+
+        private void PlotData(string title, DataPointCPP[] Y)
+        {
+            plotDataX(title, timeArr, Y);
+            plotDataY(title, timeArr, Y);
+            plotDataZ(title, timeArr, Y);
+        }
+        public void plotDataX(string title, float[] X, DataPointCPP[] Y)
+        {
+            List<DataPoint> tmp = new List<DataPoint>();
+            tmp.AddRange(new DataPoint[X.Length]);
+            Parallel.For(0, X.Length,
+                t =>
+                {
+                    tmp[t] = new DataPoint(X[t], Y[t].X);
+                });
+            LineSeries aweLineSeries = new LineSeries { Title = title };
+            aweLineSeries.Points.AddRange(tmp);
+            awePlotModelX.Series.Add(aweLineSeries);
+        }
+        public void plotDataY(string title, float[] X, DataPointCPP[] Y)
+        {
+            List<DataPoint> tmp = new List<DataPoint>();
+            tmp.AddRange(new DataPoint[X.Length]);
+            Parallel.For(0, X.Length,
+                t =>
+                {
+                    tmp[t] = new DataPoint(X[t], Y[t].Y);
+                });
+            LineSeries aweLineSeries = new LineSeries { Title = title };
+            aweLineSeries.Points.AddRange(tmp);
+            awePlotModelY.Series.Add(aweLineSeries);
+        }
+        public void plotDataZ(string title, float[] X, DataPointCPP[] Y)
+        {
+            List<DataPoint> tmp = new List<DataPoint>();
+            tmp.AddRange(new DataPoint[X.Length]);
+            Parallel.For(0, X.Length,
+                t =>
+                {
+                    tmp[t] = new DataPoint(X[t], Y[t].Z);
+                });
+            LineSeries aweLineSeries = new LineSeries { Title = title };
+            aweLineSeries.Points.AddRange(tmp);
+            awePlotModelZ.Series.Add(aweLineSeries);
         }
 
         private void Draw3d(int t, int Deriv)
         {
-            if (world == null)
+            if (p != null && p.Length > 0)
             {
-                return;
+                Application.Current.Dispatcher.Invoke(delegate
+                {
+                    Objs3d.Clear();
+                    Load3d();
+                    Objs3d.Add(new CubeVisual3D
+                    {
+                        Center = new Point3D(p[0][t].X * 10E2,
+                                             p[0][t].Z * 10E2,
+                                             p[0][t].Y * 10E2),
+                        SideLength = .8,
+                        Fill = Brushes.Gray
+                    });
+                    Objs3d.Add(new CubeVisual3D
+                    {
+                        Center = new Point3D(p[p.Length - 1][t].X * 10E2,
+                                             p[p.Length - 1][t].Z * 10E2,
+                                             p[p.Length - 1][t].Y * 10E2),
+                        SideLength = .8,
+                        Fill = Brushes.Gray
+                    });
+                    for (int node = 0; node < p.Length - 1; node++)
+                    {
+                        Objs3d.Add(new LinesVisual3D
+                        {
+                            Points = { new Point3D(p[node][t].X * 10E2,
+                                                p[node][t].Z * 10E2,
+                                                p[node][t].Y * 10E2),
+                            new Point3D(p[node + 1][t].X * 10E2,
+                                        p[node + 1][t].Z * 10E2,
+                                        p[node + 1][t].Y * 10E2) },
+                            Thickness = 2,
+                            Color = Brushes.Blue.Color
+                        });
+                        Objs3d.Add(new SphereVisual3D
+                        {
+                            Center = new Point3D(p[node][t].X * 10E2,
+                                                p[node][t].Z * 10E2,
+                                                p[node][t].Y * 10E2),
+                            Radius = .3,
+                            Fill = Brushes.Black
+                        });
+                    }
+                });
             }
-            Application.Current.Dispatcher.Invoke(delegate
-            {
-                Objs3d.Clear();
-                Load3d();
-                Objs3d.Add(new CubeVisual3D
-                {
-                    Center = new Point3D(world.rope.Nodes[0].deriv[t].p.X * 10E2,
-                                         world.rope.Nodes[0].deriv[t].p.Z * 10E2,
-                                         world.rope.Nodes[0].deriv[t].p.Y * 10E2),
-                    SideLength = .8,
-                    Fill = Brushes.Gray
-                });
-                Objs3d.Add(new CubeVisual3D
-                {
-                    Center = new Point3D(world.rope.Nodes[world.rope.Nodes.Length - 1].deriv[t].p.X * 10E2,
-                                         world.rope.Nodes[world.rope.Nodes.Length - 1].deriv[t].p.Z * 10E2,
-                                         world.rope.Nodes[world.rope.Nodes.Length - 1].deriv[t].p.Y * 10E2),
-                    SideLength = .8,
-                    Fill = Brushes.Gray
-                });
-                for (int node = 0; node < world.rope.Nodes.Length - 1; node++)
-                {
-                    Objs3d.Add(new LinesVisual3D
-                    {
-                        Points = { new Point3D(world.rope.Nodes[node].deriv[t].p.X * 10E2,
-                                                world.rope.Nodes[node].deriv[t].p.Z * 10E2,
-                                                world.rope.Nodes[node].deriv[t].p.Y * 10E2),
-                            new Point3D(world.rope.Nodes[node + 1].deriv[t].p.X * 10E2,
-                                        world.rope.Nodes[node + 1].deriv[t].p.Z * 10E2,
-                                        world.rope.Nodes[node + 1].deriv[t].p.Y * 10E2) },
-                        Thickness = 2,
-                        Color = Brushes.Blue.Color
-                    });
-                    Objs3d.Add(new SphereVisual3D
-                    {
-                        Center = new Point3D(world.rope.Nodes[node].deriv[t].p.X * 10E2,
-                                            world.rope.Nodes[node].deriv[t].p.Z * 10E2,
-                                            world.rope.Nodes[node].deriv[t].p.Y * 10E2),
-                        Radius = .3,
-                        Fill = Brushes.Black
-                    });
-                }
-            });
-        }
-
-        private void UpdTline(int t, int Deriv)
-        {
-            Application.Current.Dispatcher.Invoke(delegate
-            {
-                for (int obj = 4; obj < Objs3d.Count - 1; obj++)
-                {
-                    //Objs3d[obj].SetValue(new DependencyProperty, "" );
-
-                    //Objs3d.Add(new LinesVisual3D
-                    //{
-                    //    Points = { new Point3D(Nodes[node].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.y] * 10E2),
-                    //        new Point3D(Nodes[node + 1].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[node + 1].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[node + 1].tm[t][(int)N.p][(int)C.y] * 10E2) },
-                    //    Thickness = 2,
-                    //    Color = Brushes.Blue.Color
-                    //});
-                    //Objs3d.Add(new SphereVisual3D
-                    //{
-                    //    Center = new Point3D(Nodes[node].tm[t][(int)N.p][(int)C.x] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.z] * 10E2, Nodes[node].tm[t][(int)N.p][(int)C.y] * 10E2),
-                    //    Radius = .5,
-                    //    Fill = Brushes.Black
-                    //});
-                }
-            });
-        }
-
-        private void DrawTline(float t)
-        {
-            //Application.Current.Dispatcher.Invoke(delegate
-            //{
-            //    awePlotModelX.PlotView.ShowTracker(new TrackerHitResult() { Text = t.ToString(), DataPoint = new DataPoint(t, 0) });
-            //    awePlotModelY.PlotView.ShowTracker(new TrackerHitResult() { Text = t.ToString(), DataPoint = new DataPoint(t, 0) });
-            //    awePlotModelZ.PlotView.ShowTracker(new TrackerHitResult() { Text = t.ToString(), DataPoint = new DataPoint(t, 0) });
-            //});
-            //LineSeries aweLineSeriesX = new LineSeries { Title = "current time" };
-            //aweLineSeriesX.Points.AddRange(new DataPoint[2] { new DataPoint(t, -1f), new DataPoint(t, 1f) });
-            //LineSeries aweLineSeriesY = new LineSeries { Title = "current time" };
-            //aweLineSeriesY.Points.AddRange(new DataPoint[2] { new DataPoint(t, -1f), new DataPoint(t, 1f) });
-            //LineSeries aweLineSeriesZ = new LineSeries { Title = "current time" };
-            //aweLineSeriesZ.Points.AddRange(new DataPoint[2] { new DataPoint(t, -1f), new DataPoint(t, 1f) });
-            //if (awePlotModelX.Series.Count > 0)
-            //{
-            //    awePlotModelX.Series.RemoveAt(0);
-            //}
-            //awePlotModelX.Series.Insert(0, aweLineSeriesX);
-            //awePlotModelX.InvalidatePlot(true);
-            //if (awePlotModelY.Series.Count > 0)
-            //{
-            //    awePlotModelY.Series.RemoveAt(0);
-            //}
-            //awePlotModelY.Series.Insert(0, aweLineSeriesY);
-            //awePlotModelY.InvalidatePlot(true);
-            //if (awePlotModelZ.Series.Count > 0)
-            //{
-            //    awePlotModelZ.Series.RemoveAt(0);
-            //}
-            //awePlotModelZ.Series.Insert(0, aweLineSeriesZ);
-            //awePlotModelZ.InvalidatePlot(true);
         }
     }
 }
