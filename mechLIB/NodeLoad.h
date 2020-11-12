@@ -15,6 +15,8 @@ enum class NodeLoad
 
 	//acceleration
 	a,
+	//jerk
+	b,
 
 	f,
 	none
