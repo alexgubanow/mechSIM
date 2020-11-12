@@ -1,8 +1,7 @@
 #include "EnviroWrapper.h"
 #include <msclr\marshal_cppstd.h>
-#include "Derivatives.h"
+#include "../mechLIB/DerivativesContainer.h"
 #include <d3d11_1.h>
-#include <DirectXMath.h>
 #include "SimpleMath.h"
 #include <omp.h>
 
@@ -36,99 +35,57 @@ void EnviroWrapper::Run(bool NeedToSaveResults)
 	}
 }
 
-void EnviroWrapper::GetNodesF(int step, array<array<DataPointCPP^>^>^% arr)
+void EnviroWrapper::GetDerivatives(int step, array<array<mechLIB::DerivativesContainerManaged^>^>^% arr)
 {
-	arr = gcnew array<array<DataPointCPP^>^>((int)world->rope->NodesSize);
+	arr = gcnew array<array<mechLIB::DerivativesContainerManaged^>^>((int)world->rope->NodesSize);
 #pragma omp parallel for
 	for (int n = 0; n < world->rope->NodesSize; n++)
 	{
-		arr[n] = gcnew array<DataPointCPP^>(world->phProps.Counts / step);
-		/*pin_ptr<float> pinned1 = &arr[n][0][0];
-		std::memcpy(pinned1, &world->rope->Nodes[n].F[0].x, sizeof(pinned1));*/
-		//#pragma omp parallel for
-		size_t t;
-		int tout;
-		for (t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
+		arr[n] = gcnew array<mechLIB::DerivativesContainerManaged^>(world->phProps.Counts / step);
+		int tout = 0;
+		for (size_t t = 0; t < world->time.size() && tout < arr[n]->Length; t += step, ++tout)
 		{
-			arr[n][tout] = gcnew DataPointCPP();
-			arr[n][tout]->X = world->rope->Nodes[n].F[t].x;
-			arr[n][tout]->Y = world->rope->Nodes[n].F[t].y;
-			arr[n][tout]->Z = world->rope->Nodes[n].F[t].z;
+			arr[n][tout] = gcnew mechLIB::DerivativesContainerManaged(&world->rope->Nodes[n].Derivatives[t]);
+			int dgsfb = 0;
+			int bsdfg = 0;
+			/*FillManagedF(arr[n][tout], world->rope->Nodes[n].Derivatives[t]);
+			FillManagedA(arr[n][tout], world->rope->Nodes[n].Derivatives[t]);
+			FillManagedU(arr[n][tout], world->rope->Nodes[n].Derivatives[t]);
+			FillManagedV(arr[n][tout], world->rope->Nodes[n].Derivatives[t]);
+			FillManagedP(arr[n][tout], world->rope->Nodes[n].Derivatives[t]);*/
 		}
 	}
 }
-void EnviroWrapper::GetNodesA(int step, array<array<DataPointCPP^>^>^% arr)
-{
-	arr = gcnew array<array<DataPointCPP^>^>((int)world->rope->NodesSize);
-#pragma omp parallel for
-	for (int n = 0; n < world->rope->NodesSize; n++)
-	{
-		arr[n] = gcnew array<DataPointCPP^>(world->phProps.Counts / step);
-		size_t t;
-		int tout;
-		for (t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
-		{
-			arr[n][tout] = gcnew DataPointCPP();
-			arr[n][tout]->X = world->rope->Nodes[n].a[t].x;
-			arr[n][tout]->Y = world->rope->Nodes[n].a[t].y;
-			arr[n][tout]->Z = world->rope->Nodes[n].a[t].z;
-		}
-	}
-}
-void EnviroWrapper::GetNodesV(int step, array<array<DataPointCPP^>^>^% arr)
-{
-	arr = gcnew array<array<DataPointCPP^>^>((int)world->rope->NodesSize);
-#pragma omp parallel for
-	for (int n = 0; n < world->rope->NodesSize; n++)
-	{
-		arr[n] = gcnew array<DataPointCPP^>(world->phProps.Counts / step);
-		size_t t;
-		int tout;
-		for (t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
-		{
-			arr[n][tout] = gcnew DataPointCPP();
-			arr[n][tout]->X = world->rope->Nodes[n].v[t].x;
-			arr[n][tout]->Y = world->rope->Nodes[n].v[t].y;
-			arr[n][tout]->Z = world->rope->Nodes[n].v[t].z;
-		}
-	}
-}
-void EnviroWrapper::GetNodesU(int step, array<array<DataPointCPP^>^>^% arr)
-{
-	arr = gcnew array<array<DataPointCPP^>^>((int)world->rope->NodesSize);
-#pragma omp parallel for
-	for (int n = 0; n < world->rope->NodesSize; n++)
-	{
-		arr[n] = gcnew array<DataPointCPP^>(world->phProps.Counts / step);
-		size_t t;
-		int tout;
-		for (t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
-		{
-			arr[n][tout] = gcnew DataPointCPP();
-			arr[n][tout]->X = world->rope->Nodes[n].u[t].x;
-			arr[n][tout]->Y = world->rope->Nodes[n].u[t].y;
-			arr[n][tout]->Z = world->rope->Nodes[n].u[t].z;
-		}
-	}
-}
-void EnviroWrapper::GetNodesP(int step, array<array<DataPointCPP^>^>^% arr)
-{
-	arr = gcnew array<array<DataPointCPP^>^>((int)world->rope->NodesSize);
-#pragma omp parallel for
-	for (int n = 0; n < world->rope->NodesSize; n++)
-	{
-		arr[n] = gcnew array<DataPointCPP^>(world->phProps.Counts / step);
-		size_t t;
-		int tout;
-		for (t = 0, tout = 0; t < world->time.size() && tout < arr[n]->Length; t += step, tout++)
-		{
-			arr[n][tout] = gcnew DataPointCPP();
-			arr[n][tout]->X = world->rope->Nodes[n].p[t].x;
-			arr[n][tout]->Y = world->rope->Nodes[n].p[t].y;
-			arr[n][tout]->Z = world->rope->Nodes[n].p[t].z;
-		}
-	}
-}
+//void EnviroWrapper::FillManagedF(mechLIB::DerivativesContainerManaged^% DerivativesManaged, const DerivativesContainer& Derivatives)
+//{
+//	DerivativesManaged->F.x = Derivatives.F.x;
+//	DerivativesManaged->F.y = Derivatives.F.y;
+//	DerivativesManaged->F.z = Derivatives.F.z;
+//}
+//void EnviroWrapper::FillManagedA(mechLIB::DerivativesContainerManaged^% DerivativesManaged, const DerivativesContainer& Derivatives)
+//{
+//	DerivativesManaged->a.x = Derivatives.a.x;
+//	DerivativesManaged->a.y = Derivatives.a.y;
+//	DerivativesManaged->a.z = Derivatives.a.z;
+//}
+//void EnviroWrapper::FillManagedU(mechLIB::DerivativesContainerManaged^% DerivativesManaged, const DerivativesContainer& Derivatives)
+//{
+//	DerivativesManaged->u.x = Derivatives.u.x;
+//	DerivativesManaged->u.y = Derivatives.u.y;
+//	DerivativesManaged->u.z = Derivatives.u.z;
+//}
+//void EnviroWrapper::FillManagedV(mechLIB::DerivativesContainerManaged^% DerivativesManaged, const DerivativesContainer& Derivatives)
+//{
+//	DerivativesManaged->v.x = Derivatives.v.x;
+//	DerivativesManaged->v.y = Derivatives.v.y;
+//	DerivativesManaged->v.z = Derivatives.v.z;
+//}
+//void EnviroWrapper::FillManagedP(mechLIB::DerivativesContainerManaged^% DerivativesManaged, const DerivativesContainer& Derivatives)
+//{
+//	DerivativesManaged->p.x = Derivatives.p.x;
+//	DerivativesManaged->p.y = Derivatives.p.y;
+//	DerivativesManaged->p.z = Derivatives.p.z;
+//}
 
 void EnviroWrapper::GetTimeArr(int step, array<float>^% arr)
 {/*

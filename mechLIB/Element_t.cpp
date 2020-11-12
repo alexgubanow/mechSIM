@@ -43,9 +43,9 @@ void Element_t::CalcForce(Node_t* baseNode, size_t t, float Re, float bloodV, fl
 		oppositeNode = n2;
 	}
 	//getting DCM for this link
-	dcm_t dcm(oppositeNode->p[t - 1] - baseNode->p[t - 1], oppositeNode->p[t - 1].Cross(baseNode->p[t - 1]));
+	dcm_t dcm(oppositeNode->Derivatives[t - 1].p - baseNode->Derivatives[t - 1].p, oppositeNode->Derivatives[t - 1].p.Cross(baseNode->Derivatives[t - 1].p));
 	Vector3 forceInLocal;
-	GetFn(t, dcm.ToLoc(baseNode->u[t - 1]) - dcm.ToLoc(oppositeNode->u[t - 1]), forceInLocal);
+	GetFn(t, dcm.ToLoc(baseNode->Derivatives[t - 1].u) - dcm.ToLoc(oppositeNode->Derivatives[t - 1].u), forceInLocal);
 	//GetPressureForce(t, bloodP, L[t]);
 	//GetDragForce(t, Re, bloodV, L);
 	forceInLocal.z += -(modelProperties->MaxU);
@@ -82,7 +82,7 @@ void Element_t::GetPhysicParam(size_t t, float Re, float& m, float& c)
 
 float Element_t::GetOwnLength(size_t t)
 {
-	float len = Vector3::Distance(n1->p[t], n2->p[t]);
+	float len = Vector3::Distance(n1->Derivatives[t].p, n2->Derivatives[t].p);
 	if (len == 0)
 	{
 		throw "Calculated length of element can't be eaqul to zero";

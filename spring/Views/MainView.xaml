@@ -66,13 +66,9 @@
                     <Label Content="Damping ratio:" HorizontalAlignment="Left"/>
                     <TextBox Text="{Binding DampRatio}"/>
                 </StackPanel>
-                <ComboBox DockPanel.Dock="Top" SelectedIndex="{Binding SelDeriv}" Margin="5,0,0,0">
-                    <ComboBoxItem Content="Coordinates" />
-                    <ComboBoxItem Content="Displacement" />
-                    <ComboBoxItem Content="Velosity" />
-                    <ComboBoxItem Content="Acceleration" />
-                    <ComboBoxItem Content="Force" />
-                </ComboBox>
+                <ComboBox DockPanel.Dock="Top" 
+                ItemsSource="{Binding Source={lcl:EnumBindingSource {x:Type mLib:DerivativesEnum}}}"
+                      SelectedValue="{Binding SelDeriv}" Margin="5,0,0,0"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Button Content="Run Test" Command="{Binding ComputeTestCommand}" Margin="5" />

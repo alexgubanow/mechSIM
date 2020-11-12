@@ -44,19 +44,15 @@ namespace spring.ViewModels
             MaxU = 2E-2f,
             DampRatio = 1
         };
-        private DataPointCPP[][] F;
-        private DataPointCPP[][] p;
-        private DataPointCPP[][] u;
-        private DataPointCPP[][] v;
-        private DataPointCPP[][] a;
+        private DerivativesContainerManaged[][] Derivatives;
         private float[] timeArr;
         private EnviroWrapper world;
 
         private int _CurrT;
         public int CurrT { get => _CurrT; set { _CurrT = value; Draw3d(value, SelDeriv); } }
 
-        private int selDeriv;
-        public int SelDeriv { get => selDeriv; set { selDeriv = value; if (IsArrayExist) { DrawPoints(value); } } }
+        private DerivativesEnum selDeriv;
+        public DerivativesEnum SelDeriv { get => selDeriv; set { selDeriv = value; if (IsArrayExist) { DrawPoints(value); } } }
 
         public Point3DCollection RopeCoords { get; set; }
         public ObservableCollection<Visual3D> Objs3d { get; set; }
@@ -162,7 +158,6 @@ namespace spring.ViewModels
         {
             _ea = ea;
             IsRunning = false;
-            selDeriv = 0;
             _CurrT = 0;
             EndT = 1;
             Objs3d = new ObservableCollection<Visual3D>();
@@ -212,8 +207,8 @@ namespace spring.ViewModels
         private void Simulate(string fileName)
         {
             EndT = 1;
-            F = null;
-            p = u = v = a = null;
+            Derivatives = null;
+            //p = u = v = a = null;
             world = new EnviroWrapper();
             try
             {
@@ -230,22 +225,14 @@ namespace spring.ViewModels
             try
             {
                 timeArr = Array.Empty<float>();
-                F = Array.Empty<DataPointCPP[]>();
-                p = Array.Empty<DataPointCPP[]>();
-                u = Array.Empty<DataPointCPP[]>();
-                v = Array.Empty<DataPointCPP[]>();
-                a = Array.Empty<DataPointCPP[]>();
+                Derivatives = Array.Empty<DerivativesContainerManaged[]>();
                 int step = 1;
                 if (_ModelProperties.Counts > (int)SystemParameters.PrimaryScreenWidth / 2)
                 {
                     step = _ModelProperties.Counts / ((int)SystemParameters.PrimaryScreenWidth / 2);
                 }
                 world.GetTimeArr(step, ref timeArr);
-                world.GetNodesF(step, ref F);
-                world.GetNodesP(step, ref p);
-                world.GetNodesU(step, ref u);
-                world.GetNodesV(step, ref v);
-                world.GetNodesA(step, ref a);
+                world.GetDerivatives(step, ref Derivatives);
                 EndT = timeArr.Length - 1;
                 _ea.GetEvent<GotResultsEvent>().Publish();
             }
@@ -274,7 +261,7 @@ namespace spring.ViewModels
             Objs3d.Add(new DefaultLights());
         }
 
-        private void ShowResults(int Deriv)
+        private void ShowResults(DerivativesEnum Deriv)
         {
             if (IsArrayExist)
             {
@@ -283,110 +270,81 @@ namespace spring.ViewModels
             }
         }
 
-        private bool IsArrayExist => F != null && p != null && u != null && v != null && a != null;
+        private bool IsArrayExist => Derivatives != null;
 
-        private void DrawPoints(int Deriv)
+        private void DrawPoints(DerivativesEnum Deriv)
         {
             ClearDataView();
-            if (Deriv == (int)NodeLoad.f)
+            for (int n = 0; n < Derivatives.Length; n++)
             {
-                //foreach (var elem in world.rope.Elements)
-                //{
-                //    plotData("elem #" + elem.ID, elem.F);
-                //}
-                for (int n = 0; n < F.Length; n++)
+                DataPoint[] XdataPoints = new DataPoint[Derivatives[n].Length];
+                DataPoint[] YdataPoints = new DataPoint[Derivatives[n].Length];
+                DataPoint[] ZdataPoints = new DataPoint[Derivatives[n].Length];
+                switch (Deriv)
                 {
-                    PlotData("node #" + n, F[n]);
+                    case DerivativesEnum.f:
+                        Parallel.For(0, Derivatives[n].Length,
+                            t =>
+                            {
+                                XdataPoints[t] = new DataPoint(timeArr[t], Derivatives[n][t].f.x);
+                                YdataPoints[t] = new DataPoint(timeArr[t], Derivatives[n][t].f.y);
+                                ZdataPoints[t] = new DataPoint(timeArr[t], Derivatives[n][t].f.z);
+                            });
+                        break;
+                    case DerivativesEnum.p:
+                        Parallel.For(0, Derivatives[n].Length,
+                            t =>
+                            {
+                                XdataPoints[t] = new DataPoint(timeArr[t], Derivatives[n][t].p.x);
+                                YdataPoints[t] = new DataPoint(timeArr[t], Derivatives[n][t].p.y);
+                                ZdataPoints[t] = new DataPoint(timeArr[t], Derivatives[n][t].p.z);
+                            });
+                        break;
+                    case DerivativesEnum.u:
+                        Parallel.For(0, Derivatives[n].Length,
+                            t =>
+                            {
+                                XdataPoints[t] = new DataPoint(timeArr[t], Derivatives[n][t].u.x);
+                                YdataPoints[t] = new DataPoint(timeArr[t], Derivatives[n][t].u.y);
+                                ZdataPoints[t] = new DataPoint(timeArr[t], Derivatives[n][t].u.z);
+                            });
+                        break;
+                    case DerivativesEnum.v:
+                        Parallel.For(0, Derivatives[n].Length,
+                            t =>
+                            {
+                                XdataPoints[t] = new DataPoint(timeArr[t], Derivatives[n][t].v.x);
+                                YdataPoints[t] = new DataPoint(timeArr[t], Derivatives[n][t].v.y);
+                                ZdataPoints[t] = new DataPoint(timeArr[t], Derivatives[n][t].v.z);
+                            });
+                        break;
+                    case DerivativesEnum.a:
+                        Parallel.For(0, Derivatives[n].Length,
+                            t =>
+                            {
+                                XdataPoints[t] = new DataPoint(timeArr[t], Derivatives[n][t].a.x);
+                                YdataPoints[t] = new DataPoint(timeArr[t], Derivatives[n][t].a.y);
+                                ZdataPoints[t] = new DataPoint(timeArr[t], Derivatives[n][t].a.z);
+                            });
+                        break;
                 }
-            }
-            else
-            {
-                switch ((Derivatives)Deriv)
-                {
-                    case Derivatives.p:
-                        for (int n = 0; n < p.Length; n++)
-                        {
-                            PlotData("node #" + n, p[n]);
-                        }
-                        break;
-                    case Derivatives.u:
-                        for (int n = 0; n < u.Length; n++)
-                        {
-                            PlotData("node #" + n, u[n]);
-                        }
-                        break;
-                    case Derivatives.v:
-                        for (int n = 0; n < v.Length; n++)
-                        {
-                            PlotData("node #" + n, v[n]);
-                        }
-                        break;
-                    case Derivatives.a:
-                        for (int n = 0; n < a.Length; n++)
-                        {
-                            PlotData("node #" + n, a[n]);
-                        }
-                        break;
-                    case Derivatives.maxDerivatives:
-                        throw new System.Exception();
-                    default:
-                        throw new System.Exception();
-                }
+                LineSeries aweLineSeriesX = new LineSeries { Title = "node #" + n };
+                aweLineSeriesX.Points.AddRange(XdataPoints);
+                awePlotModelX.Series.Add(aweLineSeriesX);
+                LineSeries aweLineSeriesY = new LineSeries { Title = "node #" + n };
+                aweLineSeriesY.Points.AddRange(YdataPoints);
+                awePlotModelY.Series.Add(aweLineSeriesY);
+                LineSeries aweLineSeriesZ = new LineSeries { Title = "node #" + n };
+                aweLineSeriesZ.Points.AddRange(ZdataPoints);
+                awePlotModelZ.Series.Add(aweLineSeriesZ);
             }
             awePlotModelX.InvalidatePlot(true);
             awePlotModelY.InvalidatePlot(true);
             awePlotModelZ.InvalidatePlot(true);
         }
-
-        private void PlotData(string title, DataPointCPP[] Y)
+        private void Draw3d(int t, DerivativesEnum Deriv)
         {
-            plotDataX(title, timeArr, Y);
-            plotDataY(title, timeArr, Y);
-            plotDataZ(title, timeArr, Y);
-        }
-        public void plotDataX(string title, float[] X, DataPointCPP[] Y)
-        {
-            List<DataPoint> tmp = new List<DataPoint>();
-            tmp.AddRange(new DataPoint[X.Length]);
-            Parallel.For(0, X.Length,
-                t =>
-                {
-                    tmp[t] = new DataPoint(X[t], Y[t].X);
-                });
-            LineSeries aweLineSeries = new LineSeries { Title = title };
-            aweLineSeries.Points.AddRange(tmp);
-            awePlotModelX.Series.Add(aweLineSeries);
-        }
-        public void plotDataY(string title, float[] X, DataPointCPP[] Y)
-        {
-            List<DataPoint> tmp = new List<DataPoint>();
-            tmp.AddRange(new DataPoint[X.Length]);
-            Parallel.For(0, X.Length,
-                t =>
-                {
-                    tmp[t] = new DataPoint(X[t], Y[t].Y);
-                });
-            LineSeries aweLineSeries = new LineSeries { Title = title };
-            aweLineSeries.Points.AddRange(tmp);
-            awePlotModelY.Series.Add(aweLineSeries);
-        }
-        public void plotDataZ(string title, float[] X, DataPointCPP[] Y)
-        {
-            List<DataPoint> tmp = new List<DataPoint>();
-            tmp.AddRange(new DataPoint[X.Length]);
-            Parallel.For(0, X.Length,
-                t =>
-                {
-                    tmp[t] = new DataPoint(X[t], Y[t].Z);
-                });
-            LineSeries aweLineSeries = new LineSeries { Title = title };
-            aweLineSeries.Points.AddRange(tmp);
-            awePlotModelZ.Series.Add(aweLineSeries);
-        }
-
-        private void Draw3d(int t, int Deriv)
-        {
-            if (p != null && p.Length > 0)
+            if (Derivatives != null && Derivatives.Length > 0)
             {
                 Application.Current.Dispatcher.Invoke(delegate
                 {
@@ -394,38 +352,38 @@ namespace spring.ViewModels
                     Load3d();
                     Objs3d.Add(new CubeVisual3D
                     {
-                        Center = new Point3D(p[0][t].X * 10E2,
-                                             p[0][t].Z * 10E2,
-                                             p[0][t].Y * 10E2),
+                        Center = new Point3D(Derivatives[0][t].p.x * 10E2,
+                                             Derivatives[0][t].p.z * 10E2,
+                                             Derivatives[0][t].p.y * 10E2),
                         SideLength = .8,
                         Fill = Brushes.Gray
                     });
                     Objs3d.Add(new CubeVisual3D
                     {
-                        Center = new Point3D(p[p.Length - 1][t].X * 10E2,
-                                             p[p.Length - 1][t].Z * 10E2,
-                                             p[p.Length - 1][t].Y * 10E2),
+                        Center = new Point3D(Derivatives[Derivatives.Length - 1][t].p.x * 10E2,
+                                             Derivatives[Derivatives.Length - 1][t].p.z * 10E2,
+                                             Derivatives[Derivatives.Length - 1][t].p.y * 10E2),
                         SideLength = .8,
                         Fill = Brushes.Gray
                     });
-                    for (int node = 0; node < p.Length - 1; node++)
+                    for (int node = 0; node < Derivatives.Length - 1; node++)
                     {
                         Objs3d.Add(new LinesVisual3D
                         {
-                            Points = { new Point3D(p[node][t].X * 10E2,
-                                                p[node][t].Z * 10E2,
-                                                p[node][t].Y * 10E2),
-                            new Point3D(p[node + 1][t].X * 10E2,
-                                        p[node + 1][t].Z * 10E2,
-                                        p[node + 1][t].Y * 10E2) },
+                            Points = { new Point3D(Derivatives[node][t].p.x * 10E2,
+                                                Derivatives[node][t].p.z * 10E2,
+                                                Derivatives[node][t].p.y * 10E2),
+                            new Point3D(Derivatives[node + 1][t].p.x * 10E2,
+                                        Derivatives[node + 1][t].p.z * 10E2,
+                                        Derivatives[node + 1][t].p.y * 10E2) },
                             Thickness = 2,
                             Color = Brushes.Blue.Color
                         });
                         Objs3d.Add(new SphereVisual3D
                         {
-                            Center = new Point3D(p[node][t].X * 10E2,
-                                                p[node][t].Z * 10E2,
-                                                p[node][t].Y * 10E2),
+                            Center = new Point3D(Derivatives[node][t].p.x * 10E2,
+                                                Derivatives[node][t].p.z * 10E2,
+                                                Derivatives[node][t].p.y * 10E2),
                             Radius = .3,
                             Fill = Brushes.Black
                         });

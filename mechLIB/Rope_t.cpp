@@ -25,7 +25,7 @@ void Rope_t::SetupNodesPositions(ModelPropertiesNative* props, DirectX::SimpleMa
 	float cosA = endCoord.x / props->L;
 	float sinA = endCoord.y / props->L;
 	Nodes[0].init(props->Counts, startCoord,
-		NodeFreedom::xyz, NodeLoad::none, std::vector<Element_t*>{ &Elements[0] });
+		NodeFreedom::xyz, mechLIB::DerivativesEnum::DerivativesEnumMAX, std::vector<Element_t*>{ &Elements[0] });
 	for (size_t i = 1; i < lastNode; i++)
 	{
 		DirectX::SimpleMath::Vector3 flatC(i * dl, 0, 0);
@@ -35,10 +35,10 @@ void Rope_t::SetupNodesPositions(ModelPropertiesNative* props, DirectX::SimpleMa
 			(flatC.x - startCoord.x) * sinA + (flatC.y - startCoord.y) * cosA + startCoord.y, 0
 		);
 		Nodes[i].init(props->Counts, coords,
-			NodeFreedom::xyz, NodeLoad::none, std::vector<Element_t*>{ &Elements[i - 1], & Elements[i] });
+			NodeFreedom::xyz, mechLIB::DerivativesEnum::DerivativesEnumMAX, std::vector<Element_t*>{ &Elements[i - 1], & Elements[i] });
 	}
 	Nodes[lastNode].init(props->Counts, endCoord,
-		NodeFreedom::xyz, NodeLoad::none, std::vector<Element_t*>{ &Elements[lastNode - 1] });
+		NodeFreedom::xyz, mechLIB::DerivativesEnum::DerivativesEnumMAX, std::vector<Element_t*>{ &Elements[lastNode - 1] });
 }
 
 void Rope_t::EvalElements(ModelPropertiesNative* props)
