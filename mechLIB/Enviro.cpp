@@ -94,15 +94,24 @@ void Enviro::GenerateLoad(C_t axis)
 }
 void Enviro::Run(bool NeedToSaveResults)
 {
+	IsRunning = true;
 	for (size_t t = 1; t < phProps.Counts; t++)
 	{
 		rope->StepOverNodes(t, Re[t - 1], phProps.dt);
 		for (int i = 0; i < rope->ElementsSize; i++)
 		{
 			rope->L[t] += rope->Elements[i].L[t];
+			if (!ableToRun)
+			{
+				break;
+			}
+		}
+		if (!ableToRun)
+		{
+			break;
 		}
 	}
-	if (NeedToSaveResults)
+	if (NeedToSaveResults && ableToRun)
 	{
 		std::string varName = "L";
 		switch (phProps.PhysicalModel)
@@ -128,4 +137,5 @@ void Enviro::Run(bool NeedToSaveResults)
 		resultsFileName += ".mat";
 		matioWrap::writeFloatArr(resultsFileName.c_str(), varName.c_str(), rope->L);
 	}
+	IsRunning = false;
 }

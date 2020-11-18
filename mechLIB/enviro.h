@@ -17,15 +17,25 @@ private:
 	std::vector<float> bloodP;
 	void allocateTime(float dt, int Counts);
 	std::string loadFile;
+	bool ableToRun = true;
 public:
+	bool IsRunning = false;
 	ModelPropertiesNative phProps;
-	Rope_t* rope;
+	Rope_t* rope = nullptr;
 	std::vector<float> time;
 	Enviro(ModelPropertiesNative _phProps, const std::string& _loadFile);
 	void GenerateLoad(C_t axis);
 	~Enviro()
 	{
-		delete rope;
+		while (IsRunning)
+		{
+
+		}
+		if (rope)
+		{
+			delete rope;
+		}
 	}
 	void Run(bool NeedToSaveResults);
+	void Stop() { ableToRun = false; };
 };

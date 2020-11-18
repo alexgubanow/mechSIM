@@ -4,20 +4,18 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
-    xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        Loaded="ShellView_OnLoaded"
-        Title="{Binding Title}" Height="600" Width="1024"
-    Effect="{Binding Path=win_Effect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-    <DockPanel LastChildFill="True">
-        <Grid>
-            <ContentControl prism:RegionManager.RegionName="MainViewRegion"/>
-            <Rectangle Panel.ZIndex="1000" x:Name="overlayrect" Fill="DarkGray" Opacity=".5"
-                       Visibility="{Binding Path=overlay_Visibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Controls:ProgressRing IsActive="True" Panel.ZIndex="1000" x:Name="overlayring" Foreground="White"
-                                   Visibility="{Binding Path=overlay_Visibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Button Panel.ZIndex="1000" Content="STOP" Command="{Binding ComputeStopCommand}" Height="100" 
+    xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+    Loaded="ShellView_OnLoaded"
+        Title="{Binding Title}" Height="600" Width="1024">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding ClosingCMD}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid>
+        <ContentControl prism:RegionManager.RegionName="MainViewRegion"/>
+        <Button Panel.ZIndex="1000" Content="STOP" Command="{Binding ComputeStopCommand}" Height="100" 
                 FontSize="42" Background="Red" VerticalAlignment="Bottom" 
                     Visibility="{Binding Path=overlay_Visibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        </Grid>
-    </DockPanel>
+    </Grid>
 </controls:MetroWindow>

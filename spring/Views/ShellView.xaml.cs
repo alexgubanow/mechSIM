@@ -30,6 +30,8 @@ namespace spring.Views
         private void ShellView_OnLoaded(object sender, RoutedEventArgs e)
         {
             _regionManager.Regions["MainViewRegion"].Add(_container.Resolve<MainView>());
+            _regionManager.Regions["MultiPlotViewRegion"].Add(_container.Resolve<MultiPlotView>());
+            _regionManager.Regions["TopRibbonViewRegion"].Add(_container.Resolve<TopRibbonView>());
             //_regionManager.Regions["PlotViewRegion"].Add(_container.Resolve<PlotView>());
             //_ea.GetEvent<ViewModels.Load3dEvent>().Publish();
         }
