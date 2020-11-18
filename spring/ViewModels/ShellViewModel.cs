@@ -6,6 +6,7 @@ using System.Windows;
 namespace spring.ViewModels
 {
     public class StopComputeEvent : PubSubEvent { }
+    public class ClosingEvent : PubSubEvent { }
     public class ShellViewModel : BindableBase
     {
         private Visibility _overlay_Visibility;
@@ -13,6 +14,9 @@ namespace spring.ViewModels
         private DelegateCommand _ComputeStopCommand;
         public DelegateCommand ComputeStopCommand => _ComputeStopCommand ??
             (_ComputeStopCommand = new DelegateCommand(() => _ea.GetEvent<StopComputeEvent>().Publish()));
+        private DelegateCommand _ClosingCMD;
+        public DelegateCommand ClosingCMD => _ClosingCMD ??
+            (_ClosingCMD = new DelegateCommand(() => _ea.GetEvent<ClosingEvent>().Publish()));
         private string _title;
         public string Title { get => _title; set => SetProperty(ref _title, value); }
 

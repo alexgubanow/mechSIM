@@ -45,6 +45,7 @@ namespace spring.ViewModels
                 overlay_Visibility = Visibility.Collapsed;
             }
         }
+        private bool goingToBeClosed = false;
         private bool _IsConrolsEnabled = true;
         public bool IsConrolsEnabled
         {
@@ -63,6 +64,7 @@ namespace spring.ViewModels
             _ea.GetEvent<ComputeIsStartedEvent>().Subscribe(() => ApplyEffect(true));
             _ea.GetEvent<GotResultsEvent>().Subscribe(() => EnableControls());
             _ea.GetEvent<StopComputeEvent>().Subscribe(() => { ComputeStop(); EnableControls(); });
+            _ea.GetEvent<ClosingEvent>().Subscribe(() => { ComputeStop(); goingToBeClosed = true; });
         }
 
         private void EnableControls()
@@ -82,22 +84,24 @@ namespace spring.ViewModels
         }
         private void ComputeStop()
         {
-            thrsim.Abort();
-            thrsim = null;
-            world.Dispose();
+            if (world != null)
+            {
+                world.Stop();
+            }
         }
 
         private void Simulate(string fileName)
         {
             var _ModelProperties = (ModelProperties)Application.Current.Properties["ModelProperties"];
-            float[] TimeArr = Array.Empty<float>();
-            DerivativesContainerManaged[][] Derivatives = Array.Empty<DerivativesContainerManaged[]>();
-            //p = u = v = a = null;
             world = new EnviroWrapper();
             try
             {
                 world.CreateWorld(_ModelProperties, fileName);
                 world.Run((bool)Application.Current.Properties["NeedToSaveResults"]);
+                if (goingToBeClosed != true)
+                {
+                    GetResults(_ModelProperties);
+                }
             }
             catch (RuntimeWrappedException e)
             {
@@ -106,30 +110,23 @@ namespace spring.ViewModels
                     MessageBox.Show(s);
                 }
             }
-            try
+            world.Dispose();
+        }
+
+        private void GetResults(ModelProperties _ModelProperties)
+        {
+            int step = _ModelProperties.Counts;
+            if (_ModelProperties.Counts > (int)SystemParameters.PrimaryScreenWidth / 2)
             {
-                int step = 1;
-                if (_ModelProperties.Counts > (int)SystemParameters.PrimaryScreenWidth / 2)
-                {
-                    step = _ModelProperties.Counts / ((int)SystemParameters.PrimaryScreenWidth / 2);
-                }
-                world.GetTimeArr(step, ref TimeArr);
-                world.GetDerivatives(step, ref Derivatives);
-                Application.Current.Properties["TimeArr"] = TimeArr;
-                Application.Current.Properties["Derivatives"] = Derivatives;
-                _ea.GetEvent<GotResultsEvent>().Publish();
+                step = _ModelProperties.Counts / ((int)SystemParameters.PrimaryScreenWidth / 2);
             }
-            catch (RuntimeWrappedException e)
-            {
-                if (e.WrappedException is string s)
-                {
-                    MessageBox.Show(s);
-                }
-            }
-            if (world != null)
-            {
-                world.Dispose();
-            }
+            float[] TimeArr = Array.Empty<float>();
+            DerivativesContainerManaged[][] Derivatives = Array.Empty<DerivativesContainerManaged[]>();
+            world.GetTimeArr(step, ref TimeArr);
+            world.GetDerivatives(step, ref Derivatives);
+            Application.Current.Properties["TimeArr"] = TimeArr;
+            Application.Current.Properties["Derivatives"] = Derivatives;
+            _ea.GetEvent<GotResultsEvent>().Publish();
         }
     }
 }
