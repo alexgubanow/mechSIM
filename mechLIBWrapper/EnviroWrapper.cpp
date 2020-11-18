@@ -5,10 +5,6 @@
 #include "SimpleMath.h"
 #include <omp.h>
 
-EnviroWrapper::EnviroWrapper()
-{
-}
-
 void EnviroWrapper::CreateWorld(ModelProperties^ _props, System::String^ loadFile)
 {
 	std::string str = msclr::interop::marshal_as<std::string>(loadFile);
@@ -21,6 +17,10 @@ void EnviroWrapper::CreateWorld(ModelProperties^ _props, System::String^ loadFil
 	{
 		throw gcnew System::String(ex);
 	}
+	catch (...)
+	{
+		throw "Something went very wrong";
+	}
 }
 
 void EnviroWrapper::Run(bool NeedToSaveResults)
@@ -29,9 +29,28 @@ void EnviroWrapper::Run(bool NeedToSaveResults)
 	{
 		world->Run(NeedToSaveResults);
 	}
-	catch (const char *ex)
+	catch (const char* ex)
 	{
 		throw gcnew System::String(ex);
+	}
+	catch (...)
+	{
+		throw "Something went very wrong";
+	}
+}
+void EnviroWrapper::Stop()
+{
+	try
+	{
+		world->Stop();
+	}
+	catch (const char* ex)
+	{
+		throw gcnew System::String(ex);
+	}
+	catch (...)
+	{
+		throw "Something went very wrong";
 	}
 }
 
@@ -46,46 +65,9 @@ void EnviroWrapper::GetDerivatives(int step, array<array<mechLIB::DerivativesCon
 		for (size_t t = 0; t < world->time.size() && tout < arr[n]->Length; t += step, ++tout)
 		{
 			arr[n][tout] = gcnew mechLIB::DerivativesContainerManaged(&world->rope->Nodes[n].Derivatives[t]);
-			int dgsfb = 0;
-			int bsdfg = 0;
-			/*FillManagedF(arr[n][tout], world->rope->Nodes[n].Derivatives[t]);
-			FillManagedA(arr[n][tout], world->rope->Nodes[n].Derivatives[t]);
-			FillManagedU(arr[n][tout], world->rope->Nodes[n].Derivatives[t]);
-			FillManagedV(arr[n][tout], world->rope->Nodes[n].Derivatives[t]);
-			FillManagedP(arr[n][tout], world->rope->Nodes[n].Derivatives[t]);*/
 		}
 	}
 }
-//void EnviroWrapper::FillManagedF(mechLIB::DerivativesContainerManaged^% DerivativesManaged, const DerivativesContainer& Derivatives)
-//{
-//	DerivativesManaged->F.x = Derivatives.F.x;
-//	DerivativesManaged->F.y = Derivatives.F.y;
-//	DerivativesManaged->F.z = Derivatives.F.z;
-//}
-//void EnviroWrapper::FillManagedA(mechLIB::DerivativesContainerManaged^% DerivativesManaged, const DerivativesContainer& Derivatives)
-//{
-//	DerivativesManaged->a.x = Derivatives.a.x;
-//	DerivativesManaged->a.y = Derivatives.a.y;
-//	DerivativesManaged->a.z = Derivatives.a.z;
-//}
-//void EnviroWrapper::FillManagedU(mechLIB::DerivativesContainerManaged^% DerivativesManaged, const DerivativesContainer& Derivatives)
-//{
-//	DerivativesManaged->u.x = Derivatives.u.x;
-//	DerivativesManaged->u.y = Derivatives.u.y;
-//	DerivativesManaged->u.z = Derivatives.u.z;
-//}
-//void EnviroWrapper::FillManagedV(mechLIB::DerivativesContainerManaged^% DerivativesManaged, const DerivativesContainer& Derivatives)
-//{
-//	DerivativesManaged->v.x = Derivatives.v.x;
-//	DerivativesManaged->v.y = Derivatives.v.y;
-//	DerivativesManaged->v.z = Derivatives.v.z;
-//}
-//void EnviroWrapper::FillManagedP(mechLIB::DerivativesContainerManaged^% DerivativesManaged, const DerivativesContainer& Derivatives)
-//{
-//	DerivativesManaged->p.x = Derivatives.p.x;
-//	DerivativesManaged->p.y = Derivatives.p.y;
-//	DerivativesManaged->p.z = Derivatives.p.z;
-//}
 
 void EnviroWrapper::GetTimeArr(int step, array<float>^% arr)
 {/*

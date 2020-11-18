@@ -6,20 +6,28 @@
 
 public ref class EnviroWrapper
 {
-	Enviro* world;
-	/*static void FillManagedF(mechLIB::DerivativesContainerManaged^% DerivativesManaged, const DerivativesContainer& Derivatives);
-	static void FillManagedA(mechLIB::DerivativesContainerManaged^% DerivativesManaged, const DerivativesContainer& Derivatives);
-	static void FillManagedU(mechLIB::DerivativesContainerManaged^% DerivativesManaged, const DerivativesContainer& Derivatives);
-	static void FillManagedV(mechLIB::DerivativesContainerManaged^% DerivativesManaged, const DerivativesContainer& Derivatives);
-	static void FillManagedP(mechLIB::DerivativesContainerManaged^% DerivativesManaged, const DerivativesContainer& Derivatives);*/
+	Enviro* world = nullptr;
 public:
-	EnviroWrapper();
-	virtual ~EnviroWrapper()
+	~EnviroWrapper()
 	{
-		delete world;
+		if (world)
+		{
+			delete world;
+		}
 	}
 	void CreateWorld(ModelProperties^ _props, System::String^ loadFile);
 	void Run(bool NeedToSaveResults);
+	void Stop();
 	void GetDerivatives(int step, array<array<mechLIB::DerivativesContainerManaged^>^>^% arr);
 	void GetTimeArr(int step, array<float>^% arr);
+	bool IsRunning() {
+		if (world)
+		{
+			return world->IsRunning;
+		}
+		else
+		{
+			return false;
+		}
+	};
 };

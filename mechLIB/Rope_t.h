@@ -21,9 +21,6 @@ public:
 	Rope_t() : Nodes(0), NodesSize(0), Elements(0), ElementsSize(0), L(0)
 	{
 	}
-	~Rope_t()
-	{
-	}
 	void init(ModelPropertiesNative* props);
 	void SetupNodesPositions(ModelPropertiesNative* props);
 	void SetupNodesPositions(ModelPropertiesNative* props, DirectX::SimpleMath::Vector3 startCoord, DirectX::SimpleMath::Vector3 endCoord);
