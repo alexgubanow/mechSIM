@@ -141,8 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="DataPointCPP.hpp" />
-    <ClInclude Include="Derivatives.h" />
+    <ClInclude Include="DerivativesContainerManaged.h" />
     <ClInclude Include="EnumDescriptionTypeConverter.h" />
     <ClInclude Include="EnviroWrapper.h" />
     <ClInclude Include="ModelProperties.h" />

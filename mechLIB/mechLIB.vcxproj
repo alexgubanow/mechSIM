@@ -170,6 +170,7 @@
   <ItemGroup>
     <ClInclude Include="C_t.h" />
     <ClInclude Include="dcm_t.hpp" />
+    <ClInclude Include="DerivativesContainer.h" />
     <ClInclude Include="Element_t.h" />
     <ClInclude Include="Enviro.h" />
     <ClInclude Include="framework.h" />
@@ -178,12 +179,13 @@
     <ClInclude Include="matioWrap.h" />
     <ClInclude Include="ModelPropertiesNative.h" />
     <ClInclude Include="NodeFreedom.h" />
-    <ClInclude Include="NodeLoad.h" />
+    <ClInclude Include="DerivativesEnum.h" />
     <ClInclude Include="Node_t.h" />
     <ClInclude Include="PhysicalModelEnum.h" />
     <ClInclude Include="Rope_t.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DerivativesContainer.cpp" />
     <ClCompile Include="Element_t.cpp" />
     <ClCompile Include="Enviro.cpp" />
     <ClCompile Include="Node_t.cpp" />

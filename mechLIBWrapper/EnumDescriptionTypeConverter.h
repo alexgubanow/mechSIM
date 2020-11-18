@@ -1,4 +1,5 @@
-﻿using namespace System::ComponentModel;
+﻿#pragma once
+using namespace System::ComponentModel;
 using namespace System::Globalization;
 using namespace System::Reflection;
 

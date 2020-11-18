@@ -40,17 +40,17 @@ Enviro::Enviro(ModelPropertiesNative _phProps, const std::string& _loadFile) : l
 			size_t lastN = phProps.nodes - 1;
 			for (int t = 0; t < phProps.Counts; t++)
 			{
-				rope->Nodes[0].p[t].x = pmxq[t];
-				rope->Nodes[0].p[t].y = pmyq[t];
-				rope->Nodes[0].u[t].x = rope->Nodes[0].p[t].x - rope->Nodes[0].p[0].x;
+				rope->Nodes[0].Derivatives[t].p.x = pmxq[t];
+				rope->Nodes[0].Derivatives[t].p.y = pmyq[t];
+				rope->Nodes[0].Derivatives[t].u.x = rope->Nodes[0].Derivatives[t].p.x - rope->Nodes[0].Derivatives[0].p.x;
 
-				rope->Nodes[lastN].p[t].x = plxq[t];
-				rope->Nodes[lastN].p[t].y = plyq[t];
-				rope->Nodes[lastN].u[t].x = rope->Nodes[lastN].p[t].x - rope->Nodes[lastN].p[0].x;
+				rope->Nodes[lastN].Derivatives[t].p.x = plxq[t];
+				rope->Nodes[lastN].Derivatives[t].p.y = plyq[t];
+				rope->Nodes[lastN].Derivatives[t].u.x = rope->Nodes[lastN].Derivatives[t].p.x - rope->Nodes[lastN].Derivatives[0].p.x;
 			}
 			//choose load nodes
-			rope->Nodes[0].LoadType = NodeLoad::u;
-			rope->Nodes[phProps.nodes - 1].LoadType = NodeLoad::u;
+			rope->Nodes[0].LoadType = mechLIB::DerivativesEnum::u;
+			rope->Nodes[phProps.nodes - 1].LoadType = mechLIB::DerivativesEnum::u;
 			delete matioW;
 		}
 	}
@@ -74,12 +74,12 @@ void Enviro::GenerateLoad(C_t axis)
 	float A = (float)M_PI * maf::P2(phProps.D) / 4;
 	float maxLoad = ((phProps.E * A) / phProps.L / phProps.nodes) * phProps.MaxU;
 	float freq = 1 / (phProps.Counts * phProps.dt);
-	rope->Nodes[0].LoadType = NodeLoad::p;
+	rope->Nodes[0].LoadType = mechLIB::DerivativesEnum::p;
 	//rope->Nodes[midN].LoadType = NodeLoad::u;
-	rope->Nodes[lastN].LoadType = NodeLoad::p;
+	rope->Nodes[lastN].LoadType = mechLIB::DerivativesEnum::p;
 	for (int t = 0; t < phProps.Counts; t++)
 	{
-		rope->Nodes[0].p[t] = rope->Nodes[0].p[0];
+		rope->Nodes[0].Derivatives[t].p = rope->Nodes[0].Derivatives[0].p;
 		/*rope->Nodes[0].p[t].x = (phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq / 2)) + rope->Nodes[0].p[0].x;
 		rope->Nodes[0].u[t] = rope->Nodes[0].p[t] - rope->Nodes[0].p[0];*/
 
@@ -87,7 +87,7 @@ void Enviro::GenerateLoad(C_t axis)
 		rope->Nodes[midN].p[t].y = (rope->Nodes[midN].p[0].y + (-phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq)));
 		rope->Nodes[midN].u[t] = rope->Nodes[midN].p[t] - rope->Nodes[midN].p[0];*/
 
-		rope->Nodes[lastN].p[t] = rope->Nodes[lastN].p[0];
+		rope->Nodes[lastN].Derivatives[t].p = rope->Nodes[lastN].Derivatives[0].p;
 		/*rope->Nodes[lastN].p[t].x = 0 - ((phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq / 2)) + rope->Nodes[lastN].p[0].x);
 		rope->Nodes[lastN].u[t] = rope->Nodes[lastN].p[t] - rope->Nodes[lastN].p[0];*/
 	}
