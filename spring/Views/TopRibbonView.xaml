@@ -1,0 +1,77 @@
+﻿<UserControl x:Class="spring.Views.TopRibbonView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:spring.Views"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:mLib="clr-namespace:mechLIB;assembly=mechLIBWrapper"
+             xmlns:lcl="clr-namespace:spring"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             d:DesignHeight="80" d:DesignWidth="900">
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues"
+                        ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="mLib:PhysicalModelEnum"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
+    <StackPanel DockPanel.Dock="Top" Margin="5">
+        <StackPanel Orientation="Horizontal" >
+            <ComboBox MinWidth="150" Margin="0,0,5,0" 
+                      ItemsSource="{Binding Source={lcl:EnumBindingSource {x:Type mLib:PhysicalModelEnum}}}"
+                      SelectedValue="{Binding PhysicalModel}"/>
+            <StackPanel Margin="5,0,0,0">
+                <Label Content="E, Pa:" HorizontalAlignment="Left"/>
+                <TextBox Text="{Binding E}"/>
+            </StackPanel>
+            <StackPanel Margin="5,0,0,0">
+                <Label Content="ro, kg/m3:" HorizontalAlignment="Left"/>
+                <TextBox Text="{Binding ro}"/>
+            </StackPanel>
+            <StackPanel Margin="5,0,0,0">
+                <Label Content="L, m:" HorizontalAlignment="Left"/>
+                <TextBox Text="{Binding L}"/>
+            </StackPanel>
+            <StackPanel Margin="5,0,0,0">
+                <Label Content="nodes:" HorizontalAlignment="Left"/>
+                <TextBox Text="{Binding nodes}"/>
+            </StackPanel>
+            <StackPanel Margin="5,0,0,0">
+                <Label Content="D, m:" HorizontalAlignment="Left"/>
+                <TextBox Text="{Binding D}"/>
+            </StackPanel>
+            <StackPanel Margin="5,0,0,0">
+                <Label Content="Time steps:" HorizontalAlignment="Left"/>
+                <TextBox Text="{Binding Counts}"/>
+            </StackPanel>
+            <StackPanel Margin="5,0,0,0">
+                <Label Content="dt, s:" HorizontalAlignment="Left"/>
+                <TextBox Text="{Binding dt}"/>
+            </StackPanel>
+            <StackPanel Margin="5,0,0,0">
+                <Label Content="Initial drop, m:" HorizontalAlignment="Left"/>
+                <TextBox Text="{Binding initDrop}"/>
+            </StackPanel>
+            <StackPanel Margin="5,0,0,0">
+                <Label Content="Max U, m:" HorizontalAlignment="Left"/>
+                <TextBox Text="{Binding MaxU}"/>
+            </StackPanel>
+            <StackPanel Margin="5,0,0,0">
+                <Label Content="Damping ratio:" HorizontalAlignment="Left"/>
+                <TextBox Text="{Binding DampRatio}"/>
+            </StackPanel>
+            <ComboBox DockPanel.Dock="Top" 
+                ItemsSource="{Binding Source={lcl:EnumBindingSource {x:Type mLib:DerivativesEnum}}}"
+                      SelectedValue="{Binding SelDeriv}" Margin="5,0,0,0"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Button Content="Run Test" Command="{Binding ComputeTestCommand}" Margin="5" />
+            <Button Content="Run From file" Command="{Binding ComputeFileCommand}" Margin="5" />
+            <CheckBox Content="Write result to MAT" VerticalAlignment="Center" IsChecked="{Binding NeedToSaveResults}"/>
+        </StackPanel>
+    </StackPanel>
+</UserControl>
