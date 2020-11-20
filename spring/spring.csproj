@@ -187,8 +187,8 @@
     <PackageReference Include="DryIoc.dll">
       <Version>4.1.2</Version>
     </PackageReference>
-    <PackageReference Include="HelixToolkit.Wpf">
-      <Version>2.11.0</Version>
+    <PackageReference Include="HelixToolkit.Wpf.SharpDX">
+      <Version>2.13.1</Version>
     </PackageReference>
     <PackageReference Include="MahApps.Metro">
       <Version>1.6.5</Version>
