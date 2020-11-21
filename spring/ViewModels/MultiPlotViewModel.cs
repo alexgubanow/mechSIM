@@ -3,6 +3,7 @@ using HelixToolkit.Wpf.SharpDX;
 using mechLIB;
 using Microsoft.Win32;
 using OxyPlot;
+using OxyPlot.Annotations;
 using OxyPlot.Series;
 using Prism.Commands;
 using Prism.Events;
@@ -29,7 +30,10 @@ namespace spring.ViewModels
         private DerivativesEnum SelDeriv;
 
         private int _CurrT;
-        public int CurrT { get => _CurrT; set { _CurrT = value; Update3dPositions(); } }
+        public int CurrT { get => _CurrT; set { _CurrT = value; UpdateTimeLinePosition(awePlotModelX);
+                UpdateTimeLinePosition(awePlotModelY);
+                UpdateTimeLinePosition(awePlotModelZ); Update3dPositions(); } }
+
         public float[] TimeArr { get { return (float[])Application.Current.Properties["TimeArr"]; } }
         public DerivativesContainerManaged[][] Derivatives 
         { get { return (DerivativesContainerManaged[][])Application.Current.Properties["Derivatives"]; } }
@@ -93,6 +97,15 @@ namespace spring.ViewModels
             get => _EndT;
             set => SetProperty(ref _EndT, value);
         }
+        private DelegateCommand<object> _An3dObjectSelectedCMD;
+        public DelegateCommand<object> An3dObjectSelectedCMD =>
+            _An3dObjectSelectedCMD ?? (_An3dObjectSelectedCMD = new DelegateCommand<object>(ExecuteAn3dObjectSelectedCMD));
+
+        void ExecuteAn3dObjectSelectedCMD(object sender)
+        {
+            var viewport = sender as Viewport3DX;
+            MessageBox.Show("dcs");
+        }
         private readonly SynchronizationContext context = SynchronizationContext.Current;
         public MultiPlotViewModel(IEventAggregator ea)
         {
@@ -107,6 +120,36 @@ namespace spring.ViewModels
             _ea.GetEvent<GotResultsEvent>().Subscribe(() => { ShowResults(); EndT = TimeArr.Length - 1; });
             _ea.GetEvent<ComputeIsStartedEvent>().Subscribe(() => ClearDataView());
             _ea.GetEvent<SelDerivChangedEvent>().Subscribe((var) => { SelDeriv = var; if (IsArrayExist) { DrawPlots(); } });
+            UpdateTimeLinePosition(awePlotModelX);
+            UpdateTimeLinePosition(awePlotModelY);
+            UpdateTimeLinePosition(awePlotModelZ);
+        }
+
+        private void UpdateTimeLinePosition(PlotModel plotModel)
+        {
+            if (TimeArr != null && plotModel.DefaultYAxis != null)
+            {
+                if (plotModel.Annotations.Count > 0)
+                {
+                    (plotModel.Annotations[0] as LineAnnotation).MinimumY = plotModel.DefaultYAxis.ActualMinimum * 2;
+                    (plotModel.Annotations[0] as LineAnnotation).MaximumY = plotModel.DefaultYAxis.ActualMaximum * 2;
+                    (plotModel.Annotations[0] as LineAnnotation).X = TimeArr[CurrT];
+                }
+                else
+                {
+                    var annotation = new LineAnnotation
+                    {
+                        Color = OxyColors.Blue,
+                        MinimumY = awePlotModelX.DefaultYAxis.ActualMinimum * 2,
+                        MaximumY = awePlotModelX.DefaultYAxis.ActualMaximum * 2,
+                        X = TimeArr[CurrT],
+                        LineStyle = LineStyle.Solid,
+                        Type = LineAnnotationType.Vertical
+                    };
+                    plotModel.Annotations.Add(annotation);
+                }
+                plotModel.InvalidatePlot(true);
+            }
         }
 
         private void ClearDataView()
