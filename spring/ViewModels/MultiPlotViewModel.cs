@@ -1,4 +1,5 @@
 ﻿using HelixToolkit.Wpf;
+using HelixToolkit.Wpf.SharpDX;
 using mechLIB;
 using Microsoft.Win32;
 using OxyPlot;
@@ -6,6 +7,7 @@ using OxyPlot.Series;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using SharpDX;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,6 +16,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
@@ -27,41 +30,97 @@ namespace spring.ViewModels
         private DerivativesEnum SelDeriv;
 
         private int _CurrT;
-        public int CurrT { get => _CurrT; set { _CurrT = value; Draw3d(value, SelDeriv); } }
-
-        public Point3DCollection RopeCoords { get; set; }
-        public ObservableCollection<Visual3D> Objs3d { get; set; }
-
+        public int CurrT { get => _CurrT; set { _CurrT = value; Update3dPositions(); } }
         public float[] TimeArr { get { return (float[])Application.Current.Properties["TimeArr"]; } }
-        public DerivativesContainerManaged[][] Derivatives { get { return (DerivativesContainerManaged[][])Application.Current.Properties["Derivatives"]; } }
+        public DerivativesContainerManaged[][] Derivatives 
+        { get { return (DerivativesContainerManaged[][])Application.Current.Properties["Derivatives"]; } }
+        private ModelProperties ModelProperties 
+        { get { return (ModelProperties)Application.Current.Properties["ModelProperties"]; } }
         private bool IsArrayExist => Derivatives != null;
-        public PlotModel awePlotModelX { get; set; }
-        public PlotModel awePlotModelY { get; set; }
-        public PlotModel awePlotModelZ { get; set; }
+
+        private PlotModel _awePlotModelX = new PlotModel { Title = "X axis" };
+        public PlotModel awePlotModelX
+        {
+            get { return _awePlotModelX; }
+            set { SetProperty(ref _awePlotModelX, value); }
+        }
+
+        private PlotModel _awePlotModelY = new PlotModel { Title = "Y axis" };
+        public PlotModel awePlotModelY
+        {
+            get { return _awePlotModelY; }
+            set { SetProperty(ref _awePlotModelY, value); }
+        }
+
+        private PlotModel _awePlotModelZ = new PlotModel { Title = "Z axis" };
+        public PlotModel awePlotModelZ
+        {
+            get { return _awePlotModelZ; }
+            set { SetProperty(ref _awePlotModelZ, value); }
+        }
+        private HelixToolkit.Wpf.SharpDX.Camera _Camera;
+        public HelixToolkit.Wpf.SharpDX.Camera Camera
+        {
+            get { return _Camera; }
+            set { SetProperty(ref _Camera, value); }
+        }
+        private LineGeometry3D _Lines3d = new LineGeometry3D() { IsDynamic = true };
+        public LineGeometry3D Lines3d
+        {
+            get { return _Lines3d; }
+            set { SetProperty(ref _Lines3d, value); }
+        }
+        private PointGeometry3D _BlackPoints3d = new PointGeometry3D() { IsDynamic = true };
+        public PointGeometry3D BlackPoints3d
+        {
+            get { return _BlackPoints3d; }
+            set { SetProperty(ref _BlackPoints3d, value); }
+        }
+        private PointGeometry3D _RedPoints3d = new PointGeometry3D() { IsDynamic = true };
+        public PointGeometry3D RedPoints3d
+        {
+            get => _RedPoints3d;
+            set => SetProperty(ref _RedPoints3d, value);
+        }
+        private IEffectsManager _EffectsManager;
+        public IEffectsManager EffectsManager
+        {
+            get => _EffectsManager;
+            set => SetProperty(ref _EffectsManager, value);
+        }
         private int _EndT;
         public int EndT
         {
             get => _EndT;
             set => SetProperty(ref _EndT, value);
         }
+        private readonly SynchronizationContext context = SynchronizationContext.Current;
         public MultiPlotViewModel(IEventAggregator ea)
         {
+            EffectsManager = new DefaultEffectsManager();
+            Camera = new HelixToolkit.Wpf.SharpDX.PerspectiveCamera
+            {
+                Position = new Point3D(0, 0, 40),
+                LookDirection = new Vector3D(0, 0, -40),
+                UpDirection = new Vector3D(0, 1, 0)
+            };
             _ea = ea;
-            _CurrT = 0;
-            EndT = 1;
-            Objs3d = new ObservableCollection<Visual3D>();
-            awePlotModelX = new PlotModel { Title = "X axis" };
-            awePlotModelY = new PlotModel { Title = "Y axis" };
-            awePlotModelZ = new PlotModel { Title = "Z axis" };
-            awePlotModelX.InvalidatePlot(true);
-            awePlotModelY.InvalidatePlot(true);
-            awePlotModelZ.InvalidatePlot(true);
-            _ea.GetEvent<GotResultsEvent>().Subscribe(() => { ShowResults(SelDeriv); EndT = TimeArr.Length - 1; });
+            _ea.GetEvent<GotResultsEvent>().Subscribe(() => { ShowResults(); EndT = TimeArr.Length - 1; });
             _ea.GetEvent<ComputeIsStartedEvent>().Subscribe(() => ClearDataView());
-            _ea.GetEvent<SelDerivChangedEvent>().Subscribe((var) => { if (IsArrayExist) { DrawPoints(var); } });
-            _ea.GetEvent<SelDerivChangedEvent>().Subscribe((var) => SelDeriv = var );
+            _ea.GetEvent<SelDerivChangedEvent>().Subscribe((var) => { SelDeriv = var; if (IsArrayExist) { DrawPlots(); } });
         }
-
+        public void MouseRightButtonDownCallback(object sender, MouseButtonEventArgs e)
+        {
+            var viewport = sender as Viewport3DX;
+            if (viewport == null) { return; }
+            var point = e.GetPosition(viewport);
+            var hitTests = viewport.FindHits(point);
+            if (hitTests != null && hitTests.Count > 0)
+            {
+                int sdfvgs = 0;
+            }
+            var asd = viewport.FindNearestPoint(point);
+        }
         private void ClearDataView()
         {
             CurrT = 0;
@@ -69,20 +128,15 @@ namespace spring.ViewModels
             awePlotModelY.Series.Clear();
             awePlotModelZ.Series.Clear();
         }
-
-        private void Load3d()
-        {
-            Objs3d.Add(new DefaultLights());
-        }
-        private void ShowResults(DerivativesEnum Deriv)
+        private void ShowResults()
         {
             if (IsArrayExist)
             {
-                DrawPoints(Deriv);
-                Draw3d(CurrT, Deriv);
+                DrawPlots();
+                Draw3d();
             }
         }
-        private void DrawPoints(DerivativesEnum Deriv)
+        private void DrawPlots()
         {
             ClearDataView();
             for (int n = 0; n < Derivatives.Length; n++)
@@ -90,7 +144,7 @@ namespace spring.ViewModels
                 DataPoint[] XdataPoints = new DataPoint[Derivatives[n].Length];
                 DataPoint[] YdataPoints = new DataPoint[Derivatives[n].Length];
                 DataPoint[] ZdataPoints = new DataPoint[Derivatives[n].Length];
-                switch (Deriv)
+                switch (SelDeriv)
                 {
                     case DerivativesEnum.f:
                         Parallel.For(0, Derivatives[n].Length,
@@ -152,53 +206,89 @@ namespace spring.ViewModels
             awePlotModelY.InvalidatePlot(true);
             awePlotModelZ.InvalidatePlot(true);
         }
-        private void Draw3d(int t, DerivativesEnum Deriv)
+        private void Draw3d()
         {
             if (Derivatives != null && Derivatives.Length > 0)
             {
-                Application.Current.Dispatcher.Invoke(delegate
+                Vector3Collection NodePositions = GetNodePositions(0);
+                Vector3Collection ElementPositions = GetElementPositions(0);
+                var indices = new IntCollection(ElementPositions.Count * 2);
+                for (int i = 0; i < ElementPositions.Count - 1; ++i)
                 {
-                    Objs3d.Clear();
-                    Load3d();
-                    Objs3d.Add(new CubeVisual3D
-                    {
-                        Center = new Point3D(Derivatives[0][t].p.x * 10E2,
-                                             Derivatives[0][t].p.z * 10E2,
-                                             Derivatives[0][t].p.y * 10E2),
-                        SideLength = .8,
-                        Fill = Brushes.Gray
-                    });
-                    Objs3d.Add(new CubeVisual3D
-                    {
-                        Center = new Point3D(Derivatives[Derivatives.Length - 1][t].p.x * 10E2,
-                                             Derivatives[Derivatives.Length - 1][t].p.z * 10E2,
-                                             Derivatives[Derivatives.Length - 1][t].p.y * 10E2),
-                        SideLength = .8,
-                        Fill = Brushes.Gray
-                    });
-                    for (int node = 0; node < Derivatives.Length - 1; node++)
-                    {
-                        Objs3d.Add(new LinesVisual3D
-                        {
-                            Points = { new Point3D(Derivatives[node][t].p.x * 10E2,
-                                                Derivatives[node][t].p.z * 10E2,
-                                                Derivatives[node][t].p.y * 10E2),
-                            new Point3D(Derivatives[node + 1][t].p.x * 10E2,
-                                        Derivatives[node + 1][t].p.z * 10E2,
-                                        Derivatives[node + 1][t].p.y * 10E2) },
-                            Thickness = 2,
-                            Color = Brushes.Blue.Color
-                        });
-                        Objs3d.Add(new SphereVisual3D
-                        {
-                            Center = new Point3D(Derivatives[node][t].p.x * 10E2,
-                                                Derivatives[node][t].p.z * 10E2,
-                                                Derivatives[node][t].p.y * 10E2),
-                            Radius = .3,
-                            Fill = Brushes.Black
-                        });
-                    }
-                });
+                    indices.Add(i);
+                    indices.Add(i + 1);
+                }
+                Lines3d.Indices = indices;
+                var RedPositions = new Vector3Collection
+                {
+                    new Vector3(Derivatives[0][CurrT].p.x * 10E2f,
+                                        Derivatives[0][CurrT].p.y * 10E2f,
+                                        Derivatives[0][CurrT].p.z * 10E2f),
+                    new Vector3(Derivatives[Derivatives.Length - 1][CurrT].p.x * 10E2f,
+                                        Derivatives[Derivatives.Length - 1][CurrT].p.y * 10E2f,
+                                        Derivatives[Derivatives.Length - 1][CurrT].p.z * 10E2f)
+                };
+                var l = ModelProperties.L * 1000;
+                context.Send((o) =>
+                {
+                    Lines3d.Positions = ElementPositions;
+                    BlackPoints3d.Positions = NodePositions;
+                    RedPoints3d.Positions = RedPositions;
+                    Lines3d.UpdateBounds();
+                    BlackPoints3d.UpdateBounds();
+                    RedPoints3d.UpdateBounds();
+                    Camera.Position = new Point3D(l / 2, 0, l * 2);
+                    Camera.LookDirection = new Vector3D(0, 0, -(l * 2));
+                    Camera.UpDirection = new Vector3D(0, 1, 0);
+                }, null);
+            }
+        }
+        private Vector3Collection GetElementPositions(int timeMoment)
+        {
+            var Positions = new Vector3Collection();
+            for (int node = 0; node < Derivatives.Length - 1; node++)
+            {
+                Positions.Add(new Vector3(Derivatives[node][timeMoment].p.x * 10E2f,
+                                        Derivatives[node][timeMoment].p.y * 10E2f,
+                                        Derivatives[node][timeMoment].p.z * 10E2f));
+                Positions.Add(new Vector3(Derivatives[node + 1][timeMoment].p.x * 10E2f,
+                                        Derivatives[node + 1][timeMoment].p.y * 10E2f,
+                                        Derivatives[node + 1][timeMoment].p.z * 10E2f));
+            }
+            return Positions;
+        }
+        private Vector3Collection GetNodePositions(int timeMoment)
+        {
+            var Positions = new Vector3Collection();
+            for (int node = 1; node < Derivatives.Length -1; node++)
+            {
+                Positions.Add(new Vector3(Derivatives[node][timeMoment].p.x * 10E2f,
+                                        Derivatives[node][timeMoment].p.y * 10E2f,
+                                        Derivatives[node][timeMoment].p.z * 10E2f));
+            }
+            return Positions;
+        }
+        private void Update3dPositions()
+        {
+            if (Derivatives != null && Derivatives.Length > 0 && Lines3d.Positions != null)
+            {
+                var RedPositions = new Vector3Collection
+                {
+                    new Vector3(Derivatives[0][CurrT].p.x * 10E2f,
+                                        Derivatives[0][CurrT].p.y * 10E2f,
+                                        Derivatives[0][CurrT].p.z * 10E2f),
+                    new Vector3(Derivatives[Derivatives.Length - 1][CurrT].p.x * 10E2f,
+                                        Derivatives[Derivatives.Length - 1][CurrT].p.y * 10E2f,
+                                        Derivatives[Derivatives.Length - 1][CurrT].p.z * 10E2f)
+                };
+                Vector3Collection NodePositions = GetNodePositions(CurrT);
+                Vector3Collection ElementPositions = GetElementPositions(CurrT);
+                context.Send((o) =>
+                {
+                    Lines3d.Positions = ElementPositions;
+                    BlackPoints3d.Positions = NodePositions;
+                    RedPoints3d.Positions = RedPositions;
+                }, null);
             }
         }
     }
