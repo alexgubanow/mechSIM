@@ -115,10 +115,10 @@ namespace spring.ViewModels
 
         private void GetResults(ModelProperties _ModelProperties)
         {
-            int step = _ModelProperties.Counts;
-            if (_ModelProperties.Counts > (int)SystemParameters.PrimaryScreenWidth / 2)
+            int step = 1;
+            if (_ModelProperties.Counts() > (int)SystemParameters.PrimaryScreenWidth / 2)
             {
-                step = _ModelProperties.Counts / ((int)SystemParameters.PrimaryScreenWidth / 2);
+                step = _ModelProperties.Counts() / ((int)SystemParameters.PrimaryScreenWidth / 2);
             }
             float[] TimeArr = Array.Empty<float>();
             DerivativesContainerManaged[][] Derivatives = Array.Empty<DerivativesContainerManaged[]>();

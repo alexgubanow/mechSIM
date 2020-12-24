@@ -4,13 +4,12 @@
 class ModelPropertiesNative
 {
 public:
-	float DampRatio;
 	float MaxU;
-	float initDrop;
 	size_t nodes;
 	float E;
 	float L;
 	float D;
+	float ObservationTime;
 	int Counts;
 	float dt;
 	float ro;

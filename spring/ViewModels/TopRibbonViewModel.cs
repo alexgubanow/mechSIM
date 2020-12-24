@@ -15,20 +15,10 @@ namespace spring.ViewModels
         private ModelProperties ModelProperties { get { return (ModelProperties)Application.Current.Properties["ModelProperties"]; } }
         private DerivativesEnum selDeriv;
         public DerivativesEnum SelDeriv { get => selDeriv; set { selDeriv = value; _ea.GetEvent<SelDerivChangedEvent>().Publish(value); } }
-        public float DampRatio
-        {
-            get => ModelProperties.DampRatio;
-            set => SetProperty(ref ModelProperties.DampRatio, value);
-        }
         public float MaxU
         {
             get => ModelProperties.MaxU;
             set => SetProperty(ref ModelProperties.MaxU, value);
-        }
-        public float initDrop
-        {
-            get => ModelProperties.initDrop;
-            set => SetProperty(ref ModelProperties.initDrop, value);
         }
         public ulong nodes
         {
@@ -50,10 +40,10 @@ namespace spring.ViewModels
             get => ModelProperties.D;
             set => SetProperty(ref ModelProperties.D, value);
         }
-        public int Counts
+        public float ObservationTime
         {
-            get => ModelProperties.Counts;
-            set => SetProperty(ref ModelProperties.Counts, value);
+            get => ModelProperties.ObservationTime;
+            set => SetProperty(ref ModelProperties.ObservationTime, value);
         }
         public float dt
         {
@@ -97,12 +87,10 @@ namespace spring.ViewModels
                 L = 25E-3f,
                 D = 1E-3f,
                 ro = 1040,
-                Counts = 100000,
+                ObservationTime = 0.8f,
                 dt = 1E-6f,
                 nodes = 9,
-                initDrop = 1E-08f,
-                MaxU = 2E-2f,
-                DampRatio = 1
+                MaxU = 2E-2f
             };
         }
     }
