@@ -3,31 +3,31 @@
 #include <string>
 #include <vector>
 
-class matioWrap
+class matReader
 {
-    mat_t* mat;
+    mat_t* matFile;
 public:
-    matioWrap(const std::string& MATFile)
+    matReader(const char* MATFile)
     {
-        mat = Mat_Open(MATFile.c_str(), MAT_ACC_RDONLY);
-        if (!mat)
+        matFile = Mat_Open(MATFile, MAT_ACC_RDONLY);
+        if (!matFile)
         {
             char errBuff[2048];
-            snprintf(errBuff, sizeof(errBuff), "Failed to open file: \"%s\"", MATFile.c_str());
+            snprintf(errBuff, sizeof(errBuff), "Failed to open file: \"%s\"", MATFile);
             throw (const char*)errBuff;
         }
     }
-    ~matioWrap()
+    ~matReader()
     {
-        if (mat)
+        if (matFile)
         {
-            Mat_Close(mat);
+            Mat_Close(matFile);
         }
-        mat = NULL;
+        matFile = NULL;
     }
     void readFloatArr(const char* varName, std::vector<float>& pArr)
     {
-        matvar_t* matVar = Mat_VarRead(mat, (char*)varName);
+        matvar_t* matVar = Mat_VarRead(matFile, (char*)varName);
         if (matVar)
         {
             const float* xData = static_cast<const float*>(matVar->data);
@@ -36,16 +36,62 @@ public:
         Mat_VarFree(matVar);
         matVar = NULL;
     }
-    static void writeFloatArr(const char* filename, const char* varName, std::vector<float>& pArr)
+};
+
+
+class matWriter
+{
+    mat_t* matFile;
+public:
+    matWriter(const char* MATFile)
     {
-        mat_t* matfp = NULL; //matfp contains pointer to MAT file or NULL on failure
-        matfp = Mat_CreateVer(filename, NULL, MAT_FT_MAT5); //or MAT_FT_MAT4 / MAT_FT_MAT73
-        size_t dim1d[1] = { pArr.size() };
-        matvar_t* matVar = Mat_VarCreate(varName, MAT_C_SINGLE, MAT_T_SINGLE, 1, dim1d, &pArr.front(), 0); //rank 1
-        Mat_VarWrite(matfp, matVar, MAT_COMPRESSION_NONE);
+        matFile = Mat_CreateVer(MATFile, NULL, MAT_FT_DEFAULT);
+        if (!matFile)
+        {
+            char errBuff[2048];
+            snprintf(errBuff, sizeof(errBuff), "Failed to create file: \"%s\"", MATFile);
+            throw (const char*)errBuff;
+        }
+    }
+    ~matWriter()
+    {
+        if (matFile)
+        {
+            Mat_Close(matFile);
+        }
+        matFile = NULL;
+    }
+    void writeFloatArr(const char* varName, std::vector<float>& value)
+    {
+        size_t dim1d[1] = { value.size() };
+        matvar_t* matVar = Mat_VarCreate(varName, MAT_C_SINGLE, MAT_T_SINGLE, 1, dim1d, &value.front(), 0);
+        Mat_VarWrite(matFile, matVar, MAT_COMPRESSION_NONE);
         Mat_VarFree(matVar);
         matVar = NULL;
-        Mat_Close(matfp);
+    }
+    void writeString(const char* varName,const std::string& value)
+    {
+        size_t dim[2] = { 1, value.size() };
+        matvar_t* matVar = Mat_VarCreate(varName, MAT_C_CHAR, MAT_T_UTF8, 2, dim, (void *)&value.front(), 0);
+        Mat_VarWrite(matFile, matVar, MAT_COMPRESSION_NONE);
+        Mat_VarFree(matVar);
+        matVar = NULL;
+    }
+    void writeFloat(const char* varName, float value)
+    {
+        size_t dim[2] = { 1, 1 };
+        matvar_t* matVar = Mat_VarCreate(varName, MAT_C_SINGLE, MAT_T_SINGLE, 2, dim, &value, 0);
+        Mat_VarWrite(matFile, matVar, MAT_COMPRESSION_NONE);
+        Mat_VarFree(matVar);
+        matVar = NULL;
+    }
+    void writeInt(const char* varName, int value)
+    {
+        size_t dim[2] = { 1, 1 };
+        matvar_t* matVar = Mat_VarCreate(varName, MAT_C_INT32, MAT_T_INT32, 2, dim, &value, 0);
+        Mat_VarWrite(matFile, matVar, MAT_COMPRESSION_NONE);
+        Mat_VarFree(matVar);
+        matVar = NULL;
     }
 };
 

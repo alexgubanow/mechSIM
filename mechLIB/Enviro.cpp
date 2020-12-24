@@ -3,6 +3,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "maf.hpp"
+#include <ctime>
+#include <chrono>
 
 using namespace mechLIB;
 
@@ -18,8 +20,7 @@ Enviro::Enviro(ModelPropertiesNative _phProps, const std::string& _loadFile) : l
 {
 	if (loadFile.size() > 0)
 	{
-		matioWrap* matioW = NULL;
-		matioW = new matioWrap(loadFile);
+		auto matioW = new matReader(loadFile.c_str());
 		if (matioW)
 		{
 			matioW->readFloatArr("pmxq", pmxq);
@@ -92,6 +93,16 @@ void Enviro::GenerateLoad(C_t axis)
 		rope->Nodes[lastN].u[t] = rope->Nodes[lastN].p[t] - rope->Nodes[lastN].p[0];*/
 	}
 }
+std::string getDataTimeNow()
+{
+	std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+	std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+	std::tm now_tm;
+	localtime_s(&now_tm, &now_c);
+	char buffer[80];
+	strftime(buffer, sizeof(buffer), "%d-%m-%Y_%H-%M-%S", &now_tm);
+	return buffer;
+}
 void Enviro::Run(bool NeedToSaveResults)
 {
 	IsRunning = true;
@@ -100,7 +111,7 @@ void Enviro::Run(bool NeedToSaveResults)
 		rope->StepOverNodes(t, Re[t - 1], phProps.dt);
 		for (int i = 0; i < rope->ElementsSize; i++)
 		{
-			rope->L[t] += rope->Elements[i].L[t];
+			rope->L[t] += rope->Elements[i].GetOwnLength(t - 1);
 			if (!ableToRun)
 			{
 				break;
@@ -113,29 +124,38 @@ void Enviro::Run(bool NeedToSaveResults)
 	}
 	if (NeedToSaveResults && ableToRun)
 	{
-		std::string varName = "L";
+		std::string resultsFileName = "expr_";
+		/*if (loadFile.size() > 0)
+		{
+			resultsFileName += loadFile.substr(loadFile.size() - 3, 3);
+		}*/
+		resultsFileName += getDataTimeNow();
+		resultsFileName += ".mat";
+		auto mat = new matWriter(resultsFileName.c_str());
+		std::string PhysicalModelSTR;
 		switch (phProps.PhysicalModel)
 		{
 		case PhysicalModelEnum::hook:
-			varName += "hook";
+			PhysicalModelSTR = "hook";
 			break;
 		case PhysicalModelEnum::hookGeomNon:
-			varName += "hookGeomNon";
+			PhysicalModelSTR = "hookGeomNon";
 			break;
 		case PhysicalModelEnum::mooneyRiv:
-			varName += "mooneyRiv";
+			PhysicalModelSTR = "mooneyRiv";
 			break;
 		default:
-			varName += "";
+			PhysicalModelSTR = "";
 			break;
 		}
-		std::string resultsFileName = varName;
-		if (loadFile.size() > 0)
-		{
-			resultsFileName += loadFile.substr(loadFile.size() - 3, 3);
-		}
-		resultsFileName += ".mat";
-		matioWrap::writeFloatArr(resultsFileName.c_str(), varName.c_str(), rope->L);
+		mat->writeString("PhysicalModel", PhysicalModelSTR);
+		mat->writeFloat("dt", phProps.dt);
+		mat->writeInt("nodes", phProps.nodes);
+		mat->writeFloat("E", phProps.E);
+		mat->writeFloat("ro", phProps.ro);
+		mat->writeFloat("D", phProps.D);
+		mat->writeFloatArr("L", rope->L);
+		delete mat;
 	}
 	IsRunning = false;
 }

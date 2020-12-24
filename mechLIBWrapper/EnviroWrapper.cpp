@@ -31,10 +31,12 @@ void EnviroWrapper::Run(bool NeedToSaveResults)
 	}
 	catch (const char* ex)
 	{
+		world->IsRunning = false;
 		throw gcnew System::String(ex);
 	}
 	catch (...)
 	{
+		world->IsRunning = false;
 		throw "Something went very wrong";
 	}
 }
