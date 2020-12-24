@@ -16,6 +16,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
@@ -108,7 +109,18 @@ namespace spring.ViewModels
             _ea.GetEvent<ComputeIsStartedEvent>().Subscribe(() => ClearDataView());
             _ea.GetEvent<SelDerivChangedEvent>().Subscribe((var) => { SelDeriv = var; if (IsArrayExist) { DrawPlots(); } });
         }
-
+        public void MouseRightButtonDownCallback(object sender, MouseButtonEventArgs e)
+        {
+            var viewport = sender as Viewport3DX;
+            if (viewport == null) { return; }
+            var point = e.GetPosition(viewport);
+            var hitTests = viewport.FindHits(point);
+            if (hitTests != null && hitTests.Count > 0)
+            {
+                int sdfvgs = 0;
+            }
+            var asd = viewport.FindNearestPoint(point);
+        }
         private void ClearDataView()
         {
             CurrT = 0;
@@ -222,6 +234,9 @@ namespace spring.ViewModels
                     Lines3d.Positions = ElementPositions;
                     BlackPoints3d.Positions = NodePositions;
                     RedPoints3d.Positions = RedPositions;
+                    Lines3d.UpdateBounds();
+                    BlackPoints3d.UpdateBounds();
+                    RedPoints3d.UpdateBounds();
                     Camera.Position = new Point3D(l / 2, 0, l * 2);
                     Camera.LookDirection = new Vector3D(0, 0, -(l * 2));
                     Camera.UpDirection = new Vector3D(0, 1, 0);
