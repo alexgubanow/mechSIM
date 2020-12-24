@@ -85,10 +85,18 @@ public:
         Mat_VarFree(matVar);
         matVar = NULL;
     }
-    void writeInt(const char* varName, int value)
+    void writeINT32(const char* varName, int value)
     {
         size_t dim[2] = { 1, 1 };
         matvar_t* matVar = Mat_VarCreate(varName, MAT_C_INT32, MAT_T_INT32, 2, dim, &value, 0);
+        Mat_VarWrite(matFile, matVar, MAT_COMPRESSION_NONE);
+        Mat_VarFree(matVar);
+        matVar = NULL;
+    }
+    void writeUINT64(const char* varName, size_t value)
+    {
+        size_t dim[2] = { 1, 1 };
+        matvar_t* matVar = Mat_VarCreate(varName, MAT_C_UINT64, MAT_T_UINT64, 2, dim, &value, 0);
         Mat_VarWrite(matFile, matVar, MAT_COMPRESSION_NONE);
         Mat_VarFree(matVar);
         matVar = NULL;

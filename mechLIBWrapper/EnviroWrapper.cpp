@@ -58,9 +58,9 @@ void EnviroWrapper::Stop()
 
 void EnviroWrapper::GetDerivatives(int step, array<array<mechLIB::DerivativesContainerManaged^>^>^% arr)
 {
-	arr = gcnew array<array<mechLIB::DerivativesContainerManaged^>^>((int)world->rope->NodesSize);
+	arr = gcnew array<array<mechLIB::DerivativesContainerManaged^>^>((int)world->rope->Nodes.size());
 #pragma omp parallel for
-	for (int n = 0; n < world->rope->NodesSize; n++)
+	for (int n = 0; n < world->rope->Nodes.size(); n++)
 	{
 		arr[n] = gcnew array<mechLIB::DerivativesContainerManaged^>(world->phProps.Counts / step);
 		int tout = 0;

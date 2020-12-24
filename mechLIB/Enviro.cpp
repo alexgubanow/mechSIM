@@ -33,11 +33,10 @@ Enviro::Enviro(ModelPropertiesNative _phProps, const std::string& _loadFile) : l
 			matioW->readFloatArr("abpq", bloodP);
 			phProps.Counts = (int)time.size();
 
-			rope = new Rope_t();
-			rope->init(&phProps);
-			rope->SetupNodesPositions(&phProps, DirectX::SimpleMath::Vector3(pmxq[0], pmyq[0], 0),
+			rope = new Rope_t(&phProps);
+			rope->SetupNodesPositions(DirectX::SimpleMath::Vector3(pmxq[0], pmyq[0], 0),
 				DirectX::SimpleMath::Vector3(plxq[0], plyq[0], 0));
-			rope->EvalElements(&phProps);
+			rope->EvalElements();
 			size_t lastN = phProps.nodes - 1;
 			for (int t = 0; t < phProps.Counts; t++)
 			{
@@ -58,10 +57,9 @@ Enviro::Enviro(ModelPropertiesNative _phProps, const std::string& _loadFile) : l
 	else
 	{
 		allocateTime(phProps.dt, phProps.Counts);
-		rope = new Rope_t();
-		rope->init(&phProps);
-		rope->SetupNodesPositions(&phProps);
-		rope->EvalElements(&phProps);
+		rope = new Rope_t(&phProps);
+		rope->SetupNodesPositions();
+		rope->EvalElements();
 		GenerateLoad(C_t::x);
 	}
 }
@@ -109,7 +107,7 @@ void Enviro::Run(bool NeedToSaveResults)
 	for (size_t t = 1; t < phProps.Counts; t++)
 	{
 		rope->StepOverNodes(t, Re[t - 1], phProps.dt);
-		for (int i = 0; i < rope->ElementsSize; i++)
+		for (int i = 0; i < rope->Elements.size(); i++)
 		{
 			rope->L[t] += rope->Elements[i].GetOwnLength(t - 1);
 			if (!ableToRun)
@@ -150,7 +148,7 @@ void Enviro::Run(bool NeedToSaveResults)
 		}
 		mat->writeString("PhysicalModel", PhysicalModelSTR);
 		mat->writeFloat("dt", phProps.dt);
-		mat->writeInt("nodes", phProps.nodes);
+		mat->writeUINT64("nodes", phProps.nodes);
 		mat->writeFloat("E", phProps.E);
 		mat->writeFloat("ro", phProps.ro);
 		mat->writeFloat("D", phProps.D);

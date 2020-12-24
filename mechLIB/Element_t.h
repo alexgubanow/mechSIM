@@ -11,14 +11,11 @@ class Element_t
 
 private:
 	ModelPropertiesNative* modelProperties;
-	float A;
-	float I;
 public:
 	Node_t* n1;
 	Node_t* n2;
 	std::vector<float> L;
 	std::vector<DirectX::SimpleMath::Vector3> F;
-	Element_t() : modelProperties(nullptr), A(0), I(0), n1(0), n2(0), L(0), F(0) { }
 	~Element_t() { }
 	void init(Node_t* _n1, Node_t* _n2, ModelPropertiesNative* _props);
 	void CalcForce(Node_t* baseNode, size_t t, float Re, float bloodV, float bloodP);

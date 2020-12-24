@@ -60,6 +60,11 @@ namespace spring.ViewModels
             get => ModelProperties.PhysicalModel;
             set => SetProperty(ref ModelProperties.PhysicalModel, value);
         }
+        public IntegrationSchemesEnum IntegrationSchema
+        {
+            get => ModelProperties.IntegrationSchema;
+            set => SetProperty(ref ModelProperties.IntegrationSchema, value);
+        }
         public bool NeedToSaveResults
         {
             get => (bool)Application.Current.Properties["NeedToSaveResults"];

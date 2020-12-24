@@ -24,6 +24,9 @@
             <ComboBox MinWidth="150" Margin="0,0,5,0" 
                       ItemsSource="{Binding Source={lcl:EnumBindingSource {x:Type mLib:PhysicalModelEnum}}}"
                       SelectedValue="{Binding PhysicalModel}"/>
+            <ComboBox MinWidth="150" Margin="0,0,5,0" 
+                      ItemsSource="{Binding Source={lcl:EnumBindingSource {x:Type mLib:IntegrationSchemesEnum}}}"
+                      SelectedValue="{Binding IntegrationSchema}"/>
             <StackPanel Margin="5,0,0,0">
                 <Label Content="E, Pa:" HorizontalAlignment="Left"/>
                 <TextBox Text="{Binding E}"/>

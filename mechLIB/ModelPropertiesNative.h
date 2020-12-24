@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "PhysicalModelEnum.h"
+#include "IntegrationSchemesEnum.h"
 
 class ModelPropertiesNative
 {
@@ -13,5 +14,8 @@ public:
 	int Counts;
 	float dt;
 	float ro;
+	float A;
+	float I;
 	mechLIB::PhysicalModelEnum PhysicalModel;
+	mechLIB::IntegrationSchemesEnum IntegrationSchema;
 };

@@ -175,6 +175,7 @@
     <ClInclude Include="Enviro.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="integr.h" />
+    <ClInclude Include="IntegrationSchemesEnum.h" />
     <ClInclude Include="maf.hpp" />
     <ClInclude Include="matioWrap.h" />
     <ClInclude Include="ModelPropertiesNative.h" />

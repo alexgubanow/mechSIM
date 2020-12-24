@@ -2,6 +2,7 @@
 #include "maf.hpp"
 #include "DerivativesEnum.h"
 #include "DerivativesContainer.h"
+#include "IntegrationSchemesEnum.h"
 
 class Integr
 {
@@ -10,7 +11,6 @@ private:
 	const float v2 = 5.0f / 12.0f;
 	const float v3 = 1.0f;
 	const float v4 = 1.0f;
-public:
 	static void EulerExpl(mechLIB::DerivativesEnum nodeLoad, DerivativesContainer& now, const DerivativesContainer& before,
 		const DerivativesContainer& zero, float dt)
 	{
@@ -91,4 +91,27 @@ public:
 	//{
 	//    return new float[3] { aNow[(int)C.X] - aBefore[(int)C.X], 0, 0 };
 	//}
+public:
+	static void Integrate(mechLIB::IntegrationSchemesEnum IntegrationSchema, mechLIB::DerivativesEnum nodeLoad, DerivativesContainer& now, const DerivativesContainer& before,
+		const DerivativesContainer& zero, float dt)
+	{
+
+		switch (IntegrationSchema)
+		{
+		case mechLIB::IntegrationSchemesEnum::Euler:
+			EulerExpl(nodeLoad, now, before, zero, dt);
+			break;
+		case mechLIB::IntegrationSchemesEnum::Verlet:
+			Verlet(nodeLoad, now, before, zero, dt);
+			break;
+		case mechLIB::IntegrationSchemesEnum::GearPC:
+			break;
+		case mechLIB::IntegrationSchemesEnum::maxIntegrationSchemesEnum:
+			throw "Unexpected IntegrationSchemesEnum";
+			break;
+		default:
+			throw "Unexpected IntegrationSchemesEnum";
+			break;
+		}
+	}
 };

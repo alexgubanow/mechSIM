@@ -6,25 +6,26 @@
 #include "omp.h"
 
 using namespace DirectX::SimpleMath;
+using namespace mechLIB;
 
-Node_t::Node_t() : freedom(), LoadType(), Neigs(0)
+Node_t::Node_t() : freedom(), LoadType(), Members(0)
 {
 }
 Node_t::~Node_t()
 {
 }
 void Node_t::init(size_t tCounts, Vector3 coords,
-	NodeFreedom _freedom, mechLIB::DerivativesEnum _LoadType, std::vector<Element_t*> _Neigs)
+	NodeFreedom _freedom, DerivativesEnum _LoadType, std::vector<Element_t*> _Members)
 {
 	freedom = _freedom;
 	LoadType = _LoadType;
-	Neigs = _Neigs;
+	Members = _Members;
 	Derivatives = std::vector<DerivativesContainer>(tCounts);
 	Derivatives[0].p = coords;
 }
 void Node_t::CalcAccel(size_t t, float m)
 {
-	if (LoadType != mechLIB::DerivativesEnum::p)
+	if (LoadType != DerivativesEnum::p)
 	{
 		Derivatives[t].a.x = Derivatives[t].F.x / m;
 		Derivatives[t].a.y = Derivatives[t].F.y / m;
@@ -38,13 +39,13 @@ void Node_t::GetForces(size_t t, float m)
 	Derivatives[t].F.y += m * _g;
 	/*getting element forces*/
 	float x = 0.0, y = 0.0, z = 0.0;
-	for (auto element : Neigs)
+	for (size_t i = 0; i < Members.size(); i++)
 	{
 		//push it to this force pull
-		element->CalcForce(this, t, 0, 0, 0);
-		x += element->F[t].x;
-		y += element->F[t].y;
-		z += element->F[t].z;
+		Members[i]->CalcForce(this, t, 0, 0, 0);
+		x += Members[i]->F[t].x;
+		y += Members[i]->F[t].y;
+		z += Members[i]->F[t].z;
 	}
 	Derivatives[t].F.x += x;
 	Derivatives[t].F.y += y;
@@ -52,10 +53,10 @@ void Node_t::GetForces(size_t t, float m)
 }
 void Node_t::GetPhysicParam(size_t t, float Re, float& m)
 {
-	for (auto element : Neigs)
+	for (size_t i = 0; i < Members.size(); i++)
 	{
 		float mElem = 0;
-		element->GetPhysicParam(t, Re, mElem);
+		Members[i]->GetPhysicParam(t, Re, mElem);
 		m += mElem;
 	}
 	if (m <= 0)
@@ -63,7 +64,7 @@ void Node_t::GetPhysicParam(size_t t, float Re, float& m)
 		throw "Calculated mass of node can't be eaqul to zero";
 	}
 }
-void Node_t::Integrate(size_t now, size_t before, float dt)
+void Node_t::Integrate(IntegrationSchemesEnum IntegrationSchema, size_t now, size_t before, float dt)
 {
-	Integr::EulerExpl(LoadType, Derivatives[now], Derivatives[before], Derivatives[0], dt);
+	Integr::Integrate(IntegrationSchema, LoadType, Derivatives[now], Derivatives[before], Derivatives[0], dt);
 }

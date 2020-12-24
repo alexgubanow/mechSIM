@@ -15,6 +15,7 @@ public:
 	float dt;
 	float ro;
 	mechLIB::PhysicalModelEnum PhysicalModel;
+	mechLIB::IntegrationSchemesEnum IntegrationSchema;
 	ModelPropertiesNative getNative(void)
 	{
 		ModelPropertiesNative tmp{};
@@ -27,7 +28,10 @@ public:
 		tmp.dt = dt;
 		tmp.Counts = Counts();
 		tmp.ro = ro;
+		tmp.A = 3.14159265358979323846f * D * D;
+		tmp.I = (tmp.A * tmp.A * tmp.A) / 12.0f;
 		tmp.PhysicalModel = PhysicalModel;
+		tmp.IntegrationSchema = IntegrationSchema;
 		return tmp;
 	}
 };

@@ -60,6 +60,9 @@
     <ClInclude Include="DerivativesEnum.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IntegrationSchemesEnum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Element_t.cpp">

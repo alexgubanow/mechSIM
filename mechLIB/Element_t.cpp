@@ -15,8 +15,6 @@ void Element_t::init(Node_t* _n1, Node_t* _n2, ModelPropertiesNative* _props)
 	F = std::vector<Vector3>(modelProperties->Counts);
 	n1 = _n1;
 	n2 = _n2;
-	A = (float)M_PI * maf::P2(modelProperties->D);
-	I = maf::P3(A) / 12.0f;
 }
 
 void Element_t::CalcForce(Node_t* baseNode, size_t t, float Re, float bloodV, float bloodP)
@@ -64,7 +62,7 @@ void Element_t::GetForceForNode(size_t t, Node_t* baseP, Vector3& force)
 void Element_t::GetPhysicParam(size_t t, float Re, float& m)
 {
 	float len = GetOwnLength(t);
-	m += modelProperties->ro * A * len;
+	m += modelProperties->ro * modelProperties->A * len;
 	//if (Re > 0)
 	//{
 	//	//calc h of fluid on rod
@@ -106,7 +104,7 @@ void Element_t::GetFn(size_t t, const Vector3& deltaL, Vector3& force)
 
 void Element_t::calcHookFn(Vector3& Fn, float oldL, const Vector3& deltaL)
 {
-	Fn.x = 0 - (modelProperties->E * A / oldL * deltaL.x);
+	Fn.x = 0 - (modelProperties->E * modelProperties->A / oldL * deltaL.x);
 	//Fn[(int)C.y] = 12f * E * I / maf.P3(oldL2) * oldUy2;
 }
 
@@ -116,7 +114,7 @@ void Element_t::calcMooneyRivlinFn(Vector3& Fn, float oldL, const Vector3& delta
 	const float C10 = 22956961.3f;
 	const float C01 = -23512872.8f;
 	float sigma = 2 * C10 * (lamdax - (1 / maf::P2(lamdax))) + 2 * C01 * (1 - (1 / maf::P3(lamdax)));
-	Fn.x = A * sigma;
+	Fn.x = modelProperties->A * sigma;
 }
 
 void Element_t::GetPressureForce(size_t t, float bloodP, float L)
