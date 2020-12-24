@@ -45,24 +45,16 @@
                 <TextBox Text="{Binding D}"/>
             </StackPanel>
             <StackPanel Margin="5,0,0,0">
-                <Label Content="Time steps:" HorizontalAlignment="Left"/>
-                <TextBox Text="{Binding Counts}"/>
+                <Label Content="Observation time, s:" HorizontalAlignment="Left"/>
+                <TextBox Text="{Binding ObservationTime}"/>
             </StackPanel>
             <StackPanel Margin="5,0,0,0">
                 <Label Content="dt, s:" HorizontalAlignment="Left"/>
                 <TextBox Text="{Binding dt}"/>
             </StackPanel>
             <StackPanel Margin="5,0,0,0">
-                <Label Content="Initial drop, m:" HorizontalAlignment="Left"/>
-                <TextBox Text="{Binding initDrop}"/>
-            </StackPanel>
-            <StackPanel Margin="5,0,0,0">
                 <Label Content="Max U, m:" HorizontalAlignment="Left"/>
                 <TextBox Text="{Binding MaxU}"/>
-            </StackPanel>
-            <StackPanel Margin="5,0,0,0">
-                <Label Content="Damping ratio:" HorizontalAlignment="Left"/>
-                <TextBox Text="{Binding DampRatio}"/>
             </StackPanel>
             <ComboBox DockPanel.Dock="Top" 
                 ItemsSource="{Binding Source={lcl:EnumBindingSource {x:Type mLib:DerivativesEnum}}}"

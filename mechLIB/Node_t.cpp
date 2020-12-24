@@ -32,13 +32,10 @@ void Node_t::CalcAccel(size_t t, float m)
 	}
 
 }
-void Node_t::GetForces(size_t t, float m, float c)
+void Node_t::GetForces(size_t t, float m)
 {
 	//gravity force
 	Derivatives[t].F.y += m * _g;
-	//damping force
-	Derivatives[t].F.x += 0 - (c * Derivatives[t - 1].v.x);
-	Derivatives[t].F.y += 0 - (c * Derivatives[t - 1].v.y);
 	/*getting element forces*/
 	float x = 0.0, y = 0.0, z = 0.0;
 	for (auto element : Neigs)
@@ -48,24 +45,19 @@ void Node_t::GetForces(size_t t, float m, float c)
 		x += element->F[t].x;
 		y += element->F[t].y;
 		z += element->F[t].z;
-		//F[t] += element->F[t];
 	}
 	Derivatives[t].F.x += x;
 	Derivatives[t].F.y += y;
 	Derivatives[t].F.z += z;
 }
-void Node_t::GetPhysicParam(size_t t, float Re, float& m, float& c)
+void Node_t::GetPhysicParam(size_t t, float Re, float& m)
 {
 	for (auto element : Neigs)
 	{
 		float mElem = 0;
-		float cElem = 0;
-		element->GetPhysicParam(t, Re, mElem, cElem);
-		c += cElem;
+		element->GetPhysicParam(t, Re, mElem);
 		m += mElem;
 	}
-	//m = 1E-04f;
-	c /= Neigs.size();
 	if (m <= 0)
 	{
 		throw "Calculated mass of node can't be eaqul to zero";

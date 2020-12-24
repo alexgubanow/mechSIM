@@ -21,8 +21,8 @@ public:
 	void init(size_t tCounts, DirectX::SimpleMath::Vector3 coords, NodeFreedom _freedom, 
 		mechLIB::DerivativesEnum _LoadType, std::vector<Element_t*> _Neigs);
 	void CalcAccel(size_t t, float m);
-	void GetForces(size_t t, float m, float c);
-	void GetPhysicParam(size_t t, float Re, float& m, float& c);
+	void GetForces(size_t t, float m);
+	void GetPhysicParam(size_t t, float Re, float& m);
 	void Integrate(size_t now, size_t before, float dt);
 };
 

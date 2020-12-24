@@ -61,7 +61,7 @@ void Element_t::GetForceForNode(size_t t, Node_t* baseP, Vector3& force)
 	}
 }
 
-void Element_t::GetPhysicParam(size_t t, float Re, float& m, float& c)
+void Element_t::GetPhysicParam(size_t t, float Re, float& m)
 {
 	float len = GetOwnLength(t);
 	m += modelProperties->ro * A * len;
@@ -74,10 +74,6 @@ void Element_t::GetPhysicParam(size_t t, float Re, float& m, float& c)
 	//	m += (float)M_PI * len * (maf::P2(rP1[t - 1].z + thFluid) -
 	//		maf::P2(rP1[t - 1].z)) * 1060;
 	//}
-	float alpha = 0 - ((sqrtf(5) * log10f(modelProperties->DampRatio)) /
-		(sqrtf(maf::P2(log10f(modelProperties->DampRatio)) + maf::P2((float)M_PI))));
-	float k = (modelProperties->E * A) / len;
-	c = alpha * sqrtf(m * k);
 }
 
 float Element_t::GetOwnLength(size_t t)
