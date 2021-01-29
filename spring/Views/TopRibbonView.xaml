@@ -56,8 +56,16 @@
                 <TextBox Text="{Binding dt}"/>
             </StackPanel>
             <StackPanel Margin="5,0,0,0">
+                <Label Content="Save to file n counts:" HorizontalAlignment="Left"/>
+                <TextBox Text="{Binding ToBeStoredCounts}"/>
+            </StackPanel>            
+            <StackPanel Margin="5,0,0,0">
                 <Label Content="Max U, m:" HorizontalAlignment="Left"/>
                 <TextBox Text="{Binding MaxU}"/>
+            </StackPanel>
+            <StackPanel Margin="5,0,0,0">
+                <Label Content="IsGravityEnabled" HorizontalAlignment="Left"/>
+                <CheckBox IsChecked="{Binding IsGravityEnabled}"/>
             </StackPanel>
             <ComboBox DockPanel.Dock="Top" 
                 ItemsSource="{Binding Source={lcl:EnumBindingSource {x:Type mLib:DerivativesEnum}}}"

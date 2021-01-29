@@ -12,10 +12,12 @@ public:
 	float D;
 	float ObservationTime;
 	int Counts;
+	int ToBeStoredCounts;
 	float dt;
 	float ro;
 	float A;
 	float I;
+	bool isGravityEnabled;
 	mechLIB::PhysicalModelEnum PhysicalModel;
 	mechLIB::IntegrationSchemesEnum IntegrationSchema;
 };

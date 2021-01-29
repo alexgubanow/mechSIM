@@ -50,6 +50,11 @@ namespace spring.ViewModels
             get => ModelProperties.dt;
             set => SetProperty(ref ModelProperties.dt, value);
         }
+        public int ToBeStoredCounts
+        {
+            get => ModelProperties.ToBeStoredCounts;
+            set => SetProperty(ref ModelProperties.ToBeStoredCounts, value);
+        }
         public float ro
         {
             get => ModelProperties.ro;
@@ -64,6 +69,11 @@ namespace spring.ViewModels
         {
             get => ModelProperties.IntegrationSchema;
             set => SetProperty(ref ModelProperties.IntegrationSchema, value);
+        }
+        public bool IsGravityEnabled
+        {
+            get => ModelProperties.isGravityEnabled;
+            set => SetProperty(ref ModelProperties.isGravityEnabled, value);
         }
         public bool NeedToSaveResults
         {
@@ -88,14 +98,15 @@ namespace spring.ViewModels
             Application.Current.Properties["NeedToSaveResults"] = false;
             Application.Current.Properties["ModelProperties"] = new ModelProperties()
             {
-                E = 6E6f,
+                E = 3.5E+08f,
                 L = 25E-3f,
                 D = 1E-3f,
                 ro = 1040,
-                ObservationTime = 0.8f,
+                ObservationTime = 1,
                 dt = 1E-6f,
+                ToBeStoredCounts = 20,
                 nodes = 9,
-                MaxU = 2E-2f
+                MaxU = 82.4668f
             };
         }
     }

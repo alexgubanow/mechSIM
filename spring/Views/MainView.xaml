@@ -6,7 +6,7 @@
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-             mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="800"
+             mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="1024"
     Effect="{Binding Path=win_Effect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
     <Grid>
         <Rectangle Panel.ZIndex="1000" x:Name="overlayrect" Fill="DarkGray" Opacity=".5"

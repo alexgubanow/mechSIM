@@ -46,18 +46,13 @@ void Element_t::CalcForce(Node_t* baseNode, size_t t, float Re, float bloodV, fl
 	GetFn(t, dcm.ToLoc(baseNode->Derivatives[t - 1].u) - dcm.ToLoc(oppositeNode->Derivatives[t - 1].u), forceInLocal);
 	//GetPressureForce(t, bloodP, L[t]);
 	//GetDragForce(t, Re, bloodV, L);
-	forceInLocal.z += -(modelProperties->MaxU);
+	if (modelProperties)
+	{
+		forceInLocal.z += -(modelProperties->MaxU);
+	}
 	dcm.ToGlob(forceInLocal, F[t]);
 }
 
-void Element_t::GetForceForNode(size_t t, Node_t* baseP, Vector3& force)
-{
-	force = F[t];
-	if (n1 != baseP)
-	{
-		force.x = -force.x;
-	}
-}
 
 void Element_t::GetPhysicParam(size_t t, float Re, float& m)
 {
