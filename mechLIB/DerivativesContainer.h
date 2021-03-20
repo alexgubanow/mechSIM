@@ -7,7 +7,6 @@
 struct DerivativesContainer
 {
 	DirectX::SimpleMath::Vector3 p;
-	DirectX::SimpleMath::Vector3 u;
 	DirectX::SimpleMath::Vector3 v;
 	DirectX::SimpleMath::Vector3 a;
 	DirectX::SimpleMath::Vector3 F;

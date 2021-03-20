@@ -19,10 +19,6 @@ namespace mechLIB {
 #endif
 	p,
 #if (_MANAGED == 1) || (_M_CEE == 1)
-		[Description("Displacement")]
-#endif
-	u,
-#if (_MANAGED == 1) || (_M_CEE == 1)
 		[Description("Velocity")]
 #endif
 	v,
