@@ -22,4 +22,5 @@ public:
 	void SetupNodesPositions(DirectX::SimpleMath::Vector3 startCoord, DirectX::SimpleMath::Vector3 endCoord);
 	void EvalElements();
 	void StepOverNodes(size_t t, float Re, float dt);
+	void StepOverElements(size_t t, float Re);
 };

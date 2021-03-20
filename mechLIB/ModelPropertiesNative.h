@@ -11,7 +11,7 @@ public:
 	float L;
 	float D;
 	float ObservationTime;
-	int Counts;
+	size_t Counts;
 	int ToBeStoredCounts;
 	float dt;
 	float ro;

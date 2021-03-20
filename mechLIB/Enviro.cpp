@@ -5,6 +5,7 @@
 #include "maf.hpp"
 #include <ctime>
 #include <chrono>
+#include <map>
 
 using namespace mechLIB;
 
@@ -93,11 +94,11 @@ void Enviro::GenerateLoad(C_t axis)
 		//rope->Nodes[lastN].Derivatives[t].F.x = (phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq / 2));
 		/*rope->Nodes[lastN].Derivatives[t].p.x = (phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq / 2)) +
 			rope->Nodes[lastN].Derivatives[0].p.x;*/
-		/*rope->Nodes[lastN].Derivatives[t].p.x = (phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq * 3)) +
-			rope->Nodes[lastN].Derivatives[0].p.x;*/
+			/*rope->Nodes[lastN].Derivatives[t].p.x = (phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq * 3)) +
+				rope->Nodes[lastN].Derivatives[0].p.x;*/
 
-		/*rope->Nodes[lastN].p[t].x = 0 - ((phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq / 2)) + rope->Nodes[lastN].p[0].x);
-		rope->Nodes[lastN].u[t] = rope->Nodes[lastN].p[t] - rope->Nodes[lastN].p[0];*/
+				/*rope->Nodes[lastN].p[t].x = 0 - ((phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq / 2)) + rope->Nodes[lastN].p[0].x);
+				rope->Nodes[lastN].u[t] = rope->Nodes[lastN].p[t] - rope->Nodes[lastN].p[0];*/
 	}
 }
 std::string getDataTimeNow()
@@ -115,6 +116,7 @@ void Enviro::Run(bool NeedToSaveResults)
 	IsRunning = true;
 	for (size_t t = 2; t < phProps.Counts; t++)
 	{
+		rope->StepOverElements(t, Re[t - 1]);
 		rope->StepOverNodes(t, Re[t - 1], phProps.dt);
 		for (int i = 0; i < rope->Elements.size(); i++)
 		{

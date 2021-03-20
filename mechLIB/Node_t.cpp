@@ -22,34 +22,32 @@ void Node_t::init(size_t tCounts, Vector3 coords,
 	Members = _Members;
 	Derivatives = std::vector<DerivativesContainer>(tCounts);
 	Derivatives[0].p = coords;
-}
-void Node_t::CalcAccel(size_t t, float m)
-{
-	if (LoadType != DerivativesEnum::p)
-	{
-		Derivatives[t].a.x = Derivatives[t].F.x / m;
-		Derivatives[t].a.y = Derivatives[t].F.y / m;
-		//deriv[t].a.z = F[t].z / m;//has to be different
-	}
-
+	Derivatives[1].p = coords;
 }
 void Node_t::GetForces(size_t t, float m)
 {
 	//gravity force
-	Derivatives[t].F.y += m * _g;
-	/*getting element forces*/
-	float x = 0.0, y = 0.0, z = 0.0;
+	/*if (modelProperties->isGravityEnabled)
+	{
+		Derivatives[t].F.y += m * _g;
+	}*/
+	//Derivatives[t].F.y += m * _g;
+	//pressure
+	//Derivatives[t].F.y += -0.1;
 	for (size_t i = 0; i < Members.size(); i++)
 	{
-		//push it to this force pull
-		Members[i]->CalcForce(this, t, 0, 0, 0);
-		x += Members[i]->F[t].x;
-		y += Members[i]->F[t].y;
-		z += Members[i]->F[t].z;
+		Node_t* oppositeNode = Members[i]->n1;
+		if (oppositeNode == this)
+		{
+			oppositeNode = Members[i]->n2;
+		}
+		//getting DCM for this link
+		dcm_t dcm(oppositeNode->Derivatives[t - 1].p - Derivatives[t - 1].p,
+			oppositeNode->Derivatives[t - 1].p.Cross(Derivatives[t - 1].p));
+		Derivatives[t].F += dcm.ToGlob(Members[i]->F[t]);
 	}
-	Derivatives[t].F.x += x;
-	Derivatives[t].F.y += y;
-	Derivatives[t].F.z += z;
+	//damping force
+	Derivatives[t].F += -(1 - 0.001) * Derivatives[t - 1].v;
 }
 void Node_t::GetPhysicParam(size_t t, float Re, float& m)
 {
