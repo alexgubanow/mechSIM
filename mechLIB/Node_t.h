@@ -24,6 +24,6 @@ public:
 	void CalcAccel(size_t t, float m);
 	void GetForces(size_t t, float m);
 	void GetPhysicParam(size_t t, float Re, float& m);
-	void Integrate(mechLIB::IntegrationSchemesEnum IntegrationSchema, size_t now, size_t before, float dt);
+	void Integrate(mechLIB::IntegrationSchemesEnum IntegrationSchema, size_t now, size_t before, float dt, float m);
 };
 

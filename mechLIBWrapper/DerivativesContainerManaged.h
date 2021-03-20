@@ -21,7 +21,6 @@ namespace mechLIB {
 	public ref class DerivativesContainerManaged
 	{
 		Vector3Managed^ _p;
-		Vector3Managed^ _u;
 		Vector3Managed^ _v;
 		Vector3Managed^ _a;
 		Vector3Managed^ _f;
@@ -29,13 +28,11 @@ namespace mechLIB {
 		DerivativesContainerManaged(DerivativesContainer* _NativeContainerPtr)
 		{
 			p = gcnew Vector3Managed(_NativeContainerPtr->p);
-			u = gcnew Vector3Managed(_NativeContainerPtr->u);
 			v = gcnew Vector3Managed(_NativeContainerPtr->v);
 			a = gcnew Vector3Managed(_NativeContainerPtr->a);
 			f = gcnew Vector3Managed(_NativeContainerPtr->F);
 		}
 		property Vector3Managed^ p { Vector3Managed^ get() { return _p; } void set(Vector3Managed^ value) { _p = value; } }
-		property Vector3Managed^ u { Vector3Managed^ get() { return _u; } void set(Vector3Managed^ value) { _u = value; } }
 		property Vector3Managed^ v { Vector3Managed^ get() { return _v; } void set(Vector3Managed^ value) { _v = value; } }
 		property Vector3Managed^ a { Vector3Managed^ get() { return _a; } void set(Vector3Managed^ value) { _a = value; } }
 		property Vector3Managed^ f { Vector3Managed^ get() { return _f; } void set(Vector3Managed^ value) { _f = value; } }

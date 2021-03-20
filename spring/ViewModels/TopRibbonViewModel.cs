@@ -106,7 +106,7 @@ namespace spring.ViewModels
                 dt = 1E-6f,
                 ToBeStoredCounts = 20,
                 nodes = 9,
-                MaxU = 82.4668f
+                MaxU = 0.0075f
             };
         }
     }

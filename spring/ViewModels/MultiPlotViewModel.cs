@@ -109,18 +109,6 @@ namespace spring.ViewModels
             _ea.GetEvent<ComputeIsStartedEvent>().Subscribe(() => ClearDataView());
             _ea.GetEvent<SelDerivChangedEvent>().Subscribe((var) => { SelDeriv = var; if (IsArrayExist) { DrawPlots(); } });
         }
-        public void MouseRightButtonDownCallback(object sender, MouseButtonEventArgs e)
-        {
-            var viewport = sender as Viewport3DX;
-            if (viewport == null) { return; }
-            var point = e.GetPosition(viewport);
-            var hitTests = viewport.FindHits(point);
-            if (hitTests != null && hitTests.Count > 0)
-            {
-                int sdfvgs = 0;
-            }
-            var asd = viewport.FindNearestPoint(point);
-        }
         private void ClearDataView()
         {
             CurrT = 0;
@@ -162,15 +150,6 @@ namespace spring.ViewModels
                                 XdataPoints[t] = new DataPoint(TimeArr[t], Derivatives[n][t].p.x);
                                 YdataPoints[t] = new DataPoint(TimeArr[t], Derivatives[n][t].p.y);
                                 ZdataPoints[t] = new DataPoint(TimeArr[t], Derivatives[n][t].p.z);
-                            });
-                        break;
-                    case DerivativesEnum.u:
-                        Parallel.For(0, Derivatives[n].Length,
-                            t =>
-                            {
-                                XdataPoints[t] = new DataPoint(TimeArr[t], Derivatives[n][t].u.x);
-                                YdataPoints[t] = new DataPoint(TimeArr[t], Derivatives[n][t].u.y);
-                                ZdataPoints[t] = new DataPoint(TimeArr[t], Derivatives[n][t].u.z);
                             });
                         break;
                     case DerivativesEnum.v:
