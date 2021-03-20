@@ -8,7 +8,7 @@
 
 using namespace mechLIB;
 
-void Enviro::allocateTime(float dt, int Counts)
+void Enviro::allocateTime(float dt, size_t Counts)
 {
 	time = std::vector<float>(Counts);
 	for (size_t i = 1; i < Counts; i++)
@@ -42,15 +42,13 @@ Enviro::Enviro(ModelPropertiesNative _phProps, const std::string& _loadFile) : l
 			{
 				rope->Nodes[0].Derivatives[t].p.x = pmxq[t];
 				rope->Nodes[0].Derivatives[t].p.y = pmyq[t];
-				rope->Nodes[0].Derivatives[t].u.x = rope->Nodes[0].Derivatives[t].p.x - rope->Nodes[0].Derivatives[0].p.x;
 
 				rope->Nodes[lastN].Derivatives[t].p.x = plxq[t];
 				rope->Nodes[lastN].Derivatives[t].p.y = plyq[t];
-				rope->Nodes[lastN].Derivatives[t].u.x = rope->Nodes[lastN].Derivatives[t].p.x - rope->Nodes[lastN].Derivatives[0].p.x;
 			}
 			//choose load nodes
-			rope->Nodes[0].LoadType = mechLIB::DerivativesEnum::u;
-			rope->Nodes[phProps.nodes - 1].LoadType = mechLIB::DerivativesEnum::u;
+			rope->Nodes[0].LoadType = mechLIB::DerivativesEnum::p;
+			rope->Nodes[phProps.nodes - 1].LoadType = mechLIB::DerivativesEnum::p;
 			delete matioW;
 		}
 	}
@@ -76,9 +74,10 @@ void Enviro::GenerateLoad(C_t axis)
 	rope->Nodes[0].LoadType = mechLIB::DerivativesEnum::p;
 	//rope->Nodes[midN].LoadType = NodeLoad::u;
 	rope->Nodes[lastN].LoadType = mechLIB::DerivativesEnum::p;
-	for (int t = 0; t < phProps.Counts; t++)
+	float stepP = phProps.MaxU / phProps.Counts;
+	for (size_t t = 1; t < phProps.Counts; t++)
 	{
-		rope->Nodes[0].Derivatives[t].p = rope->Nodes[0].Derivatives[0].p;
+		//rope->Nodes[0].Derivatives[t].p = rope->Nodes[0].Derivatives[0].p;
 		/*rope->Nodes[0].p[t].x = (phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq / 2)) + rope->Nodes[0].p[0].x;
 		rope->Nodes[0].u[t] = rope->Nodes[0].p[t] - rope->Nodes[0].p[0];*/
 
@@ -86,7 +85,17 @@ void Enviro::GenerateLoad(C_t axis)
 		rope->Nodes[midN].p[t].y = (rope->Nodes[midN].p[0].y + (-phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq)));
 		rope->Nodes[midN].u[t] = rope->Nodes[midN].p[t] - rope->Nodes[midN].p[0];*/
 
-		rope->Nodes[lastN].Derivatives[t].p = rope->Nodes[lastN].Derivatives[0].p;
+		//rope->Nodes[lastN].Derivatives[t].p = rope->Nodes[lastN].Derivatives[0].p;
+
+		//rope->Nodes[lastN].Derivatives[t].F.x = rope->Nodes[lastN].Derivatives[t - 1].F.x + stepP;
+		rope->Nodes[lastN].Derivatives[t].p.x = rope->Nodes[lastN].Derivatives[t - 1].p.x + stepP;
+		//rope->Nodes[lastN].Derivatives[t].p.y = rope->Nodes[lastN].Derivatives[t - 1].p.y + stepP;
+		//rope->Nodes[lastN].Derivatives[t].F.x = (phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq / 2));
+		/*rope->Nodes[lastN].Derivatives[t].p.x = (phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq / 2)) +
+			rope->Nodes[lastN].Derivatives[0].p.x;*/
+		/*rope->Nodes[lastN].Derivatives[t].p.x = (phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq * 3)) +
+			rope->Nodes[lastN].Derivatives[0].p.x;*/
+
 		/*rope->Nodes[lastN].p[t].x = 0 - ((phProps.MaxU * sinf(2 * (float)M_PI * time[t] * freq / 2)) + rope->Nodes[lastN].p[0].x);
 		rope->Nodes[lastN].u[t] = rope->Nodes[lastN].p[t] - rope->Nodes[lastN].p[0];*/
 	}
@@ -104,7 +113,7 @@ std::string getDataTimeNow()
 void Enviro::Run(bool NeedToSaveResults)
 {
 	IsRunning = true;
-	for (size_t t = 1; t < phProps.Counts; t++)
+	for (size_t t = 2; t < phProps.Counts; t++)
 	{
 		rope->StepOverNodes(t, Re[t - 1], phProps.dt);
 		for (int i = 0; i < rope->Elements.size(); i++)
@@ -122,38 +131,116 @@ void Enviro::Run(bool NeedToSaveResults)
 	}
 	if (NeedToSaveResults && ableToRun)
 	{
-		std::string resultsFileName = "expr_";
-		/*if (loadFile.size() > 0)
-		{
-			resultsFileName += loadFile.substr(loadFile.size() - 3, 3);
-		}*/
-		resultsFileName += getDataTimeNow();
-		resultsFileName += ".mat";
-		auto mat = new matWriter(resultsFileName.c_str());
-		std::string PhysicalModelSTR;
-		switch (phProps.PhysicalModel)
-		{
-		case PhysicalModelEnum::hook:
-			PhysicalModelSTR = "hook";
-			break;
-		case PhysicalModelEnum::hookGeomNon:
-			PhysicalModelSTR = "hookGeomNon";
-			break;
-		case PhysicalModelEnum::mooneyRiv:
-			PhysicalModelSTR = "mooneyRiv";
-			break;
-		default:
-			PhysicalModelSTR = "";
-			break;
-		}
-		mat->writeString("PhysicalModel", PhysicalModelSTR);
-		mat->writeFloat("dt", phProps.dt);
-		mat->writeUINT64("nodes", phProps.nodes);
-		mat->writeFloat("E", phProps.E);
-		mat->writeFloat("ro", phProps.ro);
-		mat->writeFloat("D", phProps.D);
-		mat->writeFloatArr("L", rope->L);
-		delete mat;
+		saveResultsToTXT();
 	}
 	IsRunning = false;
+}
+std::map<PhysicalModelEnum, const char*> PhysicalModelEnumSTR
+{
+	{PhysicalModelEnum::hook,"Linear Hook"},
+	{PhysicalModelEnum::hookGeomNon,"Nonlinear Hook" },
+	{PhysicalModelEnum::mooneyRiv,"Mooney-Rivlin"}
+};
+
+void Enviro::saveResultsToMAT()
+{
+	std::string resultsFileName = "expr_";
+	/*if (loadFile.size() > 0)
+	{
+	resultsFileName += loadFile.substr(loadFile.size() - 3, 3);
+	}*/
+	resultsFileName += getDataTimeNow();
+	resultsFileName += ".mat";
+	auto mat = new matWriter(resultsFileName.c_str());
+	mat->writeString("PhysicalModel", PhysicalModelEnumSTR[phProps.PhysicalModel]);
+	mat->writeFloat("dt", phProps.dt);
+	mat->writeUINT64("nodes", phProps.nodes);
+	mat->writeFloat("E", phProps.E);
+	mat->writeFloat("ro", phProps.ro);
+	mat->writeFloat("D", phProps.D);
+	size_t step = rope->L.size() / phProps.ToBeStoredCounts;
+	size_t arraySize = rope->L.size() / phProps.ToBeStoredCounts;
+	if (phProps.ToBeStoredCounts == -1)
+	{
+		step = 1;
+		arraySize = rope->L.size();
+	}
+
+	std::vector<float> LToMat = std::vector<float>(arraySize);
+	for (size_t srcIdx = 0, dstIdx = 0; srcIdx < rope->L.size(); srcIdx += step, dstIdx++)
+	{
+		LToMat[dstIdx] = rope->L[srcIdx];
+	}
+	mat->writeFloatArr("L", LToMat);
+	delete mat;
+}
+void Enviro::writeFloatArr(FILE* file, const char* varName, std::vector<Node_t>& arr, size_t step)
+{
+	fprintf_s(file, "%s\n", varName);
+	for (size_t t = 0; t < phProps.Counts; t += step)
+	{
+		for (size_t node = 0; node < arr.size(); node++)
+		{
+			if (!strcmp(varName, "a"))
+			{
+				fprintf_s(file, "%E\t", arr[node].Derivatives[t].a.x);
+			}
+			else if (!strcmp(varName, "f"))
+			{
+				fprintf_s(file, "%E\t", arr[node].Derivatives[t].F.x);
+			}
+			else if (!strcmp(varName, "v"))
+			{
+				fprintf_s(file, "%E\t", arr[node].Derivatives[t].v.x);
+			}
+			else if (!strcmp(varName, "p"))
+			{
+				fprintf_s(file, "%E\t", arr[node].Derivatives[t].p.x);
+			}
+		}
+		fprintf_s(file, "\n");
+	}
+	fprintf_s(file, "\n");
+}
+void Enviro::saveResultsToTXT()
+{
+	std::string resultsFileName = "expr_";
+	resultsFileName += getDataTimeNow();
+	resultsFileName += ".txt";
+	FILE* fileStream;
+	if (fopen_s(&fileStream, resultsFileName.c_str(), "w+"))
+	{
+		char errBuff[2048];
+		snprintf(errBuff, sizeof(errBuff), "Failed to create file: \"%s\"", resultsFileName.c_str());
+		throw (const char*)errBuff;
+	}
+	fprintf_s(fileStream, "PhysicalModel: %s\t", PhysicalModelEnumSTR[phProps.PhysicalModel]);
+	fprintf_s(fileStream, "Total time: %E\t", phProps.Counts * (double)phProps.dt);
+	fprintf_s(fileStream, "dt: %E\t", phProps.dt);
+	fprintf_s(fileStream, "nodes: %i\t", (int)phProps.nodes);
+	fprintf_s(fileStream, "E: %E\t", phProps.E);
+	fprintf_s(fileStream, "ro: %E\t", phProps.ro);
+	fprintf_s(fileStream, "D: %E\t", phProps.D);
+	fprintf_s(fileStream, "L: %E\t", phProps.L);
+	fprintf_s(fileStream, "\n");
+	size_t step = rope->L.size() / phProps.ToBeStoredCounts;
+	if (phProps.ToBeStoredCounts == -1)
+	{
+		step = 1;
+	}
+	writeFloatArr(fileStream, "f", rope->Nodes, step);
+	writeFloatArr(fileStream, "a", rope->Nodes, step);
+	writeFloatArr(fileStream, "v", rope->Nodes, step);
+	writeFloatArr(fileStream, "p", rope->Nodes, step);
+	/*fprintf_s(fileStream, "%s\n", "f for each element");
+	for (size_t t = 0; t < phProps.Counts; t += step)
+	{
+		for (size_t Element = 0; Element < rope->Elements.size(); Element++)
+		{
+			fprintf_s(fileStream, "%E\t", rope->Elements[Element].F[t].x);
+		}
+		fprintf_s(fileStream, "\n");
+	}
+	fprintf_s(fileStream, "\n");*/
+	fclose(fileStream);
 }

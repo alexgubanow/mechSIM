@@ -15,9 +15,10 @@ private:
 	std::vector<float> Re;
 	std::vector<float> bloodV;
 	std::vector<float> bloodP;
-	void allocateTime(float dt, int Counts);
+	void allocateTime(float dt, size_t Counts);
 	std::string loadFile;
 	bool ableToRun = true;
+	void writeFloatArr(FILE* file, const char* varName, std::vector<Node_t>& arr, size_t step);
 public:
 	bool IsRunning = false;
 	ModelPropertiesNative phProps;
@@ -37,5 +38,7 @@ public:
 		}
 	}
 	void Run(bool NeedToSaveResults);
+	void saveResultsToMAT();
+	void saveResultsToTXT();
 	void Stop() { ableToRun = false; };
 };
