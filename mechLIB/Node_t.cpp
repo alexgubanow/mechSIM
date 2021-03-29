@@ -44,7 +44,7 @@ void Node_t::GetForces(size_t t, float m)
 		//getting DCM for this link
 		dcm_t dcm(oppositeNode->Derivatives[t - 1].p - Derivatives[t - 1].p,
 			oppositeNode->Derivatives[t - 1].p.Cross(Derivatives[t - 1].p));
-		Derivatives[t].F += dcm.ToGlob(Members[i]->F[t]);
+		Derivatives[t].F += dcm.ToGlob(Members[i]->F[t] / 2);
 	}
 	//damping force
 	Derivatives[t].F += -(1 - 0.001) * Derivatives[t - 1].v;
