@@ -19,6 +19,7 @@ public:
 	void Run(bool NeedToSaveResults);
 	void Stop();
 	void GetDerivatives(int step, array<array<mechLIB::DerivativesContainerManaged^>^>^% arr);
+	void GetElementsForce(int step, array<array<mechLIB::Vector3Managed^>^>^% arr);
 	void GetTimeArr(int step, array<float>^% arr);
 	bool IsRunning() {
 		if (world)

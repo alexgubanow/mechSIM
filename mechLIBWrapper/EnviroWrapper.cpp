@@ -70,6 +70,20 @@ void EnviroWrapper::GetDerivatives(int step, array<array<mechLIB::DerivativesCon
 		}
 	}
 }
+void EnviroWrapper::GetElementsForce(int step, array<array<mechLIB::Vector3Managed^>^>^% arr)
+{
+	arr = gcnew array<array<mechLIB::Vector3Managed^>^>((int)world->rope->Elements.size());
+#pragma omp parallel for
+	for (int element = 0; element < world->rope->Elements.size(); element++)
+	{
+		arr[element] = gcnew array<mechLIB::Vector3Managed^>(world->phProps.Counts / step);
+		int tout = 0;
+		for (size_t t = 0; t < world->time.size() && tout < arr[element]->Length; t += step, ++tout)
+		{
+			arr[element][tout] = gcnew mechLIB::Vector3Managed(world->rope->Elements[element].F[t]);
+		}
+	}
+}
 
 void EnviroWrapper::GetTimeArr(int step, array<float>^% arr)
 {/*
