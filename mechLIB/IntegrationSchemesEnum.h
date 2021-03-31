@@ -18,6 +18,10 @@ namespace mechLIB {
 #endif
 	Euler,
 #if (_MANAGED == 1) || (_M_CEE == 1)
+		[Description("Symplectic Euler")]
+#endif
+	SymplecticEuler,
+#if (_MANAGED == 1) || (_M_CEE == 1)
 		[Description("Verlet")]
 #endif
 	Verlet,

@@ -16,8 +16,17 @@ private:
 		now.v = before.v + now.a * dt;
 		now.p = before.p + before.v * dt;
 	};
-	static void Verlet(DerivativesContainer& now, const DerivativesContainer& before, float dt)
+	static void SymplecticEuler(DerivativesContainer& now, const DerivativesContainer& before, float dt, float m)
 	{
+		now.a = now.F / m;
+		now.v = before.v + now.a * dt;
+		now.p = before.p + now.v * dt;
+	};
+	static void Verlet(DerivativesContainer& now, const DerivativesContainer& before, float dt, float m)
+	{
+		now.a = now.F / m;
+		now.v = before.v + hlf * (now.a + before.a) * dt;
+		now.p = before.p + before.v * dt + hlf * (before.a) * maf::P2(dt);
 	}
 	static void BABAB(DerivativesContainer& now, const DerivativesContainer& before, float dt)
 	{
@@ -59,8 +68,11 @@ public:
 		case mechLIB::IntegrationSchemesEnum::Euler:
 			EulerExpl(now, before, dt, m);
 			break;
+		case mechLIB::IntegrationSchemesEnum::SymplecticEuler:
+			SymplecticEuler(now, before, dt, m);
+			break;
 		case mechLIB::IntegrationSchemesEnum::Verlet:
-			Verlet(now, before, dt);
+			Verlet(now, before, dt, m);
 			break;
 		case mechLIB::IntegrationSchemesEnum::GearPC:
 			break;
