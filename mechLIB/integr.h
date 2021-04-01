@@ -9,7 +9,7 @@ const float oneMinusTwoEpsi = 1 - 2 * 0.193183328f;
 
 class Integr
 {
-private:
+public:
 	static void EulerExpl(DerivativesContainer& now, const DerivativesContainer& before, float dt, float m)
 	{
 		now.a = now.F / m;
@@ -58,30 +58,5 @@ private:
 	static DirectX::SimpleMath::Vector3 GearDa(DirectX::SimpleMath::Vector3 aNow, DirectX::SimpleMath::Vector3 aBefore)
 	{
 		return DirectX::SimpleMath::Vector3(aNow - aBefore);
-	}
-public:
-	static void Integrate(mechLIB::IntegrationSchemesEnum IntegrationSchema, DerivativesContainer& now, const DerivativesContainer& before, float dt, float m)
-	{
-
-		switch (IntegrationSchema)
-		{
-		case mechLIB::IntegrationSchemesEnum::Euler:
-			EulerExpl(now, before, dt, m);
-			break;
-		case mechLIB::IntegrationSchemesEnum::SymplecticEuler:
-			SymplecticEuler(now, before, dt, m);
-			break;
-		case mechLIB::IntegrationSchemesEnum::Verlet:
-			Verlet(now, before, dt, m);
-			break;
-		case mechLIB::IntegrationSchemesEnum::GearPC:
-			break;
-		case mechLIB::IntegrationSchemesEnum::maxIntegrationSchemesEnum:
-			throw "Unexpected IntegrationSchemesEnum";
-			break;
-		default:
-			throw "Unexpected IntegrationSchemesEnum";
-			break;
-		}
 	}
 };

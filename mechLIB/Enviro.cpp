@@ -149,7 +149,22 @@ void Enviro::Integrate(size_t t, float dt)
 	{
 		if (Nodes[i].LoadType != DerivativesEnum::p)
 		{
-			Integr::Integrate(phProps.IntegrationSchema, Nodes[i].Derivatives[t], Nodes[i].Derivatives[t - 1], dt, Nodes[i].m);
+			switch (phProps.IntegrationSchema)
+			{
+			case mechLIB::IntegrationSchemesEnum::Euler:
+				Integr::EulerExpl(Nodes[i].Derivatives[t], Nodes[i].Derivatives[t - 1], dt, Nodes[i].m);
+				break;
+			case mechLIB::IntegrationSchemesEnum::SymplecticEuler:
+				Integr::SymplecticEuler(Nodes[i].Derivatives[t], Nodes[i].Derivatives[t - 1], dt, Nodes[i].m);
+				break;
+			case mechLIB::IntegrationSchemesEnum::Verlet:
+				Integr::Verlet(Nodes[i].Derivatives[t], Nodes[i].Derivatives[t - 1], dt, Nodes[i].m);
+				break;
+			case mechLIB::IntegrationSchemesEnum::GearPC:
+				break;
+			default:
+				throw "Unexpected IntegrationSchemesEnum";
+			}
 		}
 	}
 }
