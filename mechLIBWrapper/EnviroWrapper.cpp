@@ -58,29 +58,29 @@ void EnviroWrapper::Stop()
 
 void EnviroWrapper::GetDerivatives(int step, array<array<mechLIB::DerivativesContainerManaged^>^>^% arr)
 {
-	arr = gcnew array<array<mechLIB::DerivativesContainerManaged^>^>((int)world->rope->Nodes.size());
+	arr = gcnew array<array<mechLIB::DerivativesContainerManaged^>^>((int)world->Nodes.size());
 #pragma omp parallel for
-	for (int n = 0; n < world->rope->Nodes.size(); n++)
+	for (int n = 0; n < world->Nodes.size(); n++)
 	{
 		arr[n] = gcnew array<mechLIB::DerivativesContainerManaged^>(world->phProps.Counts / step);
 		int tout = 0;
 		for (size_t t = 0; t < world->time.size() && tout < arr[n]->Length; t += step, ++tout)
 		{
-			arr[n][tout] = gcnew mechLIB::DerivativesContainerManaged(&world->rope->Nodes[n].Derivatives[t]);
+			arr[n][tout] = gcnew mechLIB::DerivativesContainerManaged(&world->Nodes[n].Derivatives[t]);
 		}
 	}
 }
 void EnviroWrapper::GetElementsForce(int step, array<array<mechLIB::Vector3Managed^>^>^% arr)
 {
-	arr = gcnew array<array<mechLIB::Vector3Managed^>^>((int)world->rope->Elements.size());
+	arr = gcnew array<array<mechLIB::Vector3Managed^>^>((int)world->Elements.size());
 #pragma omp parallel for
-	for (int element = 0; element < world->rope->Elements.size(); element++)
+	for (int element = 0; element < world->Elements.size(); element++)
 	{
 		arr[element] = gcnew array<mechLIB::Vector3Managed^>(world->phProps.Counts / step);
 		int tout = 0;
 		for (size_t t = 0; t < world->time.size() && tout < arr[element]->Length; t += step, ++tout)
 		{
-			arr[element][tout] = gcnew mechLIB::Vector3Managed(world->rope->Elements[element].F[t]);
+			arr[element][tout] = gcnew mechLIB::Vector3Managed(world->Elements[element].F[t]);
 		}
 	}
 }

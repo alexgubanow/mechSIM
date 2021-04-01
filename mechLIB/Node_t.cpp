@@ -47,7 +47,7 @@ void Node_t::GetForces(size_t t)
 		Derivatives[t].F += dcm.ToGlob(Members[i]->F[t] / 2);
 	}
 	//damping force
-	Derivatives[t].F += -(1 - 0.001) * Derivatives[t - 1].v;
+	Derivatives[t].F += -( (1-0.001f) * Derivatives[t - 1].v);
 }
 void Node_t::GetPhysicParam(size_t t, float Re)
 {

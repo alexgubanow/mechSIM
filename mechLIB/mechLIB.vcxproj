@@ -190,7 +190,6 @@
     <ClCompile Include="Element_t.cpp" />
     <ClCompile Include="Enviro.cpp" />
     <ClCompile Include="Node_t.cpp" />
-    <ClCompile Include="Rope_t.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -20,6 +20,8 @@ private:
 	bool ableToRun = true;
 	void writeFloatArr(FILE* file, const char* varName, std::vector<Node_t>& arr, size_t step);
 public:
+	std::vector<Node_t> Nodes;
+	std::vector<Element_t> Elements;
 	bool IsRunning = false;
 	ModelPropertiesNative phProps;
 	Rope_t* rope = nullptr;
@@ -38,6 +40,9 @@ public:
 		}
 	}
 	void Run(bool NeedToSaveResults);
+	void StepOverNodes(size_t t, float Re);
+	void Integrate(size_t t, float dt);
+	void StepOverElements(size_t t, float Re);
 	void saveResultsToMAT();
 	void saveResultsToTXT();
 	void Stop() { ableToRun = false; };

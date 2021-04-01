@@ -71,9 +71,6 @@
     <ClCompile Include="Node_t.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Rope_t.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Enviro.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
