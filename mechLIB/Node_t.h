@@ -13,6 +13,7 @@ class Element_t;
 class Node_t
 {
 public:
+	float m;
 	NodeFreedom freedom;
 	mechLIB::DerivativesEnum LoadType;
 	std::vector<DerivativesContainer> Derivatives;
@@ -21,9 +22,8 @@ public:
 	~Node_t();
 	void init(size_t tCounts, DirectX::SimpleMath::Vector3 coords, NodeFreedom _freedom, 
 		mechLIB::DerivativesEnum _LoadType, std::vector<Element_t*> _Members);
-	void CalcAccel(size_t t, float m);
-	void GetForces(size_t t, float m);
-	void GetPhysicParam(size_t t, float Re, float& m);
+	void GetForces(size_t t);
+	void GetPhysicParam(size_t t, float Re);
 	void Integrate(mechLIB::IntegrationSchemesEnum IntegrationSchema, size_t now, size_t before, float dt, float m);
 };
 

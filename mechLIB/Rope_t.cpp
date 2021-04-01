@@ -55,10 +55,9 @@ void Rope_t::StepOverNodes(size_t t, float Re, float dt)
 	{
 		if (Nodes[i].LoadType != DerivativesEnum::p)
 		{
-			float m = 0;
-			Nodes[i].GetPhysicParam(t, Re, m);
-			Nodes[i].GetForces(t, m);
-			Nodes[i].Integrate(RopeProperties->IntegrationSchema, t, t - 1, dt, m);
+			Nodes[i].GetPhysicParam(t, Re);
+			Nodes[i].GetForces(t);
+			Nodes[i].Integrate(RopeProperties->IntegrationSchema, t, t - 1, dt, Nodes[i].m);
 		}
 	}
 }

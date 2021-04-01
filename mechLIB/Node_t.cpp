@@ -8,7 +8,7 @@
 using namespace DirectX::SimpleMath;
 using namespace mechLIB;
 
-Node_t::Node_t() : freedom(), LoadType(), Members(0)
+Node_t::Node_t() : m(0), freedom(), LoadType(), Members(0)
 {
 }
 Node_t::~Node_t()
@@ -24,7 +24,7 @@ void Node_t::init(size_t tCounts, Vector3 coords,
 	Derivatives[0].p = coords;
 	Derivatives[1].p = coords;
 }
-void Node_t::GetForces(size_t t, float m)
+void Node_t::GetForces(size_t t)
 {
 	//gravity force
 	/*if (modelProperties->isGravityEnabled)
@@ -49,7 +49,7 @@ void Node_t::GetForces(size_t t, float m)
 	//damping force
 	Derivatives[t].F += -(1 - 0.001) * Derivatives[t - 1].v;
 }
-void Node_t::GetPhysicParam(size_t t, float Re, float& m)
+void Node_t::GetPhysicParam(size_t t, float Re)
 {
 	for (size_t i = 0; i < Members.size(); i++)
 	{
