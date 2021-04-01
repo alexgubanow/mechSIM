@@ -62,7 +62,3 @@ void Node_t::GetPhysicParam(size_t t, float Re)
 		throw "Calculated mass of node can't be eaqul to zero";
 	}
 }
-void Node_t::Integrate(IntegrationSchemesEnum IntegrationSchema, size_t now, size_t before, float dt, float m)
-{
-	Integr::Integrate(IntegrationSchema, Derivatives[now], Derivatives[before], dt, m);
-}

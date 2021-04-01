@@ -24,6 +24,5 @@ public:
 		mechLIB::DerivativesEnum _LoadType, std::vector<Element_t*> _Members);
 	void GetForces(size_t t);
 	void GetPhysicParam(size_t t, float Re);
-	void Integrate(mechLIB::IntegrationSchemesEnum IntegrationSchema, size_t now, size_t before, float dt, float m);
 };
 

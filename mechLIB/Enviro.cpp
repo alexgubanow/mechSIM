@@ -117,15 +117,8 @@ void Enviro::Run(bool NeedToSaveResults)
 	for (size_t t = 2; t < phProps.Counts; t++)
 	{
 		rope->StepOverElements(t, Re[t - 1]);
-		rope->StepOverNodes(t, Re[t - 1], phProps.dt);
-		for (int i = 0; i < rope->Elements.size(); i++)
-		{
-			rope->L[t] += rope->Elements[i].GetOwnLength(t - 1);
-			if (!ableToRun)
-			{
-				break;
-			}
-		}
+		rope->StepOverNodes(t, Re[t - 1]);
+		rope->Integrate(t, phProps.dt);
 		if (!ableToRun)
 		{
 			break;
@@ -160,16 +153,16 @@ void Enviro::saveResultsToMAT()
 	mat->writeFloat("E", phProps.E);
 	mat->writeFloat("ro", phProps.ro);
 	mat->writeFloat("D", phProps.D);
-	size_t step = rope->L.size() / phProps.ToBeStoredCounts;
-	size_t arraySize = rope->L.size() / phProps.ToBeStoredCounts;
+	size_t step = phProps.Counts / phProps.ToBeStoredCounts;
+	size_t arraySize = phProps.Counts / phProps.ToBeStoredCounts;
 	if (phProps.ToBeStoredCounts == -1)
 	{
 		step = 1;
-		arraySize = rope->L.size();
+		arraySize = phProps.Counts;
 	}
 
 	std::vector<float> LToMat = std::vector<float>(arraySize);
-	for (size_t srcIdx = 0, dstIdx = 0; srcIdx < rope->L.size(); srcIdx += step, dstIdx++)
+	for (size_t srcIdx = 0, dstIdx = 0; srcIdx < phProps.Counts; srcIdx += step, dstIdx++)
 	{
 		LToMat[dstIdx] = rope->L[srcIdx];
 	}

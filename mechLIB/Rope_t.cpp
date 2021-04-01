@@ -1,5 +1,6 @@
 #include "Rope_t.h"
 #include "maf.hpp"
+#include "integr.h"
 
 using namespace DirectX::SimpleMath;
 using namespace mechLIB;
@@ -48,7 +49,7 @@ void Rope_t::EvalElements()
 	}
 }
 
-void Rope_t::StepOverNodes(size_t t, float Re, float dt)
+void Rope_t::StepOverNodes(size_t t, float Re)
 {
 	//#pragma omp parallel for
 	for (size_t i = 0; i < Nodes.size(); i++)
@@ -57,7 +58,17 @@ void Rope_t::StepOverNodes(size_t t, float Re, float dt)
 		{
 			Nodes[i].GetPhysicParam(t, Re);
 			Nodes[i].GetForces(t);
-			Nodes[i].Integrate(RopeProperties->IntegrationSchema, t, t - 1, dt, Nodes[i].m);
+		}
+	}
+}
+void Rope_t::Integrate(size_t t, float dt)
+{
+	//#pragma omp parallel for
+	for (size_t i = 0; i < Nodes.size(); i++)
+	{
+		if (Nodes[i].LoadType != DerivativesEnum::p)
+		{
+			Integr::Integrate(RopeProperties->IntegrationSchema, Nodes[i].Derivatives[t], Nodes[i].Derivatives[t-1], dt, Nodes[i].m);
 		}
 	}
 }
